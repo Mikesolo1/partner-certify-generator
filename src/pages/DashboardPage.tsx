@@ -67,45 +67,45 @@ const DashboardPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentPartner?.testPassed ? (
             <>
-              <Button
-                as={Link}
-                to="/dashboard/certificate"
-                variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
-              >
-                <FileText className="h-8 w-8 mb-2 text-certificate-blue" />
-                <div>
-                  <p className="font-medium">Сертификат</p>
-                  <p className="text-xs text-gray-500">Просмотр и скачивание</p>
-                </div>
-              </Button>
+              <Link to="/dashboard/certificate">
+                <Button
+                  variant="outline"
+                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
+                >
+                  <FileText className="h-8 w-8 mb-2 text-certificate-blue" />
+                  <div>
+                    <p className="font-medium">Сертификат</p>
+                    <p className="text-xs text-gray-500">Просмотр и скачивание</p>
+                  </div>
+                </Button>
+              </Link>
               
-              <Button
-                as={Link}
-                to="/dashboard/clients"
-                variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
-              >
-                <Users className="h-8 w-8 mb-2 text-certificate-blue" />
-                <div>
-                  <p className="font-medium">Мои клиенты</p>
-                  <p className="text-xs text-gray-500">Управление клиентами</p>
-                </div>
-              </Button>
+              <Link to="/dashboard/clients">
+                <Button
+                  variant="outline"
+                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
+                >
+                  <Users className="h-8 w-8 mb-2 text-certificate-blue" />
+                  <div>
+                    <p className="font-medium">Мои клиенты</p>
+                    <p className="text-xs text-gray-500">Управление клиентами</p>
+                  </div>
+                </Button>
+              </Link>
             </>
           ) : (
-            <Button
-              as={Link}
-              to="/dashboard/test"
-              variant="outline"
-              className="h-auto py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
-            >
-              <Award className="h-8 w-8 mb-2 text-certificate-blue" />
-              <div>
-                <p className="font-medium">Пройти тест</p>
-                <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
-              </div>
-            </Button>
+            <Link to="/dashboard/test">
+              <Button
+                variant="outline"
+                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300"
+              >
+                <Award className="h-8 w-8 mb-2 text-certificate-blue" />
+                <div>
+                  <p className="font-medium">Пройти тест</p>
+                  <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
+                </div>
+              </Button>
+            </Link>
           )}
         </div>
       </div>

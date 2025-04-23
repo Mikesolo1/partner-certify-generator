@@ -106,7 +106,7 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     } else {
       // Демо-данные для примера
-      const samplePartners = [
+      const samplePartners: Partner[] = [
         {
           id: '1',
           companyName: 'ТехноРешения',
