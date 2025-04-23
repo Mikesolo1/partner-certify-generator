@@ -1,9 +1,40 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Award, ArrowRight, Users, FileText, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
+
+const PartnerProgramSection = () => (
+  <section className="py-16 bg-gradient-to-br from-certificate-blue/10 via-white to-certificate-darkBlue/5">
+    <div className="container mx-auto px-4 max-w-4xl">
+      <h2 className="text-3xl font-bold mb-8 text-center text-certificate-blue">Партнёрская программа S3</h2>
+      <div className="space-y-6 text-lg text-gray-700">
+        <p>
+          Присоединяйтесь к партнёрской программе официального интегратора WABA (WhatsApp Business API) – компании S3 Tech!
+        </p>
+        <ul className="mb-3 list-disc ml-8">
+          <li>Получайте до 20% комиссии от платежей ваших клиентов — вывод в любой момент.</li>
+          <li>Доступ к персональному кабинету для управления клиентами и отслеживания выплат.</li>
+          <li>Официальный именной сертификат партнёра WABA — доступен после онлайн-теста.</li>
+          <li>Помощь персонального менеджера и техническая поддержка для вас и ваших клиентов.</li>
+          <li>Разные уровни партнёрства: от Бронзового до Платинового, бонусы за активность!</li>
+        </ul>
+        <p>
+          <span className="font-semibold text-certificate-blue">Как стать партнёром:</span><br />
+          1. Зарегистрируйтесь на сайте.<br />
+          2. Пройдите короткий сертификационный тест.<br />
+          3. Получите доступ к сертификату и начните подключать клиентов к сервису WhatsApp Business API!
+        </p>
+        <p>
+          <span className="font-semibold text-certificate-blue">Условия:</span> Партнёром может стать любая компания или индивидуальный предприниматель, сотрудничающий с бизнес-клиентами.
+        </p>
+        <p>
+          <a href="https://s3-tech.ru/partner-program" target="_blank" rel="noopener noreferrer" className="underline text-certificate-darkBlue font-medium hover:opacity-80">Подробнее о программе на официальном сайте S3 →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+);
 
 const Index = () => {
   const navigate = useNavigate();
@@ -77,6 +108,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      {/* Новый раздел о партнёрской программе */}
+      <PartnerProgramSection />
       
       {/* About Section */}
       <section className="bg-white py-16">

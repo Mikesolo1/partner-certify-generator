@@ -9,7 +9,195 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      certificates: {
+        Row: {
+          certificate_id: string
+          created_at: string | null
+          id: string
+          issue_date: string | null
+          partner_id: string
+        }
+        Insert: {
+          certificate_id: string
+          created_at?: string | null
+          id?: string
+          issue_date?: string | null
+          partner_id: string
+        }
+        Update: {
+          certificate_id?: string
+          created_at?: string | null
+          id?: string
+          issue_date?: string | null
+          partner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          partner_id: string
+          phone: string | null
+          registration_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          partner_id: string
+          phone?: string | null
+          registration_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          partner_id?: string
+          phone?: string | null
+          registration_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          certificate_id?: string | null
+          commission?: number | null
+          company_name: string
+          contact_person: string
+          created_at?: string | null
+          email: string
+          id?: string
+          join_date?: string | null
+          partner_level: string
+          password: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          test_passed?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          certificate_id?: string | null
+          commission?: number | null
+          company_name?: string
+          contact_person?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          join_date?: string | null
+          partner_level?: string
+          password?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          test_passed?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          client_id: string
+          commission_amount: number
+          created_at: string | null
+          date: string | null
+          id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          commission_amount: number
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          commission_amount?: number
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_questions: {
+        Row: {
+          correct_answer: number
+          created_at: string | null
+          id: string
+          options: Json
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string | null
+          id?: string
+          options: Json
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string | null
+          id?: string
+          options?: Json
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +206,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "partner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +321,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "partner"],
+    },
   },
 } as const
