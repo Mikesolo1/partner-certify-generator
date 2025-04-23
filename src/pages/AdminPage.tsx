@@ -67,17 +67,17 @@ const AdminPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-brand-light">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <Card>
           <CardHeader>
-            <CardTitle>Админка: управление пользователями и клиентами</CardTitle>
+            <CardTitle className="text-brand">Админка: управление пользователями и клиентами</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex justify-center items-center py-8">
-                <p>Загрузка данных...</p>
+                <p className="text-brand">Загрузка данных...</p>
               </div>
             ) : (
               <Tabs defaultValue="partners">
@@ -90,18 +90,18 @@ const AdminPage = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Компания</TableHead>
-                          <TableHead>Контакт</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Статус</TableHead>
-                          <TableHead>Роль</TableHead>
+                          <TableHead className="text-brand">Компания</TableHead>
+                          <TableHead className="text-brand">Контакт</TableHead>
+                          <TableHead className="text-brand">Email</TableHead>
+                          <TableHead className="text-brand">Статус</TableHead>
+                          <TableHead className="text-brand">Роль</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {partners.length > 0 ? (
                           partners.map((p) => (
                             <TableRow key={p.id}>
-                              <TableCell>{p.company_name}</TableCell>
+                              <TableCell className="font-medium">{p.company_name}</TableCell>
                               <TableCell>{p.contact_person}</TableCell>
                               <TableCell>{p.email}</TableCell>
                               <TableCell>{p.test_passed ? "Тест пройден" : "Нет"}</TableCell>
@@ -122,16 +122,16 @@ const AdminPage = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Клиент</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Телефон</TableHead>
+                          <TableHead className="text-brand">Клиент</TableHead>
+                          <TableHead className="text-brand">Email</TableHead>
+                          <TableHead className="text-brand">Телефон</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {clients.length > 0 ? (
                           clients.map((c) => (
                             <TableRow key={c.id}>
-                              <TableCell>{c.name}</TableCell>
+                              <TableCell className="font-medium">{c.name}</TableCell>
                               <TableCell>{c.email}</TableCell>
                               <TableCell>{c.phone || "—"}</TableCell>
                             </TableRow>
@@ -148,7 +148,7 @@ const AdminPage = () => {
               </Tabs>
             )}
             <div className="mt-4">
-              <Button onClick={() => window.location.reload()} className="bg-certificate-blue text-white">
+              <Button onClick={() => window.location.reload()} className="bg-brand text-white">
                 Обновить
               </Button>
             </div>

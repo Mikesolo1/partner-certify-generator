@@ -20,14 +20,19 @@ export default {
 		},
 		extend: {
 			colors: {
+				brand: {
+					DEFAULT: 'rgb(98, 207, 214)',
+					light: 'rgba(98, 207, 214, 0.2)',
+					dark: 'rgba(98, 207, 214, 0.7)',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: 'rgb(98, 207, 214)',
+					foreground: '#053c43'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -42,8 +47,8 @@ export default {
 					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'rgb(98, 207, 214)',
+					foreground: '#053c43'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -64,7 +69,7 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				certificate: {
-					blue: '#2563EB',
+					blue: 'rgb(98, 207, 214)', // Переопределяем старый
 					darkBlue: '#1E40AF',
 					gold: '#F59E0B',
 					lightGold: '#FBBF24',
@@ -101,3 +106,4 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+

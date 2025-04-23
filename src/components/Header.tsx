@@ -12,23 +12,23 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="font-bold text-2xl text-certificate-blue">S3</div>
-            <div className="text-xl font-medium text-gray-600">Tech</div>
+            <div className="font-bold text-2xl text-brand">S3</div>
+            <div className="text-xl font-medium text-brand-dark">Tech</div>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-gray-900">
+            <Link to="/" className="text-brand-dark hover:text-brand font-medium transition">
               Главная
             </Link>
-            <Link to="/partners" className="text-gray-600 hover:text-gray-900">
+            <Link to="/partners" className="text-brand-dark hover:text-brand font-medium transition">
               Партнеры
             </Link>
             {currentPartner ? (
-              <Link to="/dashboard" className="text-certificate-blue hover:text-certificate-darkBlue font-medium">
+              <Link to="/dashboard" className="text-brand font-bold hover:text-brand-dark transition">
                 Личный кабинет
               </Link>
             ) : (
-              <Link to="/login" className="text-certificate-blue hover:text-certificate-darkBlue font-medium">
+              <Link to="/login" className="text-brand font-bold hover:text-brand-dark transition">
                 Вход для партнеров
               </Link>
             )}
@@ -38,7 +38,7 @@ const Header = () => {
             {currentPartner ? (
               <Link to="/dashboard">
                 <Button
-                  className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue text-white"
+                  className="bg-brand text-white hover:bg-brand-dark transition"
                 >
                   Личный кабинет
                 </Button>
@@ -46,7 +46,7 @@ const Header = () => {
             ) : (
               <Link to="/register">
                 <Button
-                  className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue text-white"
+                  className="bg-brand text-white hover:bg-brand-dark transition"
                 >
                   Стать партнером
                 </Button>
