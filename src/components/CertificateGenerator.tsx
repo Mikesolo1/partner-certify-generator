@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Partner } from '@/types/partner';
 import CertificateTemplate from './CertificateTemplate';
 import { Download } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -21,8 +21,8 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
 
     try {
       toast({
-        title: "Generating PDF...",
-        description: "Please wait while we generate your certificate.",
+        title: "Создание PDF...",
+        description: "Пожалуйста, подождите, пока мы генерируем ваш сертификат.",
       });
 
       const canvas = await html2canvas(certificateRef.current, {
@@ -43,17 +43,17 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
       const imgHeight = 210; // A4 landscape height in mm
       
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`${partner.companyName}-${partner.partnerLevel}-Certificate.pdf`);
+      pdf.save(`S3-${partner.companyName}-Сертификат.pdf`);
 
       toast({
-        title: "Certificate Downloaded",
-        description: "Your certificate has been generated and downloaded successfully.",
+        title: "Сертификат скачан",
+        description: "Ваш сертификат успешно создан и скачан.",
       });
     } catch (error) {
-      console.error("Error generating PDF", error);
+      console.error("Ошибка создания PDF", error);
       toast({
-        title: "Error",
-        description: "Failed to generate certificate. Please try again.",
+        title: "Ошибка",
+        description: "Не удалось создать сертификат. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
     }
@@ -71,7 +71,7 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
           className="px-6 py-3 bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue transition-all duration-300"
         >
           <Download className="h-4 w-4 mr-2" />
-          Download Certificate
+          Скачать сертификат
         </Button>
       </div>
     </div>

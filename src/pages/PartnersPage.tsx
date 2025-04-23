@@ -30,16 +30,16 @@ const PartnersPage = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Partners</h1>
-            <p className="text-gray-600">Manage your registered partners and their certificates.</p>
+            <h1 className="text-3xl font-bold mb-2">Партнеры</h1>
+            <p className="text-gray-600">Управление зарегистрированными партнерами и их сертификатами.</p>
           </div>
           
           <Button 
-            onClick={() => navigate('/add-partner')}
+            onClick={() => navigate('/register')}
             className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Partner
+            Стать партнером
           </Button>
         </div>
         
@@ -47,7 +47,7 @@ const PartnersPage = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             className="pl-10"
-            placeholder="Search partners by name, contact person, or level..."
+            placeholder="Поиск партнеров по названию, контактному лицу или уровню..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -55,7 +55,7 @@ const PartnersPage = () => {
         
         {loading ? (
           <div className="text-center py-8">
-            <p className="text-gray-500">Loading partners...</p>
+            <p className="text-gray-500">Загрузка партнеров...</p>
           </div>
         ) : filteredPartners.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,18 +65,18 @@ const PartnersPage = () => {
           </div>
         ) : (
           <div className="text-center py-16 border rounded-lg bg-white">
-            <h3 className="text-xl font-medium mb-2">No partners found</h3>
+            <h3 className="text-xl font-medium mb-2">Партнеров не найдено</h3>
             {searchTerm ? (
-              <p className="text-gray-500">Try adjusting your search terms.</p>
+              <p className="text-gray-500">Попробуйте изменить параметры поиска.</p>
             ) : (
               <div className="mt-4">
-                <p className="text-gray-500 mb-4">Get started by adding your first partner.</p>
+                <p className="text-gray-500 mb-4">Начните с регистрации первого партнера.</p>
                 <Button 
-                  onClick={() => navigate('/add-partner')}
+                  onClick={() => navigate('/register')}
                   className="bg-certificate-blue text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Partner
+                  Стать партнером
                 </Button>
               </div>
             )}

@@ -11,6 +11,12 @@ import AddPartnerPage from "./pages/AddPartnerPage";
 import EditPartnerPage from "./pages/EditPartnerPage";
 import CertificatePage from "./pages/CertificatePage";
 import NotFound from "./pages/NotFound";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import PartnerTestPage from "./pages/PartnerTestPage";
+import PartnerCertificatePage from "./pages/PartnerCertificatePage";
+import ClientsPage from "./pages/ClientsPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +33,12 @@ const App = () => (
             <Route path="/add-partner" element={<AddPartnerPage />} />
             <Route path="/edit-partner/:id" element={<EditPartnerPage />} />
             <Route path="/certificate/:id" element={<CertificatePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/test" element={<PartnerTestPage />} />
+            <Route path="/dashboard/certificate" element={<PartnerCertificatePage />} />
+            <Route path="/dashboard/clients" element={<ClientsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

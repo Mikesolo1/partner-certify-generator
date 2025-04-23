@@ -1,49 +1,57 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Award, Home, List, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { usePartners } from '@/contexts/PartnersContext';
 
 const Header = () => {
-  const navigate = useNavigate();
+  const { currentPartner } = usePartners();
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="border-b bg-white shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-2">
-            <Award className="h-8 w-8 text-certificate-blue" />
-            <h1 className="text-xl font-bold text-gray-800 tracking-tight">CertifyPartner</h1>
-          </div>
-          <nav className="hidden md:flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-1"
-            >
-              <Home className="h-4 w-4" />
-              <span>Home</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/partners')}
-              className="flex items-center space-x-1"
-            >
-              <List className="h-4 w-4" />
-              <span>Partners</span>
-            </Button>
-            <Button 
-              onClick={() => navigate('/add-partner')}
-              className="flex items-center space-x-1 bg-gradient-to-r from-certificate-blue to-certificate-darkBlue text-white"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Partner</span>
-            </Button>
+        <div className="h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="font-bold text-2xl text-certificate-blue">S3</div>
+            <div className="text-xl font-medium text-gray-600">Tech</div>
+          </Link>
+
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-gray-600 hover:text-gray-900">
+              Главная
+            </Link>
+            <Link to="/partners" className="text-gray-600 hover:text-gray-900">
+              Партнеры
+            </Link>
+            {currentPartner ? (
+              <Link to="/dashboard" className="text-certificate-blue hover:text-certificate-darkBlue font-medium">
+                Личный кабинет
+              </Link>
+            ) : (
+              <Link to="/login" className="text-certificate-blue hover:text-certificate-darkBlue font-medium">
+                Вход для партнеров
+              </Link>
+            )}
           </nav>
-          <div className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <List className="h-6 w-6" />
-            </Button>
+
+          <div className="flex items-center space-x-4">
+            {currentPartner ? (
+              <Link to="/dashboard">
+                <Button
+                  className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue text-white"
+                >
+                  Личный кабинет
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/register">
+                <Button
+                  className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue text-white"
+                >
+                  Стать партнером
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
