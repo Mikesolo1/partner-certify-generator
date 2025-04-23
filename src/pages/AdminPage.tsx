@@ -1,10 +1,18 @@
 
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableRow, 
+  TableHead, 
+  TableCell 
+} from "@/components/ui/table";
 
 interface PartnerRow {
   id: string;
@@ -30,14 +38,32 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data: partnerData } = await supabase.from("partners").select("*");
-      setPartners(partnerData || []);
-      const { data: clientData } = await supabase.from("clients").select("*");
-      setClients(clientData || []);
-      setLoading(false);
-    })();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const { data: partnerData, error: partnerError } = await supabase.from("partners").select("*");
+        
+        if (partnerError) {
+          console.error("Error fetching partners:", partnerError);
+        } else {
+          setPartners(partnerData || []);
+        }
+        
+        const { data: clientData, error: clientError } = await supabase.from("clients").select("*");
+        
+        if (clientError) {
+          console.error("Error fetching clients:", clientError);
+        } else {
+          setClients(clientData || []);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -50,7 +76,9 @@ const AdminPage = () => {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div>Загрузка...</div>
+              <div className="flex justify-center items-center py-8">
+                <p>Загрузка данных...</p>
+              </div>
             ) : (
               <Tabs defaultValue="partners">
                 <TabsList>
@@ -58,48 +86,64 @@ const AdminPage = () => {
                   <TabsTrigger value="clients">Клиенты</TabsTrigger>
                 </TabsList>
                 <TabsContent value="partners">
-                  <table className="w-full border mb-6">
-                    <thead>
-                      <tr>
-                        <th className="p-2 text-left">Компания</th>
-                        <th className="p-2 text-left">Контакт</th>
-                        <th className="p-2 text-left">Email</th>
-                        <th className="p-2 text-left">Статус</th>
-                        <th className="p-2 text-left">Роль</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {partners.map((p) => (
-                        <tr key={p.id}>
-                          <td className="p-2">{p.company_name}</td>
-                          <td className="p-2">{p.contact_person}</td>
-                          <td className="p-2">{p.email}</td>
-                          <td className="p-2">{p.test_passed ? "Тест пройден" : "Нет"}</td>
-                          <td className="p-2">{p.role}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Компания</TableHead>
+                          <TableHead>Контакт</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Статус</TableHead>
+                          <TableHead>Роль</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {partners.length > 0 ? (
+                          partners.map((p) => (
+                            <TableRow key={p.id}>
+                              <TableCell>{p.company_name}</TableCell>
+                              <TableCell>{p.contact_person}</TableCell>
+                              <TableCell>{p.email}</TableCell>
+                              <TableCell>{p.test_passed ? "Тест пройден" : "Нет"}</TableCell>
+                              <TableCell>{p.role}</TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-4">Нет данных</TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </TabsContent>
                 <TabsContent value="clients">
-                  <table className="w-full border">
-                    <thead>
-                      <tr>
-                        <th className="p-2 text-left">Клиент</th>
-                        <th className="p-2 text-left">Email</th>
-                        <th className="p-2 text-left">Телефон</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {clients.map((c) => (
-                        <tr key={c.id}>
-                          <td className="p-2">{c.name}</td>
-                          <td className="p-2">{c.email}</td>
-                          <td className="p-2">{c.phone}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Клиент</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Телефон</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {clients.length > 0 ? (
+                          clients.map((c) => (
+                            <TableRow key={c.id}>
+                              <TableCell>{c.name}</TableCell>
+                              <TableCell>{c.email}</TableCell>
+                              <TableCell>{c.phone || "—"}</TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3} className="text-center py-4">Нет данных</TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </TabsContent>
               </Tabs>
             )}
