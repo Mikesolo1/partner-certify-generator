@@ -10,7 +10,7 @@ import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails'
 import { supabase } from "@/integrations/supabase/client";
 import { Partner } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -28,31 +28,35 @@ const AdminPartnerDetailsPage = () => {
       
       try {
         setLoading(true);
+        console.log("Fetching partner details for ID:", partnerId);
+        
         // Using the secure RPC function to bypass RLS
-        const { data, error } = await supabase
+        const { data, error: rpcError } = await supabase
           .rpc('get_partner_by_id', { p_id: partnerId });
 
-        if (error) {
-          console.error("Error fetching partner:", error);
-          setError("Не удалось загрузить данные партнера");
+        if (rpcError) {
+          console.error("RPC Error fetching partner:", rpcError);
+          setError(`Ошибка загрузки: ${rpcError.message}`);
           toast({
             title: "Ошибка",
-            description: "Не удалось загрузить данные партнера",
+            description: `Не удалось загрузить данные партнера: ${rpcError.message}`,
             variant: "destructive"
           });
           return;
         }
 
         if (!data || data.length === 0) {
-          setError("Партнер не найден");
+          console.error("No partner data returned for ID:", partnerId);
+          setError("Партнер не найден в базе данных");
           toast({
             title: "Ошибка",
-            description: "Партнер не найден",
+            description: "Партнер не найден в базе данных",
             variant: "destructive"
           });
           return;
         }
 
+        console.log("Partner data received:", data[0]);
         const partnerData = data[0];
         setPartner({
           id: partnerData.id,
@@ -68,12 +72,12 @@ const AdminPartnerDetailsPage = () => {
           phone: partnerData.phone || ''
         });
         setError(null);
-      } catch (err) {
-        console.error("Error in fetchPartnerDetails:", err);
-        setError("Произошла ошибка при загрузке данных партнера");
+      } catch (err: any) {
+        console.error("Exception in fetchPartnerDetails:", err);
+        setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
         toast({
-          title: "Ошибка",
-          description: "Произошла ошибка при загрузке данных партнера",
+          title: "Критическая ошибка",
+          description: err.message || "Произошла неизвестная ошибка",
           variant: "destructive"
         });
       } finally {
@@ -93,8 +97,19 @@ const AdminPartnerDetailsPage = () => {
       <div className="min-h-screen bg-brand-light">
         <Header />
         <div className="container mx-auto px-4 py-12">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Загрузка данных партнера...</h1>
+          <Button variant="outline" asChild className="mb-4">
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Вернуться к списку
+            </Link>
+          </Button>
+          
+          <div className="flex justify-center items-center py-20">
+            <div className="text-center">
+              <div className="h-12 w-12 border-4 border-t-blue-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <h2 className="text-xl font-semibold mb-2">Загрузка данных партнера...</h2>
+              <p className="text-gray-500">Пожалуйста, подождите</p>
+            </div>
           </div>
         </div>
       </div>
@@ -113,7 +128,16 @@ const AdminPartnerDetailsPage = () => {
                 Вернуться к списку
               </Link>
             </Button>
-            <h1 className="text-3xl font-bold text-red-600">{error || "Партнер не найден"}</h1>
+            
+            <div className="p-6 bg-white rounded-lg shadow-sm border border-red-200">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+                <h1 className="text-2xl font-bold text-red-600">Ошибка</h1>
+              </div>
+              <p className="text-lg mb-2">{error || "Партнер не найден"}</p>
+              <p className="text-gray-500">Проверьте ID партнера или повторите попытку позже</p>
+              <p className="text-gray-500 text-sm mt-4">ID: {partnerId}</p>
+            </div>
           </div>
         </div>
       </div>
