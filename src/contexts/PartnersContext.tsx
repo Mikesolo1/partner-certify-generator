@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Partner, TestQuestion } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +23,7 @@ interface PartnersContextType {
   addPayment: ReturnType<typeof useClientManagement>['addPayment'];
   refreshPartnerLevel: (partnerId: string) => Promise<void>;
   loading: boolean;
+  error: string | null;
 }
 
 const PartnersContext = createContext<PartnersContextType | undefined>(undefined);
@@ -38,6 +39,8 @@ export const usePartners = () => {
 export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dataInitialized, setDataInitialized] = useState(false);
   const { toast } = useToast();
   const { partnerLevel, setPartnerLevel, calculateLevel } = usePartnerLevel();
   const { currentPartner, setCurrentPartner, loginPartner, logoutPartner } = usePartnerAuth();
@@ -101,54 +104,73 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const partnersData = await api.fetchPartners();
-        setPartners(partnersData);
-        
-        const storedCurrentPartner = localStorage.getItem('currentPartner');
-        if (storedCurrentPartner) {
-          try {
-            const parsedPartner = JSON.parse(storedCurrentPartner);
-            if (parsedPartner.id) {
+  const fetchData = useCallback(async () => {
+    if (dataInitialized) return;
+    
+    setLoading(true);
+    try {
+      const partnersData = await api.fetchPartners();
+      setPartners(partnersData);
+      
+      const storedCurrentPartner = localStorage.getItem('currentPartner');
+      if (storedCurrentPartner) {
+        try {
+          const parsedPartner = JSON.parse(storedCurrentPartner);
+          if (parsedPartner && parsedPartner.id) {
+            try {
               const refreshedPartner = await api.fetchPartnerById(parsedPartner.id);
               setCurrentPartner(refreshedPartner);
               
-              const clients = await api.fetchPartnerClients(refreshedPartner.id);
-              const clientsWithPayments = clients.filter(client => 
-                client.payments && client.payments.some(payment => payment.status === "оплачено")
-              ).length;
+              try {
+                const clients = await api.fetchPartnerClients(refreshedPartner.id);
+                const clientsWithPayments = clients.filter(client => 
+                  client.payments && client.payments.some(payment => payment.status === "оплачено")
+                ).length;
+                
+                calculateLevel(clientsWithPayments);
+              } catch (clientError) {
+                console.error('Error fetching partner clients:', clientError);
+                // Все равно устанавливаем партнера, даже если не удалось получить клиентов
+              }
+            } catch (partnerError) {
+              console.error('Error fetching partner data:', partnerError);
+              // Убираем только если не удалось получить партнера
+              localStorage.removeItem('currentPartner');
+              setCurrentPartner(null);
               
-              calculateLevel(clientsWithPayments);
+              toast({
+                title: "Ошибка авторизации",
+                description: "Не удалось восстановить сессию. Пожалуйста, войдите снова.",
+                variant: "destructive"
+              });
             }
-          } catch (error) {
-            console.error('Error parsing stored partner or fetching data', error);
-            localStorage.removeItem('currentPartner');
-            setCurrentPartner(null);
-            
-            toast({
-              title: "Ошибка авторизации",
-              description: "Не удалось восстановить сессию. Пожалуйста, войдите снова.",
-              variant: "destructive"
-            });
           }
+        } catch (parseError) {
+          console.error('Error parsing stored partner or fetching data', parseError);
+          localStorage.removeItem('currentPartner');
+          setCurrentPartner(null);
         }
-      } catch (error) {
-        console.error('Error fetching initial data', error);
-        toast({
-          title: "Ошибка загрузки данных",
-          description: "Не удалось загрузить данные с сервера. Проверьте подключение.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      setDataInitialized(true);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching initial data', error);
+      setError("Ошибка загрузки данных. Пожалуйста, проверьте подключение и перезагрузите страницу.");
+      
+      toast({
+        title: "Ошибка загрузки данных",
+        description: "Не удалось загрузить данные с сервера. Проверьте подключение.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, setCurrentPartner, calculateLevel, dataInitialized, setPartnerLevel]);
 
+  useEffect(() => {
     fetchData();
-  }, [toast, setCurrentPartner, calculateLevel]);
+  }, [fetchData]);
 
   const addPartner = async (partner: Partner) => {
     try {
@@ -271,6 +293,7 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addPayment,
     refreshPartnerLevel,
     loading,
+    error
   };
 
   return <PartnersContext.Provider value={value}>{children}</PartnersContext.Provider>;
