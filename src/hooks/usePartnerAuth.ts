@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Partner } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -17,22 +17,53 @@ export const usePartnerAuth = () => {
   });
   const { toast } = useToast();
 
+  // Обновление локального хранилища при изменении currentPartner
+  useEffect(() => {
+    if (currentPartner) {
+      try {
+        localStorage.setItem('currentPartner', JSON.stringify(currentPartner));
+      } catch (e) {
+        console.error("Error storing partner data:", e);
+        toast({
+          title: "Предупреждение",
+          description: "Не удалось сохранить данные сессии",
+          variant: "default"  // Changed from "warning" to "default"
+        });
+      }
+    } else {
+      try {
+        localStorage.removeItem('currentPartner');
+      } catch (e) {
+        console.error("Error removing partner data:", e);
+      }
+    }
+  }, [currentPartner, toast]);
+
   const loginPartner = async (email: string, password: string) => {
     try {
       // Добавим задержку для предотвращения частых запросов
       await new Promise(resolve => setTimeout(resolve, 300));
+      
+      console.log("Attempting to login with email:", email);
       
       const { data, error } = await supabase
         .from('partners')
         .select('id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, password')
         .eq('email', email)
         .eq('password', password)
-        .single();
+        .maybeSingle();
       
-      if (error || !data) {
+      if (error) {
         console.error('Login failed:', error);
         return null;
       }
+      
+      if (!data) {
+        console.log('No partner found with these credentials');
+        return null;
+      }
+      
+      console.log("Login successful, partner data:", data);
       
       const partner: Partner = {
         id: data.id,
@@ -49,18 +80,6 @@ export const usePartnerAuth = () => {
       };
       
       setCurrentPartner(partner);
-      
-      try {
-        localStorage.setItem('currentPartner', JSON.stringify(partner));
-      } catch (e) {
-        console.error("Error storing partner data:", e);
-        toast({
-          title: "Предупреждение",
-          description: "Не удалось сохранить данные сессии",
-          variant: "default"  // Changed from "warning" to "default"
-        });
-      }
-      
       return partner;
     } catch (error) {
       console.error('Error during login:', error);
@@ -70,11 +89,6 @@ export const usePartnerAuth = () => {
 
   const logoutPartner = () => {
     setCurrentPartner(null);
-    try {
-      localStorage.removeItem('currentPartner');
-    } catch (e) {
-      console.error("Error removing partner data:", e);
-    }
   };
 
   return {

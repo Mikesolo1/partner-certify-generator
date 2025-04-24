@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -48,6 +48,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const { addPartner, loginPartner } = usePartners();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,19 +63,33 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsLoading(true);
+      
       // Проверяем, не существует ли уже пользователь с таким email
-      const { data: existingUser } = await supabase
+      const { data: existingUser, error } = await supabase
         .from('partners')
         .select('*')
         .eq('email', data.email)
-        .single();
+        .maybeSingle();
         
+      if (error && error.code !== 'PGRST116') {
+        console.error("Ошибка при проверке существующего пользователя:", error);
+        toast({
+          title: "Ошибка регистрации",
+          description: "Произошла ошибка при проверке данных. Пожалуйста, попробуйте снова.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       if (existingUser) {
         toast({
           title: "Ошибка регистрации",
           description: "Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
       
@@ -87,22 +102,45 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         partnerLevel: 'Бронзовый', // Начальный уровень для новых партнеров
         joinDate: new Date().toISOString().split('T')[0],
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+        testPassed: false,
+        role: 'user',
+        commission: 20
       };
       
-      const createdPartner = await addPartner(newPartner);
-      const loggedInPartner = await loginPartner(data.email, data.password);
+      console.log("Registering new partner:", newPartner);
       
-      if (loggedInPartner) {
-        toast({
-          title: "Регистрация успешна",
-          description: "Добро пожаловать в партнерскую программу S3!",
-        });
+      try {
+        const createdPartner = await addPartner(newPartner);
+        console.log("Partner created successfully:", createdPartner);
         
-        if (onSuccess) {
-          onSuccess();
+        const loggedInPartner = await loginPartner(data.email, data.password);
+        
+        if (loggedInPartner) {
+          toast({
+            title: "Регистрация успешна",
+            description: "Добро пожаловать в партнерскую программу S3!",
+          });
+          
+          if (onSuccess) {
+            onSuccess();
+          }
+          
+          navigate('/dashboard');
+        } else {
+          toast({
+            title: "Ошибка входа",
+            description: "Регистрация выполнена успешно, но не удалось автоматически войти в систему.",
+            variant: "default",
+          });
+          navigate('/login');
         }
-        
-        navigate('/dashboard');
+      } catch (createError) {
+        console.error("Ошибка при создании партнера:", createError);
+        toast({
+          title: "Ошибка регистрации",
+          description: "Произошла ошибка при создании аккаунта. Пожалуйста, попробуйте снова.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Ошибка при регистрации:", error);
@@ -111,6 +149,8 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         description: "Произошла ошибка при создании аккаунта. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,8 +230,9 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         <Button 
           type="submit" 
           className="w-full bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue transition-all duration-300"
+          disabled={isLoading}
         >
-          Зарегистрироваться
+          {isLoading ? "Регистрация..." : "Зарегистрироваться"}
         </Button>
       </form>
     </Form>
