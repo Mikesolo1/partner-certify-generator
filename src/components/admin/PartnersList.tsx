@@ -3,6 +3,7 @@ import React from 'react';
 import { Partner } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -130,6 +131,16 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                       onClick={() => onSelectPartner(p.id === selectedPartnerId ? null : p.id)}
                     >
                       {p.id === selectedPartnerId ? "Скрыть" : "Детали"}
+                    </Button>
+
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      asChild
+                    >
+                      <Link to={`/admin/partners/${p.id}`}>
+                        Подробнее
+                      </Link>
                     </Button>
                   </div>
                 </TableCell>
