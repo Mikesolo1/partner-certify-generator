@@ -1,9 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, BanknotesIcon } from 'lucide-react';
+import { CreditCard, BanknoteIcon } from 'lucide-react';
 
 interface PaymentDetails {
   id: string;
@@ -45,7 +44,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
       case 'bank':
         return <CreditCard className="h-4 w-4 mr-2" />;
       case 'cash':
-        return <BanknotesIcon className="h-4 w-4 mr-2" />;
+        return <BanknoteIcon className="h-4 w-4 mr-2" />;
       default:
         return null;
     }
