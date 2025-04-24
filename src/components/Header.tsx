@@ -5,23 +5,22 @@ import { Button } from '@/components/ui/button';
 import { usePartners } from '@/contexts/PartnersContext';
 
 const Header = () => {
-  // Create a safer way to access the context
-  const [currentPartner, setContextError] = React.useState(null);
-  const [hasContextError, setHasContextError] = React.useState(false);
+  const [partner, setPartner] = React.useState(null);
+  const [contextError, setContextError] = React.useState(false);
   
   React.useEffect(() => {
     try {
-      const { currentPartner } = usePartners();
+      const partnersContext = usePartners();
+      setPartner(partnersContext.currentPartner);
       setContextError(false);
-      setContextError(currentPartner);
     } catch (error) {
       console.error("Error accessing partners context:", error);
-      setHasContextError(true);
+      setContextError(true);
     }
   }, []);
 
   // If we had an error accessing the context, render a simpler header
-  if (hasContextError) {
+  if (contextError) {
     return (
       <header className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4">
@@ -62,7 +61,7 @@ const Header = () => {
             <Link to="/partners" className="text-brand-dark hover:text-brand font-medium transition">
               Партнеры
             </Link>
-            {currentPartner ? (
+            {partner ? (
               <Link to="/dashboard" className="text-brand font-bold hover:text-brand-dark transition">
                 Личный кабинет
               </Link>
@@ -74,7 +73,7 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-4">
-            {currentPartner ? (
+            {partner ? (
               <Link to="/dashboard">
                 <Button
                   className="bg-brand text-white hover:bg-brand-dark transition"

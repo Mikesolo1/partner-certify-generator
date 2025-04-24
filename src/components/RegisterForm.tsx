@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { registerFormSchema, RegisterFormValues } from '@/validations/authSchemas';
 import { useRegistration } from '@/hooks/useRegistration';
+import { toast } from '@/hooks/use-toast';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -36,15 +37,34 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   });
 
   const handleSubmit = async (data: RegisterFormValues) => {
-    const result = await registerPartner(data);
-    
-    if (result?.success) {
-      if (onSuccess) {
-        onSuccess();
+    try {
+      console.log("Form submitted with data:", { 
+        ...data, 
+        password: '[REDACTED]',
+        confirmPassword: '[REDACTED]' 
+      });
+      
+      const result = await registerPartner(data);
+      
+      if (result?.success) {
+        console.log("Registration successful, redirecting to dashboard");
+        if (onSuccess) {
+          onSuccess();
+        }
+        navigate('/dashboard');
+      } else if (result?.success === false && result?.message?.includes("Регистрация успешна")) {
+        console.log("Registration successful but login failed, redirecting to login page");
+        navigate('/login');
+      } else {
+        console.log("Registration failed:", result?.message);
       }
-      navigate('/dashboard');
-    } else if (result?.success === false && result?.message?.includes("Регистрация успешна")) {
-      navigate('/login');
+    } catch (error) {
+      console.error("Unexpected error during form submission:", error);
+      toast({
+        title: "Ошибка",
+        description: "Произошла неожиданная ошибка при регистрации. Пожалуйста, попробуйте еще раз.",
+        variant: "destructive"
+      });
     }
   };
 

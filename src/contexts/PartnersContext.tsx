@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { PartnersContextType } from './types/PartnersContextTypes';
 import { testQuestions } from '@/data/testQuestions';
 import { usePartnersData } from '@/hooks/usePartnersData';
@@ -19,6 +19,8 @@ export const usePartners = () => {
 };
 
 export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [initialized, setInitialized] = useState(false);
+  
   const { 
     partners,
     loading,
@@ -34,8 +36,20 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { addClient, removeClient, updateClient, addPayment } = useClientManagement();
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const initializeData = async () => {
+      try {
+        await fetchData();
+        setInitialized(true);
+      } catch (err) {
+        console.error("Error initializing partners data:", err);
+        setInitialized(true); // Still mark as initialized to prevent infinite loading
+      }
+    };
+    
+    if (!initialized) {
+      initializeData();
+    }
+  }, [fetchData, initialized]);
 
   const completeTest = async (partnerId: string) => {
     try {

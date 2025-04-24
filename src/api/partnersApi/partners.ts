@@ -27,11 +27,15 @@ export const fetchPartnerById = async (id: string) => {
       .from("partners")
       .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role")
       .eq("id", id)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error("Error fetching partner:", error);
       throw error;
+    }
+    
+    if (!data) {
+      throw new Error("Partner not found");
     }
     
     const partner: Partner = {
@@ -59,7 +63,7 @@ export const checkPartnerExists = async (email: string) => {
     // Use direct query instead of RPC to check if partner exists
     const { data, error } = await supabase
       .from("partners")
-      .select("email")
+      .select("id")
       .eq("email", email)
       .maybeSingle();
     
@@ -77,7 +81,7 @@ export const checkPartnerExists = async (email: string) => {
 
 export const createPartner = async (partner: Partner) => {
   try {
-    // Check if partner exists using the new direct query method
+    // Check if partner exists using direct query method
     const exists = await checkPartnerExists(partner.email);
 
     if (exists) {
@@ -97,13 +101,27 @@ export const createPartner = async (partner: Partner) => {
       commission: partner.commission || 20
     };
     
+    console.log("Creating new partner with data:", {
+      ...partnerData,
+      password: '[REDACTED]'
+    });
+    
     const { data, error } = await supabase
       .from("partners")
       .insert([partnerData])
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error("Error inserting partner:", error);
+      throw error;
+    }
+    
+    if (!data) {
+      throw new Error("Failed to create partner - no data returned");
+    }
+    
+    console.log("Partner created successfully:", data.id);
     
     return {
       id: data.id,
@@ -125,52 +143,62 @@ export const createPartner = async (partner: Partner) => {
 };
 
 export const updatePartner = async (id: string, partner: any) => {
-  const { data, error } = await supabase
-    .from("partners")
-    .update(partner)
-    .eq("id", id)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  
-  return {
-    id: data.id,
-    companyName: data.company_name,
-    contactPerson: data.contact_person,
-    email: data.email,
-    partnerLevel: data.partner_level,
-    joinDate: data.join_date,
-    certificateId: data.certificate_id,
-    testPassed: data.test_passed,
-    commission: data.commission,
-    role: data.role
-  };
+  try {
+    const { data, error } = await supabase
+      .from("partners")
+      .update(partner)
+      .eq("id", id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      id: data.id,
+      companyName: data.company_name,
+      contactPerson: data.contact_person,
+      email: data.email,
+      partnerLevel: data.partner_level,
+      joinDate: data.join_date,
+      certificateId: data.certificate_id,
+      testPassed: data.test_passed,
+      commission: data.commission,
+      role: data.role
+    };
+  } catch (error) {
+    console.error("Error updating partner:", error);
+    throw error;
+  }
 };
 
 export const completeTest = async (partnerId: string) => {
-  const { data, error } = await supabase
-    .from("partners")
-    .update({ 
-      test_passed: true,
-      role: 'partner'
-    })
-    .eq("id", partnerId)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  
-  return {
-    id: data.id,
-    companyName: data.company_name,
-    contactPerson: data.contact_person,
-    email: data.email,
-    partnerLevel: data.partner_level,
-    joinDate: data.join_date,
-    certificateId: data.certificate_id,
-    testPassed: data.test_passed,
-    commission: data.commission,
-    role: data.role
-  };
+  try {
+    const { data, error } = await supabase
+      .from("partners")
+      .update({ 
+        test_passed: true,
+        role: 'partner'
+      })
+      .eq("id", partnerId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      id: data.id,
+      companyName: data.company_name,
+      contactPerson: data.contact_person,
+      email: data.email,
+      partnerLevel: data.partner_level,
+      joinDate: data.join_date,
+      certificateId: data.certificate_id,
+      testPassed: data.test_passed,
+      commission: data.commission,
+      role: data.role
+    };
+  } catch (error) {
+    console.error("Error completing test:", error);
+    throw error;
+  }
 };

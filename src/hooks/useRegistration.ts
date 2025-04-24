@@ -15,6 +15,8 @@ export const useRegistration = () => {
     try {
       setIsLoading(true);
       
+      console.log("Starting registration process for:", formData.email);
+      
       // Проверяем существование партнера с таким email
       console.log("Checking if partner exists with email:", formData.email);
       const exists = await checkPartnerExists(formData.email);
@@ -26,10 +28,11 @@ export const useRegistration = () => {
           description: "Партнер с таким email уже существует",
           variant: "destructive",
         });
-        return null;
+        return { success: false, message: "Партнер с таким email уже существует" };
       }
       
       // Создаем нового партнера
+      console.log("Creating new partner record");
       const newPartner: Partner = {
         companyName: formData.companyName,
         contactPerson: formData.contactPerson,
@@ -42,11 +45,6 @@ export const useRegistration = () => {
         role: 'user',
         commission: 20
       };
-      
-      console.log("Creating new partner:", {
-        ...newPartner,
-        password: '[REDACTED]'
-      });
       
       // Добавляем партнера в базу данных
       const createdPartner = await addPartner(newPartner);

@@ -42,7 +42,7 @@ export const usePartnerAuth = () => {
     try {
       console.log("Attempting to login with email:", email);
       
-      // Use direct query instead of RPC for login
+      // Use direct query instead of security definer function to avoid infinite recursion
       const { data, error } = await supabase
         .from("partners")
         .select("*")
