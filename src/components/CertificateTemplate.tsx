@@ -151,9 +151,9 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateTemplateProps>
           </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 CertificateTemplate.displayName = 'CertificateTemplate';
 
