@@ -64,6 +64,24 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     try {
       setIsLoading(true);
       
+      // Check if partner already exists before registration
+      const { data: existsData, error: existsError } = await supabase.rpc('check_partner_exists', { 
+        p_email: data.email 
+      });
+
+      if (existsError) {
+        throw new Error("Ошибка проверки существующего пользователя");
+      }
+
+      if (existsData) {
+        toast({
+          title: "Ошибка регистрации",
+          description: "Партнер с таким email уже существует",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Create new partner
       const newPartner: Partner = {
         companyName: data.companyName,
@@ -84,10 +102,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       });
       
       const createdPartner = await addPartner(newPartner);
-      console.log("Partner created successfully:", {
-        ...createdPartner,
-        password: '[REDACTED]'
-      });
       
       // Auto login after registration
       const loggedInPartner = await loginPartner(data.email, data.password);
@@ -114,7 +128,9 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     } catch (error) {
       console.error("Error during registration:", error);
       
-      const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Не удалось зарегистрироваться. Пожалуйста, попробуйте снова.";
       
       toast({
         title: "Ошибка регистрации",
