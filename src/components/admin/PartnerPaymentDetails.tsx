@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { markPartnerCommissionsPaid } from '@/api/partnersApi/payments';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
+import { usePartnerAuth } from '@/hooks/usePartnerAuth';
 
 interface PaymentDetails {
   id: string;
@@ -29,7 +29,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("payment-methods");
-  const { user } = useAuth();
+  const { currentPartner } = usePartnerAuth();
 
   const fetchPaymentDetails = async () => {
     try {
@@ -98,7 +98,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const handlePayCommission = async () => {
     try {
       setLoading(true);
-      const result = await markPartnerCommissionsPaid(partnerId, user?.id || '');
+      const result = await markPartnerCommissionsPaid(partnerId, currentPartner?.id || '');
       
       if (result.updated_count > 0) {
         toast({
