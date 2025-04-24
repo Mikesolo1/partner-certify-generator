@@ -10,13 +10,27 @@ interface ClientDetailsSectionProps {
 export const ClientDetailsSection: React.FC<ClientDetailsSectionProps> = ({ client }) => {
   const totalPayments = client.payments?.length || 0;
   const totalAmount = client.payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
+  
+  // Fix date formatting to handle multiple date field possibilities
+  const getFormattedDate = () => {
+    const dateStr = client.registrationDate || client.registration_date || client.date;
+    if (!dateStr) return "Нет данных";
+    
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Нет данных";
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="text-sm text-gray-600">
         <div className="mb-2">Email: {client.email}</div>
         {client.phone && <div className="mb-2">Телефон: {client.phone}</div>}
-        <div className="mb-2">Дата регистрации: {new Date(client.registrationDate || '').toLocaleDateString()}</div>
+        <div className="mb-2">Дата регистрации: {getFormattedDate()}</div>
       </div>
       
       <div className="border-t pt-4">
