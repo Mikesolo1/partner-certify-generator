@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -65,14 +64,12 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     try {
       setIsLoading(true);
       
-      // Проверяем, не существует ли уже пользователь с таким email
-      const { data: existingUser, error } = await supabase
-        .from('partners')
-        .select('*')
-        .eq('email', data.email)
-        .maybeSingle();
+      // Check if a user with this email already exists using RPC
+      const { data: existingUser, error } = await supabase.rpc('check_partner_exists', {
+        p_email: data.email
+      });
         
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error("Ошибка при проверке существующего пользователя:", error);
         toast({
           title: "Ошибка регистрации",
@@ -93,13 +90,13 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         return;
       }
       
-      // Создаем нового партнера
+      // Create new partner
       const newPartner: Partner = {
         companyName: data.companyName,
         contactPerson: data.contactPerson,
         email: data.email,
         password: data.password,
-        partnerLevel: 'Бронзовый', // Начальный уровень для новых партнеров
+        partnerLevel: 'Бронзовый',
         joinDate: new Date().toISOString().split('T')[0],
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         testPassed: false,
@@ -113,6 +110,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         const createdPartner = await addPartner(newPartner);
         console.log("Partner created successfully:", createdPartner);
         
+        // Auto login after registration
         const loggedInPartner = await loginPartner(data.email, data.password);
         
         if (loggedInPartner) {

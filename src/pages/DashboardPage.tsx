@@ -14,16 +14,28 @@ import { usePartners } from '@/contexts/PartnersContext';
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel, partnerLevel } = usePartners();
   const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     if (currentPartner?.id) {
-      refreshPartnerLevel(currentPartner.id);
-      fetchPartnerClients(currentPartner.id);
+      const loadData = async () => {
+        try {
+          await refreshPartnerLevel(currentPartner.id);
+          await fetchPartnerClients(currentPartner.id);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      loadData();
+    } else {
+      setIsLoading(false);
     }
   }, [currentPartner?.id, refreshPartnerLevel]);
   
   const fetchPartnerClients = async (partnerId: string) => {
     try {
+      console.log("Fetching clients for partner:", partnerId);
       const { data, error } = await supabase
         .from("clients")
         .select(`
@@ -35,6 +47,7 @@ const DashboardPage = () => {
       if (error) {
         console.error("Error fetching clients:", error);
       } else {
+        console.log("Clients fetched:", data);
         setClients(data || []);
       }
     } catch (error) {
@@ -42,31 +55,48 @@ const DashboardPage = () => {
     }
   };
   
+  if (isLoading) {
+    return <DashboardLayout>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500">Загрузка данных...</p>
+      </div>
+    </DashboardLayout>;
+  }
+  
   if (!currentPartner) {
-    return <div>Загрузка...</div>;
+    return <DashboardLayout>
+      <div className="p-6 bg-red-50 border border-red-200 rounded-md">
+        <h2 className="text-xl font-bold text-red-700 mb-2">Ошибка сессии</h2>
+        <p className="text-red-600">Сессия не найдена. Пожалуйста, войдите в систему снова.</p>
+      </div>
+    </DashboardLayout>;
   }
   
   const totalCommission = clients.reduce((total, client) => {
     const clientTotal = client.payments?.reduce((sum, payment) => {
-      return sum + (payment.status === 'оплачено' ? (payment.commissionAmount || payment.commission_amount || 0) : 0);
+      return sum + (payment.status === 'оплачено' ? (payment.commissionAmount || 0) : 0);
     }, 0) || 0;
     return total + clientTotal;
   }, 0);
   
   const clientCount = clients.length || 0;
   
+  const contactPersonName = currentPartner.contactPerson || 'партнер';
+  const partnerLevel = currentPartner.partnerLevel || 'Бронзовый';
+  const testPassed = currentPartner.testPassed || false;
+  
   return (
     <DashboardLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          Добро пожаловать, {currentPartner?.contactPerson || currentPartner?.contact_person}!
+          Добро пожаловать, {contactPersonName}!
         </h1>
         <div className="flex items-center gap-2">
           <span className="text-gray-600">
             Ваш партнерский уровень: 
           </span>
           <span className="font-semibold">
-            {currentPartner?.partnerLevel || currentPartner?.partner_level}
+            {partnerLevel}
           </span>
         </div>
       </div>
@@ -87,11 +117,11 @@ const DashboardPage = () => {
       <DashboardStats 
         clientCount={clientCount}
         totalCommission={totalCommission}
-        testPassed={currentPartner?.testPassed || currentPartner?.test_passed}
+        testPassed={testPassed}
       />
       
       <QuickActions 
-        testPassed={currentPartner?.testPassed || currentPartner?.test_passed || false}
+        testPassed={testPassed}
         showLevelUpHint={!!(partnerLevel && partnerLevel.progress >= 50 && partnerLevel.nextLevelAt)}
       />
       

@@ -9,7 +9,7 @@ export interface PartnersContextType {
   testQuestions: TestQuestion[];
   partnerLevel: ReturnType<typeof usePartnerLevel>['partnerLevel'];
   addPartner: (partner: Partner) => Promise<Partner>;
-  updatePartner: (id: string, updatedPartner: Partner) => Promise<Partner>;
+  updatePartner: (id: string, updatedPartner: Partial<Partner>) => Promise<Partner>;
   getPartnerById: (id: string) => Promise<Partner>;
   loginPartner: (email: string, password: string) => Promise<Partner | null>;
   logoutPartner: () => void;

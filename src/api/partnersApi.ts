@@ -60,22 +60,16 @@ export const fetchPartnerById = async (id: string) => {
       throw error;
     }
     
-    // Маппинг полей из базы данных к формату, используемому в приложении
+    // Transform to application format
     const partner: Partner = {
       id: data.id,
       companyName: data.company_name,
-      company_name: data.company_name,
       contactPerson: data.contact_person,
-      contact_person: data.contact_person,
       email: data.email,
       partnerLevel: data.partner_level,
-      partner_level: data.partner_level,
       joinDate: data.join_date,
-      join_date: data.join_date,
       certificateId: data.certificate_id,
-      certificate_id: data.certificate_id,
       testPassed: data.test_passed,
-      test_passed: data.test_passed,
       commission: data.commission,
       role: data.role
     };
@@ -89,16 +83,16 @@ export const fetchPartnerById = async (id: string) => {
 
 export const createPartner = async (partner: Partner) => {
   try {
-    // Преобразуем данные в формат, подходящий для Supabase
+    // Transform data to Supabase format
     const partnerData = {
-      company_name: partner.companyName || partner.company_name,
-      contact_person: partner.contactPerson || partner.contact_person,
+      company_name: partner.companyName,
+      contact_person: partner.contactPerson,
       email: partner.email,
-      partner_level: partner.partnerLevel || partner.partner_level || "Бронзовый",
-      join_date: partner.joinDate || partner.join_date || new Date().toISOString(),
-      certificate_id: partner.certificateId || partner.certificate_id || `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+      partner_level: partner.partnerLevel || "Бронзовый",
+      join_date: partner.joinDate || new Date().toISOString(),
+      certificate_id: partner.certificateId || `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
       password: partner.password,
-      test_passed: partner.testPassed || partner.test_passed || false,
+      test_passed: partner.testPassed || false,
       role: partner.role || 'user',
       commission: partner.commission || 20
     };
@@ -118,22 +112,16 @@ export const createPartner = async (partner: Partner) => {
     
     console.log("Partner created successfully:", data);
     
-    // Преобразуем ответ к формату, используемому в приложении
+    // Transform response to application format
     const newPartner: Partner = {
       id: data.id,
       companyName: data.company_name,
-      company_name: data.company_name,
       contactPerson: data.contact_person,
-      contact_person: data.contact_person,
       email: data.email,
       partnerLevel: data.partner_level,
-      partner_level: data.partner_level,
       joinDate: data.join_date,
-      join_date: data.join_date,
       certificateId: data.certificate_id,
-      certificate_id: data.certificate_id,
       testPassed: data.test_passed,
-      test_passed: data.test_passed,
       commission: data.commission,
       role: data.role,
       password: data.password
@@ -159,22 +147,16 @@ export const updatePartner = async (id: string, partner: any) => {
     throw error;
   }
   
-  // Преобразуем ответ к формату, используемому в приложении
+  // Transform response to application format
   const updatedPartner: Partner = {
     id: data.id,
     companyName: data.company_name,
-    company_name: data.company_name,
     contactPerson: data.contact_person,
-    contact_person: data.contact_person,
     email: data.email,
     partnerLevel: data.partner_level,
-    partner_level: data.partner_level,
     joinDate: data.join_date,
-    join_date: data.join_date,
     certificateId: data.certificate_id,
-    certificate_id: data.certificate_id,
     testPassed: data.test_passed,
-    test_passed: data.test_passed,
     commission: data.commission,
     role: data.role
   };

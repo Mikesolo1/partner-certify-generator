@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Partner } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const usePartnerAuth = () => {
   const [currentPartner, setCurrentPartner] = useState<Partner | null>(() => {
@@ -17,7 +17,7 @@ export const usePartnerAuth = () => {
   });
   const { toast } = useToast();
 
-  // Обновление локального хранилища при изменении currentPartner
+  // Update localStorage when currentPartner changes
   useEffect(() => {
     if (currentPartner) {
       try {
@@ -27,7 +27,7 @@ export const usePartnerAuth = () => {
         toast({
           title: "Предупреждение",
           description: "Не удалось сохранить данные сессии",
-          variant: "default"  // Changed from "warning" to "default"
+          variant: "default"
         });
       }
     } else {
@@ -41,17 +41,12 @@ export const usePartnerAuth = () => {
 
   const loginPartner = async (email: string, password: string) => {
     try {
-      // Добавим задержку для предотвращения частых запросов
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
       console.log("Attempting to login with email:", email);
       
-      const { data, error } = await supabase
-        .from('partners')
-        .select('id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, password')
-        .eq('email', email)
-        .eq('password', password)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc('get_partner_by_credentials', {
+        p_email: email,
+        p_password: password
+      });
       
       if (error) {
         console.error('Login failed:', error);
