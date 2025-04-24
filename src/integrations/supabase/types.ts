@@ -460,6 +460,23 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      get_client_payments: {
+        Args: { p_client_id: string }
+        Returns: {
+          id: string
+          client_id: string
+          amount: number
+          date: string
+          status: string
+          commission_amount: number
+          commission_paid: boolean
+          payment_destination: string
+          tariff_start_date: string
+          tariff_end_date: string
+          created_by: string
+          created_at: string
+        }[]
+      }
       get_partner_by_credentials: {
         Args: { p_email: string; p_password: string }
         Returns: {

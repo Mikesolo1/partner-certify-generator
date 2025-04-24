@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 import { safeRPC } from "@/api/utils/queryHelpers";
