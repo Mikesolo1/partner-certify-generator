@@ -7,7 +7,8 @@ import PaymentDetailsForm from '@/components/PaymentDetailsForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const PaymentDetailsPage = () => {
   const { currentPartner } = usePartners();
@@ -15,6 +16,7 @@ const PaymentDetailsPage = () => {
   const { toast } = useToast();
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,6 +36,9 @@ const PaymentDetailsPage = () => {
 
         const { data, error } = await safeRPC('get_partner_payment_details', {
           p_partner_id: currentPartner.id
+        }, {
+          retries: 3,
+          delay: 1000
         });
 
         if (error) {
@@ -74,15 +79,18 @@ const PaymentDetailsPage = () => {
         throw new Error("ID партнера не определен");
       }
       
-      setLoading(true);
+      setIsSaving(true);
       console.log("Сохранение реквизитов:", data);
       
-      // Используем RPC функцию для сохранения данных
+      // Use safe RPC function with retries for saving data
       const { error } = await safeRPC('save_partner_payment_details', {
         p_partner_id: currentPartner.id,
         p_payment_type: data.payment_type,
         p_details: data.details,
         p_is_primary: true
+      }, {
+        retries: 3,
+        delay: 1000
       });
 
       if (error) {
@@ -95,7 +103,7 @@ const PaymentDetailsPage = () => {
         description: "Реквизиты для выплат сохранены",
       });
       
-      // Обновляем отображаемые данные
+      // Update displayed data
       setPaymentDetails({
         partner_id: currentPartner.id,
         payment_type: data.payment_type,
@@ -110,7 +118,7 @@ const PaymentDetailsPage = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -124,6 +132,14 @@ const PaymentDetailsPage = () => {
       </div>
 
       <div className="max-w-2xl">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Ошибка</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <Card>
           <CardHeader>
             <CardTitle>Реквизиты для выплат</CardTitle>
@@ -133,14 +149,11 @@ const PaymentDetailsPage = () => {
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
-            ) : error ? (
-              <div className="p-4 bg-red-50 text-red-700 rounded-md">
-                {error}
-              </div>
             ) : (
               <PaymentDetailsForm 
                 onSubmit={handleSubmit}
                 defaultValues={paymentDetails}
+                isLoading={isSaving}
               />
             )}
           </CardContent>

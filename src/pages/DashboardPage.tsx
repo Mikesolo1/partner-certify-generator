@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -12,11 +13,13 @@ import { usePartners } from '@/contexts/PartnersContext';
 import PaymentDetailsForm from '@/components/PaymentDetailsForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel } = usePartners();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [latestPaymentDate, setLatestPaymentDate] = useState<string | undefined>();
   const { toast } = useToast();
   
@@ -112,6 +115,47 @@ const DashboardPage = () => {
   const currentPartnerLevel = currentPartner.partnerLevel || currentPartner.partner_level || 'Бронзовый';
   const testPassed = currentPartner.testPassed || currentPartner.test_passed || false;
   
+  const handleSubmitPaymentDetails = async (data) => {
+    try {
+      setIsSaving(true);
+      console.log("Saving payment details:", data);
+      
+      const { data: response, error } = await safeRPC('save_partner_payment_details', {
+        p_partner_id: currentPartner.id,
+        p_payment_type: data.payment_type,
+        p_details: data.details,
+        p_is_primary: true
+      }, { 
+        retries: 3,
+        delay: 1000
+      });
+
+      if (error) {
+        console.error('Error saving payment details:', error);
+        toast({
+          title: "Ошибка",
+          description: `Не удалось сохранить реквизиты: ${error.message || 'Неизвестная ошибка'}`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Успешно",
+        description: "Реквизиты для выплат сохранены",
+      });
+    } catch (error) {
+      console.error('Error saving payment details:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сохранить реквизиты",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
   return (
     <DashboardLayout>
       <div className="mb-8">
@@ -138,36 +182,14 @@ const DashboardPage = () => {
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card>
+        <Card className="h-auto">
           <CardHeader>
             <CardTitle>Реквизиты для выплат</CardTitle>
           </CardHeader>
           <CardContent>
             <PaymentDetailsForm 
-              onSubmit={async (data) => {
-                try {
-                  const { data: response, error } = await supabase.rpc('save_partner_payment_details', {
-                    p_partner_id: currentPartner?.id,
-                    p_payment_type: data.payment_type,
-                    p_details: data.details,
-                    p_is_primary: true
-                  });
-
-                  if (error) throw error;
-                  
-                  toast({
-                    title: "Успешно",
-                    description: "Реквизиты для выплат сохранены",
-                  });
-                } catch (error) {
-                  console.error('Error saving payment details:', error);
-                  toast({
-                    title: "Ошибка",
-                    description: "Не удалось сохранить реквизиты",
-                    variant: "destructive",
-                  });
-                }
-              }}
+              onSubmit={handleSubmitPaymentDetails}
+              isLoading={isSaving}
             />
           </CardContent>
         </Card>
@@ -178,10 +200,8 @@ const DashboardPage = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-3">
-          <NotificationsPanel />
-        </div>
+      <div className="grid grid-cols-1 gap-6">
+        <NotificationsPanel />
       </div>
     </DashboardLayout>
   );

@@ -6,6 +6,7 @@ import { CreditCard, BanknoteIcon, AlertCircle, Bug, RefreshCw } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface PaymentDetails {
   id: string;
@@ -29,14 +30,15 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
     try {
       console.log("Fetching payment details for partner:", partnerId);
       setLoading(true);
+      setError(null);
       
-      // Updated to include delay property and use RPC
+      // Updated to include delay property and use RPC with retries
       const { data, error } = await safeRPC(
         'get_partner_payment_details',
         { p_partner_id: partnerId },
         { 
           retries: 3, 
-          delay: 1000 // Add a 1-second delay between retries
+          delay: 1000 
         }
       );
         
@@ -89,17 +91,6 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
     }
   };
 
-  const renderPaymentDetails = (details: any) => {
-    if (!details) return null;
-
-    return Object.entries(details).map(([key, value]) => (
-      <div key={key} className="flex gap-2 text-sm">
-        <span className="text-gray-500">{key}:</span>
-        <span>{String(value)}</span>
-      </div>
-    ));
-  };
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -116,16 +107,18 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="flex justify-center py-6">
-            <div className="h-8 w-8 border-4 border-t-blue-500 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
           </div>
         ) : error ? (
-          <div className="flex items-center gap-2 text-red-500 mb-2">
+          <div className="flex items-center gap-2 text-red-500 mb-2 p-4 bg-red-50 rounded-md border border-red-100">
             <AlertCircle className="h-5 w-5" />
             <p>{error}</p>
           </div>
         ) : paymentDetails.length === 0 ? (
-          <p className="text-gray-500">
+          <p className="text-gray-500 p-4 bg-gray-50 rounded-md border border-gray-100">
             Партнер еще не указал способы получения комиссии
           </p>
         ) : (
@@ -133,10 +126,10 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
             {paymentDetails.map((detail) => (
               <div
                 key={detail.id}
-                className="flex items-start gap-4 p-4 border rounded-lg"
+                className="flex items-start gap-4 p-4 bg-gray-50 border rounded-lg"
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     {renderPaymentTypeIcon(detail.payment_type)}
                     <h3 className="font-medium">
                       {detail.payment_type}
@@ -145,14 +138,16 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
                       )}
                     </h3>
                   </div>
-                  {detail.details && 
-                    Object.entries(detail.details).map(([key, value]) => (
-                      <div key={key} className="flex gap-2 text-sm">
-                        <span className="text-gray-500">{key}:</span>
-                        <span>{String(value)}</span>
-                      </div>
-                    ))
-                  }
+                  {detail.details && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {Object.entries(detail.details).map(([key, value]) => (
+                        <div key={key} className="flex gap-2 text-sm">
+                          <span className="text-gray-500 font-medium min-w-20">{key}:</span>
+                          <span>{String(value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
