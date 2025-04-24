@@ -19,7 +19,16 @@ export const createNotification = async (title: string, content: string): Promis
     }
     
     console.log("Notification created successfully:", data);
-    return data;
+
+    // Ensure the returned data matches the Notification type
+    const notification: Notification = {
+      id: data.id,
+      title: data.title,
+      content: data.content,
+      created_at: data.created_at
+    };
+    
+    return notification;
   } catch (error) {
     console.error("Error in createNotification:", error);
     throw error;
