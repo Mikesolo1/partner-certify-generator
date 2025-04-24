@@ -33,11 +33,12 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
         backgroundColor: '#ffffff',
       });
 
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = 297; // A4 height in mm
+      // A4 dimensions in mm (landscape)
+      const imgWidth = 297;
+      const imgHeight = 210;
       
       const pdf = new jsPDF({
-        orientation: 'portrait',
+        orientation: 'landscape',
         unit: 'mm',
         format: 'a4',
       });
@@ -59,7 +60,6 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
       const xOffset = (imgWidth - finalWidth) / 2;
       const yOffset = (imgHeight - finalHeight) / 2;
       
-      // Convert canvas to image and add to PDF
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
       pdf.save(`S3-${partner.companyName}-Сертификат.pdf`);

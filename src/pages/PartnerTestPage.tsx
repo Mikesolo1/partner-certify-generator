@@ -38,7 +38,6 @@ const PartnerTestPage = () => {
     if (currentQuestionIndex < testQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Завершение теста
       setShowResults(true);
     }
   };
@@ -75,7 +74,6 @@ const PartnerTestPage = () => {
     
     const result = calculateScore();
     
-    // Минимальный проходной балл - 60%
     if (result.percentage >= 60) {
       setIsSubmitting(true);
       
@@ -102,11 +100,10 @@ const PartnerTestPage = () => {
     } else {
       toast({
         title: "Тест не пройден",
-        description: `Вы правильно ответили только на ${result.score} из ${result.total} вопросов. Требуется 60% для прохождения.`,
+        description: `Вы правильно ответили тольк�� на ${result.score} из ${result.total} вопросов. Требуется 60% для прохождения.`,
         variant: "destructive",
       });
       
-      // Сброс теста для повторной попытки
       setCurrentQuestionIndex(0);
       setSelectedAnswers([]);
       setShowResults(false);
@@ -195,7 +192,7 @@ const PartnerTestPage = () => {
               <div>
                 <CardTitle>Вопрос {currentQuestionIndex + 1} из {testQuestions.length}</CardTitle>
                 <CardDescription>
-                  Выберите правильный вариант ответа
+                  Выберите один вариант ответа
                 </CardDescription>
               </div>
               <div className="text-sm text-gray-500">
@@ -208,7 +205,7 @@ const PartnerTestPage = () => {
               <p className="text-lg font-medium mb-4">{currentQuestion.question}</p>
               
               <RadioGroup 
-                value={selectedAnswers[currentQuestionIndex]?.toString()} 
+                value={selectedAnswers[currentQuestionIndex]?.toString() || ''} 
                 onValueChange={(value) => handleAnswerSelect(parseInt(value))}
                 className="space-y-3"
               >
