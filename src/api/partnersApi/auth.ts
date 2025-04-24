@@ -75,7 +75,7 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
       testPassed: partnerData.test_passed,
       commission: partnerData.commission,
       role: partnerData.role,
-      phone: partnerData.phone || '' // Ensure phone field is included
+      phone: partnerData.phone || '' // Ensure phone field is always included with fallback
     };
   } catch (error) {
     console.error("Exception during login:", error);
