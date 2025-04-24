@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,45 +12,20 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { usePartners } from '@/contexts/PartnersContext';
-import { Partner } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
-
-const formSchema = z.object({
-  companyName: z.string().min(2, {
-    message: "Название компании должно содержать не менее 2 символов.",
-  }),
-  contactPerson: z.string().min(2, {
-    message: "Имя контактного лица должно содержать не менее 2 символов.",
-  }),
-  email: z.string().email({
-    message: "Пожалуйста, введите корректный email адрес.",
-  }),
-  password: z.string().min(6, {
-    message: "Пароль должен быть не менее 6 символов.",
-  }),
-  confirmPassword: z.string().min(6, {
-    message: "Подтверждение пароля должно быть не менее 6 символов.",
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Пароли не совпадают",
-  path: ["confirmPassword"],
-});
+import { registerFormSchema, RegisterFormValues } from '@/validations/authSchemas';
+import { useRegistration } from '@/hooks/useRegistration';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
 }
 
 const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
-  const { addPartner, loginPartner } = usePartners();
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { registerPartner, isLoading } = useRegistration();
   
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       companyName: '',
       contactPerson: '',
@@ -60,85 +35,16 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     },
   });
 
-  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      setIsLoading(true);
-      
-      // Check if partner already exists before registration
-      const { data: existsData, error: existsError } = await supabase.rpc('check_partner_exists', { 
-        p_email: data.email 
-      });
-
-      if (existsError) {
-        throw new Error("Ошибка проверки существующего пользователя");
+  const handleSubmit = async (data: RegisterFormValues) => {
+    const result = await registerPartner(data);
+    
+    if (result?.success) {
+      if (onSuccess) {
+        onSuccess();
       }
-
-      if (existsData) {
-        toast({
-          title: "Ошибка регистрации",
-          description: "Партнер с таким email уже существует",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Create new partner
-      const newPartner: Partner = {
-        companyName: data.companyName,
-        contactPerson: data.contactPerson,
-        email: data.email,
-        password: data.password,
-        partnerLevel: 'Бронзовый',
-        joinDate: new Date().toISOString().split('T')[0],
-        certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
-        testPassed: false,
-        role: 'user',
-        commission: 20
-      };
-      
-      console.log("Attempting to register new partner:", {
-        ...newPartner,
-        password: '[REDACTED]'
-      });
-      
-      const createdPartner = await addPartner(newPartner);
-      
-      // Auto login after registration
-      const loggedInPartner = await loginPartner(data.email, data.password);
-      
-      if (loggedInPartner) {
-        toast({
-          title: "Регистрация успешна",
-          description: "Добро пожаловать в партнерскую программу S3!",
-        });
-        
-        if (onSuccess) {
-          onSuccess();
-        }
-        
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: "Ошибка входа",
-          description: "Регистрация выполнена успешно, но не удалось автоматически войти в систему.",
-          variant: "default",
-        });
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error("Error during registration:", error);
-      
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Не удалось зарегистрироваться. Пожалуйста, попробуйте снова.";
-      
-      toast({
-        title: "Ошибка регистрации",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      navigate('/dashboard');
+    } else if (result?.success === false && result?.message?.includes("Регистрация успешна")) {
+      navigate('/login');
     }
   };
 
