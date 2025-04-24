@@ -42,7 +42,7 @@ export const usePartnerAuth = () => {
     try {
       console.log("Attempting to login with email:", email);
       
-      // Use our new secure login function
+      // Используем функцию безопасного входа
       const partner = await loginPartnerWithCredentials(email, password);
       
       if (partner) {
@@ -51,6 +51,7 @@ export const usePartnerAuth = () => {
         return partner;
       }
       
+      console.log("Login failed: Invalid credentials");
       return null;
     } catch (error) {
       console.error('Error during login:', error);

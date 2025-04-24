@@ -12,7 +12,7 @@ BEGIN
   RETURN QUERY
   SELECT *
   FROM partners
-  WHERE email = p_email AND password = p_password
+  WHERE LOWER(email) = LOWER(p_email) AND password = p_password
   LIMIT 1;
 END;
 $$;

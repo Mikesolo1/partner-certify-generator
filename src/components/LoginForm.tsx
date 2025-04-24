@@ -58,7 +58,7 @@ const LoginForm = () => {
         console.warn("Login failed: Invalid credentials");
         toast({
           title: "Ошибка входа",
-          description: "Неверный email или пароль",
+          description: "Неверный email или пароль. Пожалуйста, проверьте введенные данные.",
           variant: "destructive",
         });
       }

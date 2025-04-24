@@ -10,7 +10,7 @@ AS $$
 DECLARE
   partner_exists BOOLEAN;
 BEGIN
-  SELECT EXISTS(SELECT 1 FROM partners WHERE email = p_email) INTO partner_exists;
+  SELECT EXISTS(SELECT 1 FROM partners WHERE LOWER(email) = LOWER(p_email)) INTO partner_exists;
   RETURN partner_exists;
 END;
 $$;

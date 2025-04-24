@@ -48,21 +48,41 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       
       if (result?.success) {
         console.log("Registration successful, redirecting to dashboard");
+        toast({
+          title: "Регистрация успешна",
+          description: "Добро пожаловать в партнерскую программу S3!",
+        });
         if (onSuccess) {
           onSuccess();
         }
         navigate('/dashboard');
       } else if (result?.success === false && result?.message?.includes("Регистрация успешна")) {
         console.log("Registration successful but login failed, redirecting to login page");
+        toast({
+          title: "Регистрация успешна",
+          description: "Аккаунт создан, но автоматический вход не удался. Попробуйте войти вручную.",
+          variant: "default",
+        });
         navigate('/login');
       } else {
         console.log("Registration failed:", result?.message);
+        toast({
+          title: "Ошибка регистрации",
+          description: result?.message || "Не удалось зарегистрироваться. Пожалуйста, попробуйте снова.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Unexpected error during form submission:", error);
+      let errorMessage = "Произошла неожиданная ошибка при регистрации. Пожалуйста, попробуйте еще раз.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Ошибка",
-        description: "Произошла неожиданная ошибка при регистрации. Пожалуйста, попробуйте еще раз.",
+        title: "Ошибка регистрации",
+        description: errorMessage,
         variant: "destructive"
       });
     }

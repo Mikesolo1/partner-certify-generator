@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Partner } from '@/types';
 import { usePartners } from '@/contexts/PartnersContext';
 import { RegisterFormValues } from '@/validations/authSchemas';
-import { checkPartnerExists } from '@/api/partnersApi/partners';
+import { checkPartnerExists } from '@/api/partnersApi/auth';
 
 export const useRegistration = () => {
   const { addPartner, loginPartner } = usePartners();
@@ -36,7 +36,7 @@ export const useRegistration = () => {
       const newPartner: Partner = {
         companyName: formData.companyName,
         contactPerson: formData.contactPerson,
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
         partnerLevel: 'Бронзовый',
         joinDate: new Date().toISOString().split('T')[0],

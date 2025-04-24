@@ -5,9 +5,12 @@ export const checkPartnerExists = async (email: string) => {
   try {
     console.log("Checking if partner exists with email:", email);
     
-    // Use a direct function call to the database instead of a query
+    // Нормализуем email перед проверкой
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Вызываем RPC функцию для проверки существования партнера
     const { data, error } = await supabase.rpc('check_partner_exists', {
-      p_email: email.trim().toLowerCase()
+      p_email: normalizedEmail
     });
     
     if (error) {
@@ -15,6 +18,7 @@ export const checkPartnerExists = async (email: string) => {
       throw new Error("Ошибка проверки существующего пользователя");
     }
     
+    console.log("Result of checking if partner exists:", data);
     return data;
   } catch (error) {
     console.error("Exception checking partner exists:", error);
@@ -26,9 +30,12 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
   try {
     console.log("Logging in partner with email:", email);
     
-    // Use a secure database function to get partner by credentials
+    // Нормализуем email перед проверкой
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Вызываем RPC функцию для получения партнера по учетным данным
     const { data, error } = await supabase.rpc('get_partner_by_credentials', {
-      p_email: email.trim().toLowerCase(),
+      p_email: normalizedEmail,
       p_password: password
     });
     
@@ -37,13 +44,13 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
       return null;
     }
     
-    if (!data || !data[0]) {
+    if (!data || data.length === 0) {
       console.log("No partner found with these credentials");
       return null;
     }
     
     const partnerData = data[0];
-    console.log("Login successful, partner data found");
+    console.log("Login successful, partner data found:", partnerData.id);
     
     return {
       id: partnerData.id,
