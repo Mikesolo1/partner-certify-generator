@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +6,10 @@ import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { markPartnerCommissionsPaid } from '@/api/partnersApi/payments';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PaymentDetails {
   id: string;
@@ -27,6 +29,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("payment-methods");
+  const { user } = useAuth();
 
   const fetchPaymentDetails = async () => {
     try {
@@ -34,7 +37,6 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
       setLoading(true);
       setError(null);
       
-      // Updated to include delay property and use RPC with retries
       const { data, error } = await safeRPC(
         'get_partner_payment_details',
         { p_partner_id: partnerId },
@@ -94,11 +96,34 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   };
 
   const handlePayCommission = async () => {
-    // В реальном проекте, здесь был бы API-вызов для регистрации выплаты комиссии партнёру
-    toast({
-      title: "Выплата комиссии",
-      description: "Функция находится в разработке. Вы можете отметить комиссии как выплаченные в разделе клиентов партнёра."
-    });
+    try {
+      setLoading(true);
+      const result = await markPartnerCommissionsPaid(partnerId, user?.id || '');
+      
+      if (result.updated_count > 0) {
+        toast({
+          title: "Комиссии отмечены как выплаченные",
+          description: `Выплачено ${result.total_amount.toLocaleString('ru-RU')} ₽ за ${result.updated_count} платежей`,
+          variant: "default"
+        });
+        fetchPaymentDetails();
+      } else {
+        toast({
+          title: "Нет платежей для обработки",
+          description: "Все комиссии уже отмечены как выплаченные",
+          variant: "default"
+        });
+      }
+    } catch (error: any) {
+      console.error('Error paying commissions:', error);
+      toast({
+        title: "Ошибка при обработке комиссий",
+        description: error.message || "Произошла неизвестная ошибка",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -180,7 +205,11 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
                   Здесь вы можете отметить комиссии как выплаченные партнеру. 
                   Для детальной информации о комиссиях перейдите в раздел клиентов партнера.
                 </p>
-                <Button onClick={handlePayCommission}>
+                <Button 
+                  onClick={handlePayCommission}
+                  disabled={loading}
+                >
+                  {loading && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
                   Отметить комиссии как выплаченные
                 </Button>
               </div>

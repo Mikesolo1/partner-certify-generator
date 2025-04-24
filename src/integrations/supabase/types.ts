@@ -607,6 +607,13 @@ export type Database = {
         Args: { p_payment_id: string }
         Returns: boolean
       }
+      mark_partner_commissions_paid: {
+        Args: { p_partner_id: string; p_admin_id: string }
+        Returns: {
+          updated_count: number
+          total_amount: number
+        }[]
+      }
       save_partner_payment_details: {
         Args: {
           p_partner_id: string

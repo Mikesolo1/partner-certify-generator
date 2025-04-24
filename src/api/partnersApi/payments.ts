@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 import { safeRPC } from "@/api/utils/queryHelpers";
@@ -113,5 +112,39 @@ export const getPartnerPayments = async (partnerId: string) => {
     console.error("Exception in getPartnerPayments:", error);
     console.error("Failed for partner ID:", partnerId);
     return [];
+  }
+};
+
+export const markPartnerCommissionsPaid = async (partnerId: string, adminId: string) => {
+  try {
+    console.log("Marking commissions as paid for partner:", partnerId);
+    
+    if (!partnerId || !adminId) {
+      console.error("Missing required parameters:", { partnerId, adminId });
+      throw new Error("Partner ID and Admin ID are required");
+    }
+
+    const { data, error } = await safeRPC('mark_partner_commissions_paid', {
+      p_partner_id: partnerId,
+      p_admin_id: adminId
+    });
+    
+    if (error) {
+      console.error("Error marking commissions as paid:", error);
+      console.error("Parameters:", { partnerId, adminId });
+      console.error("Full error details:", {
+        message: error.message,
+        hint: error.hint,
+        details: error.details,
+        code: error.code
+      });
+      throw error;
+    }
+    
+    console.log("Successfully marked commissions as paid:", data);
+    return data;
+  } catch (error) {
+    console.error("Exception in markPartnerCommissionsPaid:", error);
+    throw error;
   }
 };
