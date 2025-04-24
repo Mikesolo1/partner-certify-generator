@@ -32,7 +32,7 @@ export const updatePartner = async (id: string, partner: any) => {
 
 export const completeTest = async (partnerId: string) => {
   try {
-    // Используем функцию напрямую для обхода RLS политик
+    // Используем security definer функцию для обхода RLS политик
     const { data, error } = await supabase.rpc("complete_partner_test", {
       p_partner_id: partnerId
     });

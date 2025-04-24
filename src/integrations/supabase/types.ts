@@ -82,6 +82,27 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           certificate_id: string | null
@@ -207,6 +228,42 @@ export type Database = {
         Args: { p_email: string }
         Returns: boolean
       }
+      complete_partner_test: {
+        Args: { p_partner_id: string }
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
+      create_client: {
+        Args: {
+          p_partner_id: string
+          p_name: string
+          p_email: string
+          p_phone?: string
+        }
+        Returns: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          partner_id: string
+          phone: string | null
+          registration_date: string | null
+          updated_at: string | null
+        }[]
+      }
       get_partner_by_credentials: {
         Args: { p_email: string; p_password: string }
         Returns: {
@@ -222,6 +279,19 @@ export type Database = {
           password: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
+      get_partner_clients: {
+        Args: { p_partner_id: string }
+        Returns: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          partner_id: string
+          phone: string | null
+          registration_date: string | null
           updated_at: string | null
         }[]
       }

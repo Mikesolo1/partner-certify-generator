@@ -25,30 +25,43 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
         description: "Пожалуйста, подождите, пока мы генерируем ваш сертификат.",
       });
 
-      // Improved rendering options for better quality
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 2, // Higher scale for better quality
+        scale: 4, // Higher scale for better quality
         logging: false,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
       });
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = 297; // A4 height in mm
       
-      // Create PDF with portrait orientation (A4)
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
 
-      // A4 dimensions in mm (portrait)
-      const imgWidth = 210; 
-      const imgHeight = 297;
+      // Calculate scaling to fit A4 while preserving aspect ratio
+      const canvasRatio = canvas.width / canvas.height;
+      const a4Ratio = imgWidth / imgHeight;
       
-      // Add image while preserving aspect ratio
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+      
+      if (canvasRatio > a4Ratio) {
+        finalHeight = imgWidth / canvasRatio;
+      } else {
+        finalWidth = imgHeight * canvasRatio;
+      }
+      
+      // Center the image on the page
+      const xOffset = (imgWidth - finalWidth) / 2;
+      const yOffset = (imgHeight - finalHeight) / 2;
+      
+      // Convert canvas to image and add to PDF
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
       pdf.save(`S3-${partner.companyName}-Сертификат.pdf`);
 
       toast({
