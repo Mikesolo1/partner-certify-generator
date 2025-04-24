@@ -17,7 +17,7 @@ import { createPayment } from '@/api/partnersApi';
 
 interface ClientsListProps {
   clients: Client[];
-  getClientPayments: (clientId: string) => any[];
+  getClientPayments: (clientId: string) => Payment[];
 }
 
 export const ClientsList: React.FC<ClientsListProps> = ({
@@ -76,33 +76,36 @@ export const ClientsList: React.FC<ClientsListProps> = ({
           </TableHeader>
           <TableBody>
             {clients.length > 0 ? (
-              clients.map(client => (
-                <TableRow key={client.id}>
-                  <TableCell>{client.name}</TableCell>
-                  <TableCell>{client.email}</TableCell>
-                  <TableCell>{client.phone || "—"}</TableCell>
-                  <TableCell>
-                    {new Date(client.registration_date || '').toLocaleDateString('ru-RU')}
-                  </TableCell>
-                  <TableCell>
-                    {getClientPayments(client.id).length} платежей на сумму{" "}
-                    {getClientPayments(client.id)
-                      .reduce((sum, payment) => sum + payment.amount, 0)
-                      .toLocaleString('ru-RU')} ₽
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedClientId(client.id);
-                        setIsAddPaymentDialogOpen(true);
-                      }}
-                    >
-                      Добавить платеж
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              clients.map(client => {
+                const clientPayments = getClientPayments(client.id);
+                const totalAmount = clientPayments.reduce((sum, payment) => sum + payment.amount, 0);
+                
+                return (
+                  <TableRow key={client.id}>
+                    <TableCell>{client.name}</TableCell>
+                    <TableCell>{client.email}</TableCell>
+                    <TableCell>{client.phone || "—"}</TableCell>
+                    <TableCell>
+                      {new Date(client.registrationDate || client.registration_date || '').toLocaleDateString('ru-RU')}
+                    </TableCell>
+                    <TableCell>
+                      {clientPayments.length} платежей на сумму{" "}
+                      {totalAmount.toLocaleString('ru-RU')} ₽
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedClientId(client.id);
+                          setIsAddPaymentDialogOpen(true);
+                        }}
+                      >
+                        Добавить платеж
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-4">У партнера нет клиентов</TableCell>

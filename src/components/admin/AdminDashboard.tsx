@@ -40,14 +40,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const { updatePartnerRole, getPartnerClients, getTotalEarnings } = usePartnerActions(partners, setPartners);
 
-  // Убедимся, что клиенты правильно фильтруются по partner_id
+  console.log("Selected partner ID:", selectedPartnerId);
+  console.log("Total clients:", clients.length);
+  
+  // Filter clients by the selected partner ID
   const partnerClients = selectedPartnerId 
     ? clients.filter(client => client.partner_id === selectedPartnerId)
     : [];
     
-  console.log("Selected partner ID:", selectedPartnerId);
-  console.log("Total clients:", clients.length);
   console.log("Filtered clients for partner:", partnerClients.length);
+
+  // Function to get payments for a specific client
+  const getClientPayments = (clientId: string) => {
+    return payments.filter(payment => payment.client_id === clientId);
+  };
 
   return (
     <Card>
@@ -80,14 +86,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               />
               
               {selectedPartnerId && (
-                <div className="mt-6">
-                  <ClientsList
-                    clients={partnerClients}
-                    getClientPayments={(clientId) => 
-                      payments.filter(payment => payment.client_id === clientId)
-                    }
-                  />
-                </div>
+                <ClientsList
+                  clients={partnerClients}
+                  getClientPayments={getClientPayments}
+                />
               )}
             </TabsContent>
             
@@ -111,7 +113,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ))
                 }}
                 onCreateQuestion={(newQuestionData) => {
-                  // Generate a temporary ID for the new question
                   const newQuestion: TestQuestion = {
                     ...newQuestionData,
                     id: crypto.randomUUID()
