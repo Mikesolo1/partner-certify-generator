@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Client } from '@/types';
@@ -31,6 +32,7 @@ const DashboardPage = () => {
             })
           ]);
 
+          // Check for error in commissionsResponse instead of using truthiness
           if (commissionsResponse.error) {
             console.error("Error loading commission data:", commissionsResponse.error);
             setHasError(true);
