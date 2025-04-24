@@ -17,7 +17,6 @@ import PartnerTestPage from "./pages/PartnerTestPage";
 import PartnerCertificatePage from "./pages/PartnerCertificatePage";
 import ClientsPage from "./pages/ClientsPage";
 import AdminPage from "./pages/AdminPage";
-import PaymentDetailsPage from "./pages/PaymentDetailsPage";
 import AdminPartnerDetailsPage from "./pages/AdminPartnerDetailsPage";
 import React from 'react';
 
@@ -43,7 +42,6 @@ const App = () => (
               <Route path="/dashboard/test" element={<PartnerTestPage />} />
               <Route path="/dashboard/certificate" element={<PartnerCertificatePage />} />
               <Route path="/dashboard/clients" element={<ClientsPage />} />
-              <Route path="/dashboard/payment-details" element={<PaymentDetailsPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/partners/:partnerId" element={<AdminPartnerDetailsPage />} />
               <Route path="*" element={<NotFound />} />
