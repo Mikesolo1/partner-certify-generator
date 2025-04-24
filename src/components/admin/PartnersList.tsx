@@ -77,12 +77,12 @@ export const PartnersList: React.FC<PartnersListProps> = ({
           {partners.length > 0 ? (
             partners.map((p) => (
               <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.company_name}</TableCell>
-                <TableCell>{p.contact_person}</TableCell>
+                <TableCell className="font-medium">{p.companyName || p.company_name}</TableCell>
+                <TableCell>{p.contactPerson || p.contact_person}</TableCell>
                 <TableCell>{p.email}</TableCell>
-                <TableCell>{getTestStatusBadge(p.test_passed || false)}</TableCell>
+                <TableCell>{getTestStatusBadge(p.testPassed || p.test_passed || false)}</TableCell>
                 <TableCell>{getRoleBadge(p.role || 'user')}</TableCell>
-                <TableCell>{p.partner_level}</TableCell>
+                <TableCell>{p.partnerLevel || p.partner_level}</TableCell>
                 <TableCell>{p.id ? getPartnerClients(p.id).length : 0}</TableCell>
                 <TableCell>{p.id ? getTotalEarnings(p.id).toLocaleString('ru-RU') : 0} ₽</TableCell>
                 <TableCell>
@@ -95,7 +95,7 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                         <AlertDialogHeader>
                           <AlertDialogTitle>Изменить роль пользователя</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Выберите новую роль для пользователя {p.contact_person}
+                            Выберите новую роль для пользователя {p.contactPerson || p.contact_person}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex flex-col gap-2 my-4">

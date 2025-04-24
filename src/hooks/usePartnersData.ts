@@ -17,7 +17,21 @@ export const usePartnersData = () => {
     setLoading(true);
     try {
       const partnersData = await api.fetchPartners();
-      setPartners(partnersData);
+      // Convert from snake_case to camelCase for our application
+      const formattedPartners: Partner[] = partnersData.map(p => ({
+        id: p.id,
+        companyName: p.company_name,
+        contactPerson: p.contact_person,
+        email: p.email,
+        partnerLevel: p.partner_level,
+        joinDate: p.join_date,
+        certificateId: p.certificate_id,
+        testPassed: p.test_passed,
+        commission: p.commission,
+        role: p.role
+      }));
+      
+      setPartners(formattedPartners);
       setDataInitialized(true);
       setError(null);
     } catch (error) {

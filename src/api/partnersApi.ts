@@ -266,18 +266,12 @@ export const completeTest = async (partnerId: string) => {
   const updatedPartner: Partner = {
     id: data.id,
     companyName: data.company_name,
-    company_name: data.company_name,
     contactPerson: data.contact_person,
-    contact_person: data.contact_person,
     email: data.email,
     partnerLevel: data.partner_level,
-    partner_level: data.partner_level,
     joinDate: data.join_date,
-    join_date: data.join_date,
     certificateId: data.certificate_id,
-    certificate_id: data.certificate_id,
     testPassed: data.test_passed,
-    test_passed: data.test_passed,
     commission: data.commission,
     role: data.role
   };
