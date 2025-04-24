@@ -37,7 +37,8 @@ const AdminPartnerDetailsPage = () => {
         setError(`Ошибка загрузки: ${rpcError.message}`);
         setDebugInfo({
           method: 'RPC get_partner_by_id',
-          error: rpcError
+          error: rpcError,
+          partnerId
         });
         
         toast({
@@ -92,7 +93,8 @@ const AdminPartnerDetailsPage = () => {
       setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
       setDebugInfo({
         method: 'Exception',
-        error: err
+        error: err,
+        partnerId
       });
       
       toast({
@@ -108,9 +110,8 @@ const AdminPartnerDetailsPage = () => {
   useEffect(() => {
     console.log("AdminPartnerDetailsPage mounted with partnerId:", partnerId);
     fetchPartnerDetails();
-    
-    // Remove adminData.fetchData from the initial mount to prevent unnecessary data fetching
-    // We'll only fetch the admin data when the refresh button is clicked
+    // Fetch admin data on mount to ensure we have clients and payments
+    fetchData();
   }, [partnerId]);
 
   const handleRefresh = async () => {
@@ -125,6 +126,7 @@ const AdminPartnerDetailsPage = () => {
   };
   
   if (!partnerId) {
+    console.error("No partnerId provided in URL");
     return <Navigate to="/admin" />;
   }
 
@@ -133,6 +135,7 @@ const AdminPartnerDetailsPage = () => {
   }
 
   if (error || !partner) {
+    console.error("Error or no partner data:", error, partner);
     return (
       <PartnerDetailsError 
         error={error} 
@@ -146,8 +149,11 @@ const AdminPartnerDetailsPage = () => {
 
   // Add additional logging before rendering content
   console.log("Rendering partner details content for:", partner.companyName);
+  console.log("Available clients:", clients.length);
   
   const partnerClients = clients.filter(client => client.partner_id === partnerId);
+  console.log("Filtered partner clients:", partnerClients.length);
+  
   const getClientPayments = (clientId: string) => {
     return payments.filter(payment => payment.client_id === clientId);
   };

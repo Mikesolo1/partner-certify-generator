@@ -27,6 +27,12 @@ export const PartnerDetailsContent = ({
   onRefresh,
   getClientPayments
 }: PartnerDetailsContentProps) => {
+  console.log("PartnerDetailsContent rendering with:", {
+    partnerName: partner.companyName,
+    clientCount: partnerClients.length,
+    partnerId
+  });
+
   return (
     <div className="min-h-screen bg-brand-light">
       <Header />

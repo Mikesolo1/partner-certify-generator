@@ -12,31 +12,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { getRoleBadge } from '@/utils/roleUtils';
 
 interface PartnersListProps {
   partners: Partner[];
-  onUpdateRole: (partnerId: string, newRole: string) => void;
   onSelectPartner: (partnerId: string | null) => void;
   selectedPartnerId: string | null;
   getPartnerClients: (partnerId: string) => any[];
   getTotalEarnings: (partnerId: string) => number;
+  onUpdateRole?: (partnerId: string, newRole: string) => void; // Made optional as it's no longer used
 }
 
 export const PartnersList: React.FC<PartnersListProps> = ({
   partners,
-  onUpdateRole,
   onSelectPartner,
   selectedPartnerId,
   getPartnerClients,
@@ -82,43 +70,6 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                 <TableCell>{p.id ? getTotalEarnings(p.id).toLocaleString('ru-RU') : 0} ₽</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="outline">Сменить роль</Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Изменить роль пользователя</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Выберите новую роль для пользователя {p.contactPerson || p.contact_person}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <div className="flex flex-col gap-2 my-4">
-                          <Button 
-                            variant={p.role === 'admin' ? "default" : "outline"} 
-                            onClick={() => onUpdateRole(p.id!, 'admin')}
-                          >
-                            Администратор
-                          </Button>
-                          <Button 
-                            variant={p.role === 'partner' ? "default" : "outline"}
-                            onClick={() => onUpdateRole(p.id!, 'partner')}
-                          >
-                            Партнер
-                          </Button>
-                          <Button 
-                            variant={p.role === 'user' ? "default" : "outline"}
-                            onClick={() => onUpdateRole(p.id!, 'user')}
-                          >
-                            Пользователь
-                          </Button>
-                        </div>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Отмена</AlertDialogCancel>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -132,7 +83,7 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                       variant="outline"
                       asChild
                     >
-                      <Link to={`/admin/partners/${p.id}`}>
+                      <Link to={`/admin/partners/${p.id}`} data-testid={`view-partner-${p.id}`}>
                         Подробнее
                       </Link>
                     </Button>
