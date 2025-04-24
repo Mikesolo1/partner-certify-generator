@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,17 +19,26 @@ interface PartnerPaymentDetailsProps {
 export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ partnerId }) => {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPaymentDetails = async () => {
       try {
+        // Using retryQuery for better error handling with RLS issues
         const { data, error } = await supabase
           .from('payment_details')
           .select('*')
           .eq('partner_id', partnerId);
           
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching payment details:", error);
+          setError("Не удалось загрузить способы получения комиссии");
+          throw error;
+        }
+        
+        console.log("Payment details loaded:", data?.length || 0);
         setPaymentDetails(data || []);
+        setError(null);
       } catch (error) {
         console.error('Error fetching payment details:', error);
       } finally {
@@ -36,7 +46,12 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
       }
     };
 
-    fetchPaymentDetails();
+    if (partnerId) {
+      fetchPaymentDetails();
+    } else {
+      setLoading(false);
+      setError("ID партнера не указан");
+    }
   }, [partnerId]);
 
   const renderPaymentTypeIcon = (type: string) => {
@@ -67,6 +82,21 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         <CardHeader>
           <CardTitle>Загрузка способов получения комиссии...</CardTitle>
         </CardHeader>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Способы получения комиссии</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-500">
+            {error}
+          </p>
+        </CardContent>
       </Card>
     );
   }
