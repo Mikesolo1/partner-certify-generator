@@ -44,7 +44,7 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
     
     fetchNotifications();
     
-    // Настраиваем подписку на обновления таблицы notifications
+    // Setup subscription to notifications table updates
     const channel = supabase
       .channel('public:notifications')
       .on('postgres_changes', { 
@@ -52,10 +52,10 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
         schema: 'public', 
         table: 'notifications' 
       }, (payload) => {
-        // Добавляем новое уведомление в начало списка
+        // Add new notification to the beginning of the list
         setNotifications(prev => [payload.new as Notification, ...prev]);
         
-        // Показываем тост при поступлении нового уведомления
+        // Show toast when new notification arrives
         toast({
           title: "Новое уведомление",
           description: (payload.new as Notification).title,
