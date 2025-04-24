@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { createPayment } from '@/api/partnersApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ClientsListProps {
   clients: Client[];
@@ -27,6 +28,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
+  const [paymentDate, setPaymentDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [paymentDestination, setPaymentDestination] = useState<string>('card');
+  const [tariffStartDate, setTariffStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [tariffEndDate, setTariffEndDate] = useState<string>('');
   const { toast } = useToast();
 
   const handleAddPayment = async () => {
@@ -37,8 +42,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         client_id: selectedClientId,
         amount: paymentAmount,
         status: "оплачено",
-        date: new Date().toISOString(),
-        commission_amount: 0 // Будет рассчитано на бэкенде
+        date: new Date(paymentDate).toISOString(),
+        commission_amount: 0, // Будет рассчитано на бэкенде
+        payment_destination: paymentDestination,
+        tariff_start_date: tariffStartDate,
+        tariff_end_date: tariffEndDate || undefined
       });
 
       toast({
@@ -48,6 +56,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
       setIsAddPaymentDialogOpen(false);
       setPaymentAmount(0);
+      setPaymentDate(new Date().toISOString().split('T')[0]);
+      setPaymentDestination('card');
+      setTariffStartDate(new Date().toISOString().split('T')[0]);
+      setTariffEndDate('');
       setSelectedClientId(null);
     } catch (error) {
       console.error("Error adding payment:", error);
@@ -116,11 +128,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
       </div>
 
       <Dialog open={isAddPaymentDialogOpen} onOpenChange={setIsAddPaymentDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Добавить платеж</DialogTitle>
             <DialogDescription>
-              Укажите сумму платежа для клиента
+              Укажите детали платежа для клиента
             </DialogDescription>
           </DialogHeader>
 
@@ -135,6 +147,55 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(Number(e.target.value))}
                 placeholder="10000"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Дата платежа
+              </label>
+              <Input
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Куда поступил платеж
+              </label>
+              <Select value={paymentDestination} onValueChange={setPaymentDestination}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите тип платежа" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="card">Карта</SelectItem>
+                  <SelectItem value="ru_ip">Счет ИП РФ</SelectItem>
+                  <SelectItem value="kz_ip">Счет ИП Казахстан</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Дата начала тарифа
+              </label>
+              <Input
+                type="date"
+                value={tariffStartDate}
+                onChange={(e) => setTariffStartDate(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Дата окончания тарифа
+              </label>
+              <Input
+                type="date"
+                value={tariffEndDate}
+                onChange={(e) => setTariffEndDate(e.target.value)}
               />
             </div>
           </div>

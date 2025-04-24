@@ -9,4 +9,7 @@ export interface Payment {
   commissionAmount?: number; // Added for compatibility
   created_at?: string;
   updated_at?: string;
+  payment_destination?: string;
+  tariff_start_date?: string;
+  tariff_end_date?: string;
 }

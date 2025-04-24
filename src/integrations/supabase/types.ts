@@ -201,7 +201,10 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          payment_destination: string | null
           status: string
+          tariff_end_date: string | null
+          tariff_start_date: string | null
           updated_at: string | null
         }
         Insert: {
@@ -212,7 +215,10 @@ export type Database = {
           created_by?: string | null
           date?: string | null
           id?: string
+          payment_destination?: string | null
           status: string
+          tariff_end_date?: string | null
+          tariff_start_date?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -223,7 +229,10 @@ export type Database = {
           created_by?: string | null
           date?: string | null
           id?: string
+          payment_destination?: string | null
           status?: string
+          tariff_end_date?: string | null
+          tariff_start_date?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -291,7 +300,36 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          payment_destination: string | null
           status: string
+          tariff_end_date: string | null
+          tariff_start_date: string | null
+          updated_at: string | null
+        }
+      }
+      add_payment_with_details: {
+        Args: {
+          p_client_id: string
+          p_amount: number
+          p_date: string
+          p_status: string
+          p_payment_destination: string
+          p_tariff_start_date: string
+          p_tariff_end_date: string
+          p_admin_id: string
+        }
+        Returns: {
+          amount: number
+          client_id: string
+          commission_amount: number
+          created_at: string | null
+          created_by: string | null
+          date: string | null
+          id: string
+          payment_destination: string | null
+          status: string
+          tariff_end_date: string | null
+          tariff_start_date: string | null
           updated_at: string | null
         }
       }
@@ -398,7 +436,10 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          payment_destination: string | null
           status: string
+          tariff_end_date: string | null
+          tariff_start_date: string | null
           updated_at: string | null
         }[]
       }

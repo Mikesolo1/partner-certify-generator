@@ -7,24 +7,24 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
   try {
     console.log("Creating payment:", payment);
     
-    // Проверяем, что все необходимые поля присутствуют
     if (!payment.client_id || !payment.amount || !payment.status) {
       throw new Error("Missing required payment fields");
     }
     
-    // Убеждаемся, что commission_amount задан
     const finalPayment = {
       ...payment,
       commission_amount: payment.commission_amount || 0
     };
     
-    // Используем RPC вместо прямого доступа к таблице
-    const { data, error } = await safeRPC('add_payment', {
+    const { data, error } = await safeRPC('add_payment_with_details', {
       p_client_id: finalPayment.client_id,
       p_amount: finalPayment.amount,
       p_date: finalPayment.date || new Date().toISOString(),
       p_status: finalPayment.status,
-      p_commission_amount: finalPayment.commission_amount
+      p_payment_destination: finalPayment.payment_destination,
+      p_tariff_start_date: finalPayment.tariff_start_date,
+      p_tariff_end_date: finalPayment.tariff_end_date,
+      p_admin_id: finalPayment.created_by
     });
     
     if (error) {
