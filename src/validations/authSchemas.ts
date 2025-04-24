@@ -8,6 +8,9 @@ export const registerFormSchema = z.object({
   contactPerson: z.string().min(2, {
     message: "Имя контактного лица должно содержать не менее 2 символов.",
   }),
+  phone: z.string().min(10, {
+    message: "Введите корректный номер телефона.",
+  }),
   email: z.string().email({
     message: "Пожалуйста, введите корректный email адрес.",
   }),

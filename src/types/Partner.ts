@@ -1,4 +1,3 @@
-
 export interface Partner {
   id?: string;
   companyName: string;
@@ -17,4 +16,5 @@ export interface Partner {
   test_passed?: boolean; // Added for compatibility
   commission?: number;
   role?: string;
+  phone: string;
 }

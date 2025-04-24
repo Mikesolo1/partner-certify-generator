@@ -115,6 +115,7 @@ export type Database = {
           join_date: string | null
           partner_level: string
           password: string
+          phone: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -130,6 +131,7 @@ export type Database = {
           join_date?: string | null
           partner_level: string
           password: string
+          phone?: string
           role?: Database["public"]["Enums"]["user_role"] | null
           test_passed?: boolean | null
           updated_at?: string | null
@@ -145,11 +147,50 @@ export type Database = {
           join_date?: string | null
           partner_level?: string
           password?: string
+          phone?: string
           role?: Database["public"]["Enums"]["user_role"] | null
           test_passed?: boolean | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      payment_details: {
+        Row: {
+          created_at: string | null
+          details: Json
+          id: string
+          is_primary: boolean | null
+          partner_id: string
+          payment_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details: Json
+          id?: string
+          is_primary?: boolean | null
+          partner_id: string
+          payment_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json
+          id?: string
+          is_primary?: boolean | null
+          partner_id?: string
+          payment_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_details_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -241,6 +282,7 @@ export type Database = {
           join_date: string | null
           partner_level: string
           password: string
+          phone: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -277,6 +319,7 @@ export type Database = {
           join_date: string | null
           partner_level: string
           password: string
+          phone: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -316,6 +359,7 @@ export type Database = {
           join_date: string | null
           partner_level: string
           password: string
+          phone: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null

@@ -1,4 +1,3 @@
-
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
@@ -94,7 +93,7 @@ export const useClientManagement = (currentPartner: any = null) => {
         ? { 
             amount: payment, 
             date: new Date().toISOString(), 
-            status: 'оплачено' 
+            status: "оплачено" as const
           }
         : payment;
       
@@ -105,7 +104,8 @@ export const useClientManagement = (currentPartner: any = null) => {
       const fullPaymentData = {
         ...paymentData,
         client_id: clientId,
-        commission_amount: commissionAmount
+        commission_amount: commissionAmount,
+        status: paymentData.status || "оплачено"
       };
       
       console.log("Adding payment with data:", fullPaymentData);
