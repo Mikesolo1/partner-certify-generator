@@ -6,19 +6,22 @@ import { usePartners } from '@/contexts/PartnersContext';
 
 const Header = () => {
   // Create a safer way to access the context
-  let currentPartner = null;
-  let contextError = false;
+  const [currentPartner, setContextError] = React.useState(null);
+  const [hasContextError, setHasContextError] = React.useState(false);
   
-  try {
-    const partnersContext = usePartners();
-    currentPartner = partnersContext.currentPartner;
-  } catch (error) {
-    console.error("Error accessing partners context:", error);
-    contextError = true;
-  }
+  React.useEffect(() => {
+    try {
+      const { currentPartner } = usePartners();
+      setContextError(false);
+      setContextError(currentPartner);
+    } catch (error) {
+      console.error("Error accessing partners context:", error);
+      setHasContextError(true);
+    }
+  }, []);
 
   // If we had an error accessing the context, render a simpler header
-  if (contextError) {
+  if (hasContextError) {
     return (
       <header className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4">
