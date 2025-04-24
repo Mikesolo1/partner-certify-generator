@@ -57,6 +57,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <TabsTrigger value="test">Вопросы теста</TabsTrigger>
             </TabsList>
             
+            {/* Partners Tab Content */}
             <TabsContent value="partners">
               <PartnersList
                 partners={partners}
@@ -77,6 +78,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
             </TabsContent>
             
+            {/* Notifications Tab Content */}
             <TabsContent value="notifications">
               <div className="mb-6 space-y-4">
                 <NotificationForm onCreateNotification={(title, content) => {
@@ -86,6 +88,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </TabsContent>
 
+            {/* Test Questions Tab Content */}
             <TabsContent value="test">
               <TestQuestionsManager 
                 questions={testQuestions}
@@ -94,8 +97,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     q.id === question.id ? question : q
                   ))
                 }}
-                onCreateQuestion={(question) => {
-                  setTestQuestions([...testQuestions, question])
+                onCreateQuestion={(newQuestionData) => {
+                  // Generate a temporary ID for the new question
+                  const newQuestion: TestQuestion = {
+                    ...newQuestionData,
+                    id: crypto.randomUUID()
+                  };
+                  setTestQuestions([...testQuestions, newQuestion]);
                 }}
                 onDeleteQuestion={(id) => {
                   setTestQuestions(testQuestions.filter(q => q.id !== id))
