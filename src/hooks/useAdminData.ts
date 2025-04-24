@@ -69,9 +69,8 @@ export const useAdminData = () => {
 
   const fetchAllClients = async () => {
     try {
-      const { data, error } = await simpleQuery(() => 
-        supabase.from("clients").select("*")
-      );
+      // Используем RPC вызов вместо прямого запроса к таблице
+      const { data, error } = await supabase.rpc("get_all_clients");
       
       if (error) {
         console.error("Ошибка загрузки клиентов:", error);
@@ -94,9 +93,8 @@ export const useAdminData = () => {
 
   const fetchAllPayments = async () => {
     try {
-      const { data, error } = await simpleQuery(() => 
-        supabase.from("payments").select("*")
-      );
+      // Используем RPC вызов вместо прямого запроса к таблице
+      const { data, error } = await supabase.rpc("get_all_payments");
         
       if (error) {
         console.error("Ошибка загрузки платежей:", error);
@@ -119,9 +117,8 @@ export const useAdminData = () => {
 
   const fetchAllTestQuestions = async () => {
     try {
-      const { data, error } = await simpleQuery(() => 
-        supabase.from("test_questions").select("*")
-      );
+      // Используем RPC вызов вместо прямого запроса к таблице
+      const { data, error } = await supabase.rpc("get_all_test_questions");
         
       if (error) {
         console.error("Ошибка загрузки вопросов теста:", error);
@@ -141,9 +138,8 @@ export const useAdminData = () => {
 
   const fetchAllNotifications = async () => {
     try {
-      const { data, error } = await simpleQuery(() => 
-        supabase.from("notifications").select("*").order('created_at', { ascending: false })
-      );
+      // Используем RPC вызов вместо прямого запроса к таблице
+      const { data, error } = await supabase.rpc("get_all_notifications");
         
       if (error) {
         console.error("Ошибка загрузки уведомлений:", error);

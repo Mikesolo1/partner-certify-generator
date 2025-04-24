@@ -1,11 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, BanknoteIcon, AlertCircle, Bug } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { simpleQuery } from "@/api/utils/queryHelpers";
 
 interface PaymentDetails {
   id: string;
@@ -31,12 +29,9 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         console.log("Fetching payment details for partner:", partnerId);
         setLoading(true);
         
-        // Using simpleQuery instead of retryQuery
-        const { data, error } = await simpleQuery(() => 
-          supabase
-            .from('payment_details')
-            .select('*')
-            .eq('partner_id', partnerId)
+        const { data, error } = await supabase.rpc(
+          'get_partner_payment_details',
+          { p_partner_id: partnerId }
         );
           
         if (error) {
@@ -99,101 +94,74 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
     ));
   };
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Способы получения комиссии</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-center py-6">
-            <div className="h-8 w-8 border-4 border-t-blue-500 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="text-center text-gray-500">Загрузка способов получения комиссии...</p>
-          <p className="text-center text-xs text-gray-400 mt-2">ID партнера: {partnerId}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Способы получения комиссии</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2 text-red-500 mb-2">
-            <AlertCircle className="h-5 w-5" />
-            <p>{error}</p>
-          </div>
-          <p className="text-gray-500 mb-4">
-            Попробуйте перезагрузить страницу или обратитесь к администратору
-          </p>
-          
-          {debugInfo && (
-            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
-              <div className="flex items-center gap-2 mb-2">
-                <Bug className="h-4 w-4 text-orange-500" />
-                <h4 className="text-sm font-medium">Отладочная информация:</h4>
-              </div>
-              <div className="text-xs font-mono bg-black/5 p-2 rounded">
-                <p>ID партнера: {partnerId}</p>
-                <p>Код ошибки: {debugInfo.code}</p>
-                <p>Сообщение: {debugInfo.message}</p>
-                {debugInfo.details && <p>Детали: {debugInfo.details}</p>}
-                {debugInfo.hint && <p>Подсказка: {debugInfo.hint}</p>}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (paymentDetails.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Способы получения комиссии</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-500">
-            Партнер еще не указал способы получения комиссии
-          </p>
-          <p className="text-xs text-gray-400 mt-2">ID партнера: {partnerId}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Способы получения комиссии</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
-          {paymentDetails.map((detail) => (
-            <div
-              key={detail.id}
-              className="flex items-start gap-4 p-4 border rounded-lg"
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  {renderPaymentTypeIcon(detail.payment_type)}
-                  <h3 className="font-medium">
-                    {detail.payment_type}
-                    {detail.is_primary && (
-                      <Badge className="ml-2 bg-green-500">Основной</Badge>
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <div className="h-8 w-8 border-4 border-t-blue-500 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center gap-2 text-red-500 mb-2">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+        ) : paymentDetails.length === 0 ? (
+          <p className="text-gray-500">
+            Партнер еще не указал способы получения комиссии
+          </p>
+        ) : (
+          <div className="grid gap-4">
+            {paymentDetails.map((detail) => (
+              <div
+                key={detail.id}
+                className="flex items-start gap-4 p-4 border rounded-lg"
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {detail.payment_type.toLowerCase().includes('bank') ? (
+                      <CreditCard className="h-4 w-4 mr-2" />
+                    ) : (
+                      <BanknoteIcon className="h-4 w-4 mr-2" />
                     )}
-                  </h3>
+                    <h3 className="font-medium">
+                      {detail.payment_type}
+                      {detail.is_primary && (
+                        <Badge className="ml-2 bg-green-500">Основной</Badge>
+                      )}
+                    </h3>
+                  </div>
+                  {detail.details && 
+                    Object.entries(detail.details).map(([key, value]) => (
+                      <div key={key} className="flex gap-2 text-sm">
+                        <span className="text-gray-500">{key}:</span>
+                        <span>{String(value)}</span>
+                      </div>
+                    ))
+                  }
                 </div>
-                {renderPaymentDetails(detail.details)}
               </div>
+            ))}
+          </div>
+        )}
+        {debugInfo && (
+          <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <div className="flex items-center gap-2 mb-2">
+              <Bug className="h-4 w-4 text-orange-500" />
+              <h4 className="text-sm font-medium">Отладочная информация:</h4>
             </div>
-          ))}
-        </div>
+            <div className="text-xs font-mono bg-black/5 p-2 rounded">
+              <p>ID партнера: {partnerId}</p>
+              <p>Код ошибки: {debugInfo.code}</p>
+              <p>Сообщение: {debugInfo.message}</p>
+              {debugInfo.details && <p>Детали: {debugInfo.details}</p>}
+              {debugInfo.hint && <p>Подсказка: {debugInfo.hint}</p>}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
