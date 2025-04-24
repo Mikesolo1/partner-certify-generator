@@ -339,15 +339,25 @@ export type Database = {
         }[]
       }
       insert_partner_direct: {
-        Args: {
-          p_company_name: string
-          p_contact_person: string
-          p_email: string
-          p_password: string
-          p_partner_level?: string
-          p_certificate_id?: string
-          p_commission?: number
-        }
+        Args:
+          | {
+              p_company_name: string
+              p_contact_person: string
+              p_email: string
+              p_password: string
+              p_partner_level?: string
+              p_certificate_id?: string
+              p_commission?: number
+            }
+          | {
+              p_company_name: string
+              p_contact_person: string
+              p_email: string
+              p_password: string
+              p_partner_level?: string
+              p_commission?: number
+              p_phone?: string
+            }
         Returns: {
           certificate_id: string | null
           commission: number | null

@@ -41,7 +41,7 @@ export const createPartner = async (partner: Partner) => {
       password: '[REDACTED]'
     });
     
-    // Исправлена опечатка в названии функции: insert_partnet_direct -> insert_partner_direct
+    // Use the correct RPC function to create partner
     const { data, error } = await supabase.rpc('insert_partner_direct', {
       p_company_name: partner.companyName,
       p_contact_person: partner.contactPerson,
@@ -49,7 +49,7 @@ export const createPartner = async (partner: Partner) => {
       p_password: partner.password,
       p_partner_level: 'Бронзовый',
       p_commission: 20,
-      p_phone: partner.phone || ''  // Add phone parameter
+      p_phone: partner.phone || ''  // Include phone parameter
     });
     
     if (error) {
