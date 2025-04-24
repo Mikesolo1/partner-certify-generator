@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -95,6 +96,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <AllClientsTab
                 clients={clients}
                 getClientPayments={getClientPayments}
+                partners={partners}
               />
             </TabsContent>
 
@@ -143,3 +145,4 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     </Card>
   );
 };
+

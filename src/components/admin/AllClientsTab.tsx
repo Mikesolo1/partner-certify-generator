@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -10,22 +11,31 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Client, Payment } from '@/types';
+import { Client, Payment, Partner } from '@/types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AllClientsTabProps {
   clients: Client[];
   getClientPayments: (clientId: string) => Payment[];
+  partners?: Partner[]; // Add partners prop
 }
 
 export const AllClientsTab: React.FC<AllClientsTabProps> = ({
   clients,
   getClientPayments,
+  partners = [] // Provide empty array as default
 }) => {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isPaymentsDialogOpen, setIsPaymentsDialogOpen] = useState(false);
   const [sortField, setSortField] = useState<'name' | 'email' | 'date'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Get partner company name by ID
+  const getPartnerCompanyName = (partnerId?: string) => {
+    if (!partnerId) return "—";
+    const partner = partners.find(p => p.id === partnerId);
+    return partner?.companyName || partner?.company_name || "—";
+  };
 
   const sortedClients = [...clients].sort((a, b) => {
     if (sortField === 'date') {
@@ -111,8 +121,14 @@ export const AllClientsTab: React.FC<AllClientsTabProps> = ({
                   {formatDate(client.registrationDate || client.registration_date || '')}
                 </TableCell>
                 <TableCell>
-                  {/* We'll handle partner name display via parent component */}
-                  {client.partner_id}
+                  {client.partner_id ? (
+                    <Link 
+                      to={`/admin/partners/${client.partner_id}`}
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {getPartnerCompanyName(client.partner_id)}
+                    </Link>
+                  ) : "—"}
                 </TableCell>
                 <TableCell>
                   <Button
@@ -179,3 +195,4 @@ export const AllClientsTab: React.FC<AllClientsTabProps> = ({
     </div>
   );
 };
+
