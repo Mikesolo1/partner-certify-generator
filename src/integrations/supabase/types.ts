@@ -343,6 +343,10 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      delete_client: {
+        Args: { p_client_id: string }
+        Returns: boolean
+      }
       get_all_partners: {
         Args: Record<PropertyKey, never>
         Returns: {

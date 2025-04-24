@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Client } from "@/types";
 
@@ -63,22 +62,9 @@ export const updateClient = async (id: string, client: Partial<Client>) => {
 
 export const deleteClient = async (id: string) => {
   try {
-    // First, try to use direct RPC call to avoid RLS recursion issue
-    const { error: rpcError } = await supabase.rpc("delete_client", {
+    const { error } = await supabase.rpc("delete_client", {
       p_client_id: id
     });
-    
-    if (!rpcError) {
-      return true;
-    }
-    
-    console.log("Fallback to direct delete:", rpcError);
-    
-    // Fallback to direct delete
-    const { error } = await supabase
-      .from("clients")
-      .delete()
-      .eq("id", id);
     
     if (error) throw error;
     
