@@ -3,17 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
-import { ClientsList } from '@/components/admin/ClientsList';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminData } from '@/hooks/useAdminData';
-import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails';
 import { Partner } from '@/types';
-import { PartnerHeader } from '@/components/admin/PartnerHeader';
-import { PartnerInfo } from '@/components/admin/PartnerInfo';
-import { ErrorDisplay } from '@/components/admin/ErrorDisplay';
 import { safeRPC } from '@/api/utils/queryHelpers';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { PartnerDetailsLoading } from '@/components/admin/partner-details/PartnerDetailsLoading';
+import { PartnerDetailsError } from '@/components/admin/partner-details/PartnerDetailsError';
+import { PartnerDetailsContent } from '@/components/admin/partner-details/PartnerDetailsContent';
 
 const AdminPartnerDetailsPage = () => {
   const { partnerId } = useParams();
@@ -32,14 +27,10 @@ const AdminPartnerDetailsPage = () => {
       setLoading(true);
       console.log("Fetching partner details for ID:", partnerId);
 
-      // Increased retries and delay
       const { data, error: rpcError } = await safeRPC(
         'get_partner_by_id', 
         { p_id: partnerId },
-        { 
-          retries: 3, 
-          delay: 1500 // Add a 1.5-second delay between retries
-        }
+        { retries: 3, delay: 1500 }
       );
 
       if (rpcError) {
@@ -129,41 +120,18 @@ const AdminPartnerDetailsPage = () => {
   }
 
   if (loading || adminDataLoading) {
-    return (
-      <div className="min-h-screen bg-brand-light">
-        <Header />
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex justify-center items-center py-20">
-            <div className="text-center">
-              <div className="h-12 w-12 border-4 border-t-blue-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <h2 className="text-xl font-semibold mb-2">Загрузка данных партнера...</h2>
-              <p className="text-gray-500">ID: {partnerId}</p>
-              <p className="text-gray-500 text-sm mt-4">Пожалуйста, подождите</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <PartnerDetailsLoading partnerId={partnerId} />;
   }
 
   if (error || !partner) {
     return (
-      <div className="min-h-screen bg-brand-light">
-        <Header />
-        <div className="container mx-auto px-4 py-12">
-          <ErrorDisplay 
-            error={error || "Партнер не найден"} 
-            partnerId={partnerId}
-            debugInfo={debugInfo}
-          />
-          <div className="mt-6">
-            <Button onClick={handleRefresh} disabled={refreshing}>
-              <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              Попробовать снова
-            </Button>
-          </div>
-        </div>
-      </div>
+      <PartnerDetailsError 
+        error={error} 
+        partnerId={partnerId}
+        debugInfo={debugInfo}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+      />
     );
   }
 
@@ -175,30 +143,14 @@ const AdminPartnerDetailsPage = () => {
   return (
     <div className="min-h-screen bg-brand-light">
       <Header />
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-6">
-          <PartnerHeader partner={partner} />
-          <Button onClick={handleRefresh} disabled={refreshing} variant="outline">
-            <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Обновить
-          </Button>
-        </div>
-        <div className="grid gap-6">
-          <PartnerInfo partner={partner} />
-          <PartnerPaymentDetails partnerId={partnerId} />
-          <Card>
-            <CardHeader>
-              <CardTitle>Клиенты партнера</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ClientsList
-                clients={partnerClients}
-                getClientPayments={getClientPayments}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <PartnerDetailsContent 
+        partner={partner}
+        partnerClients={partnerClients}
+        partnerId={partnerId}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        getClientPayments={getClientPayments}
+      />
     </div>
   );
 };

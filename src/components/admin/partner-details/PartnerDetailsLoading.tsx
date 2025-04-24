@@ -1,0 +1,20 @@
+
+import { Header } from '@/components/Header';
+
+export const PartnerDetailsLoading = ({ partnerId }: { partnerId: string }) => {
+  return (
+    <div className="min-h-screen bg-brand-light">
+      <Header />
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center">
+            <div className="h-12 w-12 border-4 border-t-blue-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold mb-2">Загрузка данных партнера...</h2>
+            <p className="text-gray-500">ID: {partnerId}</p>
+            <p className="text-gray-500 text-sm mt-4">Пожалуйста, подождите</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
