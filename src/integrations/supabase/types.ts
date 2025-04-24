@@ -198,6 +198,7 @@ export type Database = {
           client_id: string
           commission_amount: number
           created_at: string | null
+          created_by: string | null
           date: string | null
           id: string
           status: string
@@ -208,6 +209,7 @@ export type Database = {
           client_id: string
           commission_amount: number
           created_at?: string | null
+          created_by?: string | null
           date?: string | null
           id?: string
           status: string
@@ -218,6 +220,7 @@ export type Database = {
           client_id?: string
           commission_amount?: number
           created_at?: string | null
+          created_by?: string | null
           date?: string | null
           id?: string
           status?: string
@@ -229,6 +232,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -265,6 +275,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_payment_as_admin: {
+        Args: {
+          p_client_id: string
+          p_amount: number
+          p_date: string
+          p_status: string
+          p_admin_id: string
+        }
+        Returns: {
+          amount: number
+          client_id: string
+          commission_amount: number
+          created_at: string | null
+          created_by: string | null
+          date: string | null
+          id: string
+          status: string
+          updated_at: string | null
+        }
+      }
       check_client_exists: {
         Args: { p_email: string; p_phone?: string }
         Returns: {
