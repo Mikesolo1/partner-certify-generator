@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase, retryQuery } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, BanknoteIcon, AlertCircle } from 'lucide-react';
+import { CreditCard, BanknoteIcon, AlertCircle, Bug } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PaymentDetails {
   id: string;
@@ -20,6 +21,8 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchPaymentDetails = async () => {
@@ -38,15 +41,25 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         if (error) {
           console.error("Error fetching payment details:", error);
           setError("Не удалось загрузить способы получения комиссии");
+          setDebugInfo(error);
+          
+          toast({
+            title: "Ошибка загрузки данных",
+            description: `Детали оплаты: ${error.message || "Неизвестная ошибка"}`,
+            variant: "destructive"
+          });
+          
           throw error;
         }
         
         console.log("Payment details loaded:", data?.length || 0, data);
         setPaymentDetails(data || []);
         setError(null);
+        setDebugInfo(null);
       } catch (error: any) {
         console.error('Error fetching payment details:', error);
         setError(`Ошибка: ${error.message || "Неизвестная ошибка"}`);
+        setDebugInfo(error);
       } finally {
         setLoading(false);
       }
@@ -58,7 +71,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
       setLoading(false);
       setError("ID партнера не указан");
     }
-  }, [partnerId]);
+  }, [partnerId, toast]);
 
   const renderPaymentTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
@@ -96,6 +109,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
             <div className="h-8 w-8 border-4 border-t-blue-500 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
           </div>
           <p className="text-center text-gray-500">Загрузка способов получения комиссии...</p>
+          <p className="text-center text-xs text-gray-400 mt-2">ID партнера: {partnerId}</p>
         </CardContent>
       </Card>
     );
@@ -112,9 +126,25 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
             <AlertCircle className="h-5 w-5" />
             <p>{error}</p>
           </div>
-          <p className="text-gray-500">
+          <p className="text-gray-500 mb-4">
             Попробуйте перезагрузить страницу или обратитесь к администратору
           </p>
+          
+          {debugInfo && (
+            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <Bug className="h-4 w-4 text-orange-500" />
+                <h4 className="text-sm font-medium">Отладочная информация:</h4>
+              </div>
+              <div className="text-xs font-mono bg-black/5 p-2 rounded">
+                <p>ID партнера: {partnerId}</p>
+                <p>Код ошибки: {debugInfo.code}</p>
+                <p>Сообщение: {debugInfo.message}</p>
+                {debugInfo.details && <p>Детали: {debugInfo.details}</p>}
+                {debugInfo.hint && <p>Подсказка: {debugInfo.hint}</p>}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -130,6 +160,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
           <p className="text-gray-500">
             Партнер еще не указал способы получения комиссии
           </p>
+          <p className="text-xs text-gray-400 mt-2">ID партнера: {partnerId}</p>
         </CardContent>
       </Card>
     );
