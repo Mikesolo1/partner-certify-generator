@@ -1,33 +1,15 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { Partner } from '@/types';
 import { usePartners } from '@/contexts/PartnersContext';
 import { RegisterFormValues } from '@/validations/authSchemas';
+import { checkPartnerExists } from '@/api/partnersApi/partners';
 
 export const useRegistration = () => {
   const { addPartner, loginPartner } = usePartners();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-  const checkPartnerExists = async (email: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase.rpc('check_partner_exists', { p_email: email });
-      
-      if (error) {
-        console.error("Error checking partner exists:", error);
-        throw new Error("Ошибка проверки существующего пользователя");
-      }
-      
-      return !!data;
-    } catch (error) {
-      console.error("Exception checking partner exists:", error);
-      throw error;
-    }
-  };
 
   const registerPartner = async (formData: RegisterFormValues) => {
     try {

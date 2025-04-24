@@ -60,7 +60,8 @@ export const calculatePartnerLevel = (clientsWithPayments: number): {
 
 export const updatePartnerLevel = async (partnerId: string) => {
   try {
-    const { data: clients } = await supabase
+    // Fixed the query to safely count clients with payments
+    const { data: clients, error } = await supabase
       .from("clients")
       .select(`
         id,
@@ -68,13 +69,22 @@ export const updatePartnerLevel = async (partnerId: string) => {
       `)
       .eq("partner_id", partnerId);
     
-    const clientsWithPayments = (clients || []).filter(client => 
-      client.payments && client.payments.some(payment => payment.status === "оплачено")
-    ).length;
+    if (error) {
+      console.error("Error fetching clients for partner level update:", error);
+      throw error;
+    }
+    
+    // Safely count clients with payments
+    const clientsWithPayments = Array.isArray(clients) ? 
+      clients.filter(client => 
+        client.payments && 
+        Array.isArray(client.payments) && 
+        client.payments.some(payment => payment.status === "оплачено")
+      ).length : 0;
     
     const { level, commission } = calculatePartnerLevel(clientsWithPayments);
     
-    const { data, error } = await supabase
+    const { data, error: updateError } = await supabase
       .from("partners")
       .update({
         partner_level: level,
@@ -83,7 +93,11 @@ export const updatePartnerLevel = async (partnerId: string) => {
       .eq("id", partnerId)
       .select();
     
-    if (error) throw error;
+    if (updateError) {
+      console.error("Error updating partner level:", updateError);
+      throw updateError;
+    }
+    
     return { level, commission };
   } catch (error) {
     console.error("Error updating partner level:", error);

@@ -42,10 +42,13 @@ export const usePartnerAuth = () => {
     try {
       console.log("Attempting to login with email:", email);
       
-      const { data, error } = await supabase.rpc('get_partner_by_credentials', {
-        p_email: email,
-        p_password: password
-      });
+      // Use direct query instead of RPC for login
+      const { data, error } = await supabase
+        .from("partners")
+        .select("*")
+        .eq("email", email)
+        .eq("password", password)
+        .maybeSingle();
       
       if (error) {
         console.error('Login failed:', error);

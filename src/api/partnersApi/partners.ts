@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Partner } from "@/types";
-import { safeQuery } from "../utils/queryHelpers";
+import { safeQuery } from "@/integrations/supabase/client";
 
 export const fetchPartners = async () => {
   try {
@@ -54,16 +54,31 @@ export const fetchPartnerById = async (id: string) => {
   }
 };
 
+export const checkPartnerExists = async (email: string) => {
+  try {
+    // Use direct query instead of RPC to check if partner exists
+    const { data, error } = await supabase
+      .from("partners")
+      .select("email")
+      .eq("email", email)
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error checking partner exists:", error);
+      throw new Error("Ошибка проверки существующего пользователя");
+    }
+    
+    return !!data;
+  } catch (error) {
+    console.error("Exception checking partner exists:", error);
+    throw error;
+  }
+};
+
 export const createPartner = async (partner: Partner) => {
   try {
-    const { data: exists, error: checkError } = await supabase.rpc('check_partner_exists', {
-      p_email: partner.email
-    });
-
-    if (checkError) {
-      console.error("Error checking partner existence:", checkError);
-      throw new Error("Ошибка при проверке существующего партнера");
-    }
+    // Check if partner exists using the new direct query method
+    const exists = await checkPartnerExists(partner.email);
 
     if (exists) {
       throw new Error("Партнер с таким email уже существует");
