@@ -1,5 +1,5 @@
 
-import { Header } from '@/components/Header';
+import Header from '@/components/Header';
 import { ErrorDisplay } from '@/components/admin/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
