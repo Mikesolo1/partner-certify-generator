@@ -5,14 +5,17 @@ import { checkPartnerExists } from "./auth";
 
 export const createPartner = async (partner: Partner) => {
   try {
-    console.log("Checking if email already exists:", partner.email);
+    console.log("Starting partner creation process:", partner.email);
+    
+    // Check if email exists first
     const exists = await checkPartnerExists(partner.email);
-
+    
     if (exists) {
-      console.warn("Partner with this email already exists:", partner.email);
+      console.warn("Partner creation failed: Email already exists:", partner.email);
       throw new Error("Партнер с таким email уже существует");
     }
 
+    // Prepare partner data
     const partnerData = {
       company_name: partner.companyName,
       contact_person: partner.contactPerson,
@@ -26,11 +29,12 @@ export const createPartner = async (partner: Partner) => {
       commission: partner.commission || 20
     };
     
-    console.log("Creating new partner with data:", {
+    console.log("Attempting to insert new partner:", {
       ...partnerData,
       password: '[REDACTED]'
     });
     
+    // Insert the new partner
     const { data, error } = await supabase
       .from("partners")
       .insert([partnerData])
@@ -38,12 +42,16 @@ export const createPartner = async (partner: Partner) => {
       .single();
     
     if (error) {
-      console.error("Error inserting partner:", error);
-      throw error;
+      console.error("Database error during partner creation:", error);
+      if (error.code === '23505') { // Unique violation
+        throw new Error("Партнер с такими данными уже существует");
+      }
+      throw new Error("Ошибка создания партнера: " + error.message);
     }
     
     if (!data) {
-      throw new Error("Failed to create partner - no data returned");
+      console.error("No data returned after partner creation");
+      throw new Error("Не удалось создать партнера - данные не получены");
     }
     
     console.log("Partner created successfully:", data.id);
