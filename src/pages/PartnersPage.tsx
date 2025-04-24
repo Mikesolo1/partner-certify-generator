@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import { Input } from '@/components/ui/input';
@@ -13,9 +12,9 @@ const PartnersPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter partners who have passed the test first, then apply search filter
+  // Filter out administrators and partners who haven't passed the test, then apply search filter
   const filteredPartners = partners
-    .filter(partner => partner.testPassed || partner.test_passed)
+    .filter(partner => (partner.testPassed || partner.test_passed) && partner.role !== 'admin')
     .filter(partner => {
       const searchString = searchTerm.toLowerCase();
       return (
