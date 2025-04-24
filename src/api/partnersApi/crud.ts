@@ -4,9 +4,9 @@ import { Partner } from "@/types";
 
 export const fetchPartners = async () => {
   try {
+    // Use the secure database function instead of direct table access
     const { data, error } = await supabase
-      .from("partners")
-      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, phone");
+      .rpc('get_all_partners');
     
     if (error) {
       console.error("Error fetching partners:", error);
@@ -22,33 +22,33 @@ export const fetchPartners = async () => {
 
 export const fetchPartnerById = async (id: string) => {
   try {
+    // Use the secure database function instead of direct table access
     const { data, error } = await supabase
-      .from("partners")
-      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, phone")
-      .eq("id", id)
-      .maybeSingle();
+      .rpc('get_partner_by_id', { p_id: id });
     
     if (error) {
       console.error("Error fetching partner:", error);
       throw error;
     }
     
-    if (!data) {
+    if (!data || data.length === 0) {
       throw new Error("Partner not found");
     }
     
+    const partnerData = data[0];
+    
     const partner: Partner = {
-      id: data.id,
-      companyName: data.company_name,
-      contactPerson: data.contact_person,
-      email: data.email,
-      partnerLevel: data.partner_level,
-      joinDate: data.join_date,
-      certificateId: data.certificate_id,
-      testPassed: data.test_passed,
-      commission: data.commission,
-      role: data.role,
-      phone: data.phone || '' // Include phone with fallback
+      id: partnerData.id,
+      companyName: partnerData.company_name,
+      contactPerson: partnerData.contact_person,
+      email: partnerData.email,
+      partnerLevel: partnerData.partner_level,
+      joinDate: partnerData.join_date,
+      certificateId: partnerData.certificate_id,
+      testPassed: partnerData.test_passed,
+      commission: partnerData.commission,
+      role: partnerData.role,
+      phone: partnerData.phone || '' // Include phone with fallback
     };
     
     return partner;

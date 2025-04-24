@@ -313,8 +313,46 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      get_all_partners: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          phone: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
       get_partner_by_credentials: {
         Args: { p_email: string; p_password: string }
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          phone: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
+      get_partner_by_id: {
+        Args: { p_id: string }
         Returns: {
           certificate_id: string | null
           commission: number | null
