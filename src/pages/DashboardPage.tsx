@@ -100,7 +100,7 @@ const DashboardPage = () => {
       if (error) {
         console.error("Error fetching clients:", error);
         setHasError(true);
-        return;
+        return [];
       }
       
       // Convert client data to our application format
@@ -110,10 +110,11 @@ const DashboardPage = () => {
       })) : [];
       
       console.log("Clients fetched:", clientsWithPayments.length);
-      setClients(clientsWithPayments);
+      return clientsWithPayments;
     } catch (error) {
       console.error("Error fetching partner clients:", error);
       setHasError(true);
+      return [];
     }
   };
   
