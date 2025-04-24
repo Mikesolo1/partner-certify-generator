@@ -8,13 +8,15 @@ interface DashboardStatisticsProps {
   totalCommission: number;
   testPassed?: boolean;
   latestPaymentDate?: string;
+  error?: boolean;
 }
 
 const DashboardStatistics = ({
   clientCount,
   totalCommission,
   testPassed,
-  latestPaymentDate
+  latestPaymentDate,
+  error = false
 }: DashboardStatisticsProps) => {
   return (
     <>
@@ -23,6 +25,7 @@ const DashboardStatistics = ({
         totalCommission={totalCommission}
         testPassed={testPassed}
         latestPaymentDate={latestPaymentDate}
+        error={error}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

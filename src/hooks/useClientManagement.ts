@@ -1,7 +1,7 @@
-
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 export const useClientManagement = (currentPartner: any = null) => {
   const { toast } = useToast();
@@ -18,14 +18,21 @@ export const useClientManagement = (currentPartner: any = null) => {
       };
       
       console.log("Sending client data to API:", clientData);
-      const newClient = await api.createClient(clientData);
+      const { data, error } = await safeRPC("create_client", {
+        p_partner_id: currentPartner.id,
+        p_name: client.name,
+        p_email: client.email,
+        p_phone: client.phone || null
+      });
+      
+      if (error) throw error;
       
       toast({
         title: "Клиент добавлен",
         description: `Клиент ${client.name} успешно добавлен в вашу базу.`,
       });
       
-      return newClient;
+      return data;
     } catch (error) {
       console.error('Error adding client:', error);
       
@@ -136,11 +143,11 @@ export const useClientManagement = (currentPartner: any = null) => {
       throw error;
     }
   };
-
+  
   return {
     addClient,
-    removeClient,
-    updateClient,
-    addPayment
+    removeClient: api.deleteClient,
+    updateClient: api.updateClient,
+    addPayment: api.createPayment
   };
 };

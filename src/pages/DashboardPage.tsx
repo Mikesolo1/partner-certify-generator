@@ -9,11 +9,13 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatistics from '@/components/dashboard/DashboardStatistics';
 import PaymentDetailsCard from '@/components/dashboard/PaymentDetailsCard';
 import { useNavigate } from 'react-router-dom';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 const DashboardPage = () => {
-  const { currentPartner, refreshPartnerLevel } = usePartners();
+  const { currentPartner } = usePartners();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [latestPaymentDate, setLatestPaymentDate] = useState<string | undefined>();
   const navigate = useNavigate();
   
@@ -21,8 +23,10 @@ const DashboardPage = () => {
     if (currentPartner?.id) {
       const loadData = async () => {
         try {
-          await refreshPartnerLevel(currentPartner.id);
           await fetchPartnerClients(currentPartner.id);
+        } catch (error) {
+          console.error("Error loading dashboard data:", error);
+          setHasError(true);
         } finally {
           setIsLoading(false);
         }
@@ -32,7 +36,7 @@ const DashboardPage = () => {
     } else {
       setIsLoading(false);
     }
-  }, [currentPartner?.id, refreshPartnerLevel]);
+  }, [currentPartner?.id]);
 
   useEffect(() => {
     const findLatestPaymentDate = () => {
@@ -60,22 +64,31 @@ const DashboardPage = () => {
   const fetchPartnerClients = async (partnerId: string) => {
     try {
       console.log("Fetching clients for partner:", partnerId);
-      const { data, error } = await supabase
-        .from("clients")
-        .select(`
-          *,
-          payments(*)
-        `)
-        .eq("partner_id", partnerId);
+      
+      const { data, error } = await safeRPC('get_partner_clients', { 
+        p_partner_id: partnerId 
+      }, {
+        retries: 3,
+        delay: 1000
+      });
       
       if (error) {
         console.error("Error fetching clients:", error);
-      } else {
-        console.log("Clients fetched:", data);
-        setClients(data || []);
+        setHasError(true);
+        return;
       }
+      
+      // Convert client data to our application format
+      const clientsWithPayments = Array.isArray(data) ? data.map(client => ({
+        ...client,
+        payments: client.payments || []
+      })) : [];
+      
+      console.log("Clients fetched:", clientsWithPayments.length);
+      setClients(clientsWithPayments);
     } catch (error) {
       console.error("Error fetching partner clients:", error);
+      setHasError(true);
     }
   };
   
@@ -120,6 +133,7 @@ const DashboardPage = () => {
         totalCommission={totalCommission}
         testPassed={testPassed}
         latestPaymentDate={latestPaymentDate}
+        error={hasError}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
