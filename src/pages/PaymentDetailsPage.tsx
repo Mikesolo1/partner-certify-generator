@@ -7,8 +7,9 @@ import PaymentDetailsForm from '@/components/PaymentDetailsForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 const PaymentDetailsPage = () => {
   const { currentPartner } = usePartners();
@@ -18,6 +19,71 @@ const PaymentDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchPaymentDetails = async (showToast = false) => {
+    try {
+      setLoading(true);
+      setIsRefreshing(true);
+      
+      if (!currentPartner?.id) {
+        setError("ID партнера не определен");
+        return;
+      }
+
+      const { data, error } = await safeRPC('get_partner_payment_details', {
+        p_partner_id: currentPartner.id
+      }, {
+        retries: 3,
+        delay: 1000,
+        timeoutMs: 15000
+      });
+
+      if (error) {
+        console.error("Ошибка загрузки данных оплаты:", error);
+        setError(`Не удалось загрузить реквизиты для выплат: ${error.message || "Неизвестная ошибка"}`);
+        
+        if (showToast) {
+          toast({
+            title: "Ошибка загрузки данных",
+            description: `Не удалось загрузить реквизиты: ${error.message || "Неизвестная ошибка"}`,
+            variant: "destructive"
+          });
+        }
+        return;
+      }
+
+      if (data && data.length > 0) {
+        console.log("Загружены данные для выплат:", data[0]);
+        setPaymentDetails(data[0]);
+        
+        if (showToast) {
+          toast({
+            title: "Данные обновлены",
+            description: "Реквизиты успешно загружены",
+          });
+        }
+      } else {
+        console.log("Данные для выплат не найдены");
+      }
+      
+      setError(null);
+    } catch (error: any) {
+      console.error("Ошибка загрузки данных оплаты:", error);
+      setError(`Произошла ошибка при загрузке реквизитов: ${error.message || "Неизвестная ошибка"}`);
+      
+      if (showToast) {
+        toast({
+          title: "Ошибка загрузки",
+          description: "Не удалось обновить данные",
+          variant: "destructive"
+        });
+      }
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!currentPartner?.testPassed) {
@@ -25,55 +91,12 @@ const PaymentDetailsPage = () => {
       return;
     }
 
-    const fetchPaymentDetails = async () => {
-      try {
-        setLoading(true);
-        
-        if (!currentPartner?.id) {
-          setError("ID партнера не определен");
-          return;
-        }
-
-        const { data, error } = await safeRPC('get_partner_payment_details', {
-          p_partner_id: currentPartner.id
-        }, {
-          retries: 3,
-          delay: 1000
-        });
-
-        if (error) {
-          console.error("Ошибка загрузки данных оплаты:", error);
-          setError("Не удалось загрузить реквизиты для выплат");
-          toast({
-            title: "Ошибка загрузки данных",
-            description: "Не удалось загрузить реквизиты для выплат",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        if (data && data.length > 0) {
-          console.log("Загружены данные для выплат:", data[0]);
-          setPaymentDetails(data[0]);
-        } else {
-          console.log("Данные для выплат не найдены");
-        }
-        
-        setError(null);
-      } catch (error) {
-        console.error("Ошибка загрузки данных оплаты:", error);
-        setError("Произошла ошибка при загрузке реквизитов для выплат");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (currentPartner?.id) {
       fetchPaymentDetails();
     }
-  }, [currentPartner, navigate, toast]);
+  }, [currentPartner, navigate]);
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (data: any) => {
     try {
       if (!currentPartner?.id) {
         throw new Error("ID партнера не определен");
@@ -83,19 +106,20 @@ const PaymentDetailsPage = () => {
       console.log("Сохранение реквизитов:", data);
       
       // Use safe RPC function with retries for saving data
-      const { error } = await safeRPC('save_partner_payment_details', {
+      const { data: response, error } = await safeRPC('save_partner_payment_details', {
         p_partner_id: currentPartner.id,
         p_payment_type: data.payment_type,
         p_details: data.details,
         p_is_primary: true
       }, {
         retries: 3,
-        delay: 1000
+        delay: 1000,
+        timeoutMs: 15000
       });
 
       if (error) {
         console.error("Ошибка сохранения реквизитов:", error);
-        throw new Error("Ошибка сохранения реквизитов: " + error.message);
+        throw new Error(`Ошибка сохранения реквизитов: ${error.message || "Неизвестная ошибка"}`);
       }
       
       toast({
@@ -110,11 +134,14 @@ const PaymentDetailsPage = () => {
         details: data.details,
         is_primary: true
       });
-    } catch (error) {
+      
+      // Refresh data after saving
+      await fetchPaymentDetails(false);
+    } catch (error: any) {
       console.error('Error saving payment details:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось сохранить реквизиты",
+        description: `Не удалось сохранить реквизиты: ${error.message || "Неизвестная ошибка"}`,
         variant: "destructive",
       });
     } finally {
@@ -141,8 +168,17 @@ const PaymentDetailsPage = () => {
         )}
         
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Реквизиты для выплат</CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => fetchPaymentDetails(true)}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Обновить
+            </Button>
           </CardHeader>
           <CardContent>
             {loading ? (

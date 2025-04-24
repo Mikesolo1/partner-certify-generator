@@ -14,6 +14,7 @@ import PaymentDetailsForm from '@/components/PaymentDetailsForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel } = usePartners();
@@ -21,7 +22,9 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [latestPaymentDate, setLatestPaymentDate] = useState<string | undefined>();
+  const [showPaymentError, setShowPaymentError] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   useEffect(() => {
     if (currentPartner?.id) {
@@ -84,6 +87,10 @@ const DashboardPage = () => {
       console.error("Error fetching partner clients:", error);
     }
   };
+
+  const handlePaymentDetailsClick = () => {
+    navigate('/dashboard/payment-details');
+  };
   
   if (isLoading) {
     return <DashboardLayout>
@@ -115,9 +122,10 @@ const DashboardPage = () => {
   const currentPartnerLevel = currentPartner.partnerLevel || currentPartner.partner_level || 'Бронзовый';
   const testPassed = currentPartner.testPassed || currentPartner.test_passed || false;
   
-  const handleSubmitPaymentDetails = async (data) => {
+  const handleSubmitPaymentDetails = async (data: any) => {
     try {
       setIsSaving(true);
+      setShowPaymentError(false);
       console.log("Saving payment details:", data);
       
       const { data: response, error } = await safeRPC('save_partner_payment_details', {
@@ -127,11 +135,13 @@ const DashboardPage = () => {
         p_is_primary: true
       }, { 
         retries: 3,
-        delay: 1000
+        delay: 1000,
+        timeoutMs: 15000
       });
 
       if (error) {
         console.error('Error saving payment details:', error);
+        setShowPaymentError(true);
         toast({
           title: "Ошибка",
           description: `Не удалось сохранить реквизиты: ${error.message || 'Неизвестная ошибка'}`,
@@ -144,11 +154,12 @@ const DashboardPage = () => {
         title: "Успешно",
         description: "Реквизиты для выплат сохранены",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving payment details:', error);
+      setShowPaymentError(true);
       toast({
         title: "Ошибка",
-        description: "Не удалось сохранить реквизиты",
+        description: `Не удалось сохранить реквизиты: ${error.message || 'Неизвестная ошибка'}`,
         variant: "destructive",
       });
     } finally {
@@ -183,10 +194,24 @@ const DashboardPage = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="h-auto">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Реквизиты для выплат</CardTitle>
+            <button 
+              onClick={handlePaymentDetailsClick} 
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Подробнее
+            </button>
           </CardHeader>
           <CardContent>
+            {showPaymentError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertTitle>Ошибка сохранения реквизитов</AlertTitle>
+                <AlertDescription>
+                  Пожалуйста, попробуйте снова или обратитесь в поддержку
+                </AlertDescription>
+              </Alert>
+            )}
             <PaymentDetailsForm 
               onSubmit={handleSubmitPaymentDetails}
               isLoading={isSaving}

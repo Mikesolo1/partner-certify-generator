@@ -558,6 +558,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      save_partner_payment_details: {
+        Args: {
+          p_partner_id: string
+          p_payment_type: string
+          p_details: Json
+          p_is_primary?: boolean
+        }
+        Returns: {
+          created_at: string | null
+          details: Json
+          id: string
+          is_primary: boolean | null
+          partner_id: string
+          payment_type: string
+          updated_at: string | null
+        }[]
+      }
     }
     Enums: {
       user_role: "admin" | "partner"
