@@ -15,18 +15,18 @@ export const createPartner = async (partner: Partner) => {
       throw new Error("Партнер с таким email уже существует");
     }
 
-    // Prepare partner data
+    // Prepare partner data with explicit field mapping
     const partnerData = {
       company_name: partner.companyName,
       contact_person: partner.contactPerson,
       email: partner.email.trim().toLowerCase(),
       password: partner.password,
-      partner_level: partner.partnerLevel || "Бронзовый",
-      join_date: partner.joinDate || new Date().toISOString(),
-      certificate_id: partner.certificateId || `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
-      test_passed: partner.testPassed || false,
-      role: partner.role || 'user',
-      commission: partner.commission || 20
+      partner_level: 'Бронзовый',
+      join_date: new Date().toISOString(),
+      certificate_id: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+      test_passed: false,
+      role: 'user',
+      commission: 20
     };
     
     console.log("Attempting to insert new partner:", {
@@ -34,18 +34,14 @@ export const createPartner = async (partner: Partner) => {
       password: '[REDACTED]'
     });
     
-    // Insert the new partner
     const { data, error } = await supabase
       .from("partners")
       .insert([partnerData])
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error("Database error during partner creation:", error);
-      if (error.code === '23505') { // Unique violation
-        throw new Error("Партнер с такими данными уже существует");
-      }
       throw new Error("Ошибка создания партнера: " + error.message);
     }
     
@@ -56,6 +52,7 @@ export const createPartner = async (partner: Partner) => {
     
     console.log("Partner created successfully:", data.id);
     
+    // Map response data back to Partner type
     return {
       id: data.id,
       companyName: data.company_name,
@@ -66,8 +63,7 @@ export const createPartner = async (partner: Partner) => {
       certificateId: data.certificate_id,
       testPassed: data.test_passed,
       commission: data.commission,
-      role: data.role,
-      password: data.password
+      role: data.role
     };
   } catch (error) {
     console.error("Error in createPartner:", error);

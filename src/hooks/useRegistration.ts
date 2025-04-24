@@ -17,29 +17,14 @@ export const useRegistration = () => {
       
       console.log("Starting registration process for:", formData.email);
       
-      // Check if partner exists before attempting creation
-      console.log("Checking if partner exists with email:", formData.email);
-      const exists = await checkPartnerExists(formData.email);
-      
-      if (exists) {
-        console.log("Registration failed: Partner already exists with email:", formData.email);
-        toast({
-          title: "Ошибка регистрации",
-          description: "Партнер с таким email уже существует",
-          variant: "destructive",
-        });
-        return { success: false, message: "Партнер с таким email уже существует" };
-      }
-      
-      // Create new partner object
-      console.log("Creating new partner record");
+      // Create new partner object with explicit field mapping
       const newPartner: Partner = {
         companyName: formData.companyName,
         contactPerson: formData.contactPerson,
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
         partnerLevel: 'Бронзовый',
-        joinDate: new Date().toISOString().split('T')[0],
+        joinDate: new Date().toISOString(),
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         testPassed: false,
         role: 'user',
@@ -86,7 +71,7 @@ export const useRegistration = () => {
         }
       } catch (error: any) {
         console.error("Error creating partner:", error);
-        let errorMessage = error?.message || "Не удалось создать аккаунт партнера";
+        const errorMessage = error?.message || "Не удалось создать аккаунт партнера";
         
         toast({
           title: "Ошибка регистрации",
@@ -99,24 +84,6 @@ export const useRegistration = () => {
           message: errorMessage
         };
       }
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      
-      let errorMessage = "Не удалось зарегистрироваться. Пожалуйста, попробуйте снова.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: "Ошибка регистрации",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      
-      return {
-        success: false,
-        message: errorMessage
-      };
     } finally {
       setIsLoading(false);
     }
