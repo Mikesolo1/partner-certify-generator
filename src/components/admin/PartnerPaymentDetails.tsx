@@ -44,8 +44,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
             description: `Детали оплаты: ${error.message || "Неизвестная ошибка"}`,
             variant: "destructive"
           });
-          
-          throw error;
+          return;
         }
         
         console.log("Payment details loaded:", data?.length || 0, data);

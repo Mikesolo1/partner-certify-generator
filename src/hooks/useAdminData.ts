@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Partner, Client, Payment, TestQuestion } from '@/types';
 import { fetchPartners } from '@/api/partnersApi';
-import { simpleQuery } from "@/api/utils/queryHelpers";
 
 export const useAdminData = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -21,14 +20,44 @@ export const useAdminData = () => {
       setLoading(true);
       setFetchError(null);
       
-      // Load all data in parallel for better performance
-      await Promise.all([
-        fetchAllPartners(),
-        fetchAllClients(),
-        fetchAllPayments(),
-        fetchAllTestQuestions(),
-        fetchAllNotifications()
-      ]);
+      // Load all data in parallel for better performance using our new RPC functions
+      const [partnersResult, clientsResult, paymentsResult, questionsResult, notificationsResult] = 
+        await Promise.all([
+          fetchAllPartners(),
+          supabase.rpc('get_all_clients'),
+          supabase.rpc('get_all_payments'),
+          supabase.rpc('get_all_test_questions'),
+          supabase.rpc('get_all_notifications')
+        ]);
+
+      // Handle partners data
+      if (partnersResult) {
+        setPartners(partnersResult);
+      }
+
+      // Handle clients data
+      if (clientsResult.data) {
+        console.log("Loaded clients:", clientsResult.data.length);
+        setClients(clientsResult.data);
+      }
+
+      // Handle payments data
+      if (paymentsResult.data) {
+        console.log("Loaded payments:", paymentsResult.data.length);
+        setPayments(paymentsResult.data);
+      }
+
+      // Handle test questions data
+      if (questionsResult.data) {
+        setTestQuestions(questionsResult.data);
+      }
+
+      // Handle notifications data
+      if (notificationsResult.data) {
+        setNotifications(notificationsResult.data);
+      }
+
+      setFetchError(null);
     } catch (error) {
       console.error("Непредвиденная ошибка:", error);
       setFetchError("Произошла непредвиденная ошибка при загрузке данных");
@@ -42,12 +71,12 @@ export const useAdminData = () => {
     }
   };
 
-  // Split functions for better parallel execution and error isolation
+  // Reuse existing fetchAllPartners function since it's already working
   const fetchAllPartners = async () => {
     try {
       const partnerData = await fetchPartners();
       if (partnerData) {
-        const formattedPartners = partnerData.map(p => ({
+        return partnerData.map(p => ({
           id: p.id,
           companyName: p.company_name,
           contactPerson: p.contact_person,
@@ -60,94 +89,11 @@ export const useAdminData = () => {
           role: p.role,
           phone: p.phone || ''
         }));
-        setPartners(formattedPartners);
       }
+      return [];
     } catch (error) {
       console.error("Ошибка загрузки партнеров:", error);
-    }
-  };
-
-  const fetchAllClients = async () => {
-    try {
-      // Используем RPC вызов вместо прямого запроса к таблице
-      const { data, error } = await supabase.rpc("get_all_clients");
-      
-      if (error) {
-        console.error("Ошибка загрузки клиентов:", error);
-      } else if (data) {
-        console.log("Loaded clients:", data.length);
-        const formattedClients = data.map(c => ({
-          id: c.id,
-          name: c.name,
-          email: c.email,
-          phone: c.phone || '',
-          registrationDate: c.registration_date,
-          partner_id: c.partner_id
-        }));
-        setClients(formattedClients);
-      }
-    } catch (error) {
-      console.error("Ошибка загрузки клиентов:", error);
-    }
-  };
-
-  const fetchAllPayments = async () => {
-    try {
-      // Используем RPC вызов вместо прямого запроса к таблице
-      const { data, error } = await supabase.rpc("get_all_payments");
-        
-      if (error) {
-        console.error("Ошибка загрузки платежей:", error);
-      } else if (data) {
-        console.log("Loaded payments:", data.length);
-        const formattedPayments = data.map(p => ({
-          id: p.id,
-          client_id: p.client_id,
-          amount: p.amount,
-          date: p.date,
-          status: p.status,
-          commission_amount: p.commission_amount
-        }));
-        setPayments(formattedPayments);
-      }
-    } catch (error) {
-      console.error("Ошибка загрузки платежей:", error);
-    }
-  };
-
-  const fetchAllTestQuestions = async () => {
-    try {
-      // Используем RPC вызов вместо прямого запроса к таблице
-      const { data, error } = await supabase.rpc("get_all_test_questions");
-        
-      if (error) {
-        console.error("Ошибка загрузки вопросов теста:", error);
-      } else if (data) {
-        const formattedQuestions = data.map(q => ({
-          id: q.id,
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correct_answer
-        }));
-        setTestQuestions(formattedQuestions);
-      }
-    } catch (error) {
-      console.error("Ошибка загрузки вопросов теста:", error);
-    }
-  };
-
-  const fetchAllNotifications = async () => {
-    try {
-      // Используем RPC вызов вместо прямого запроса к таблице
-      const { data, error } = await supabase.rpc("get_all_notifications");
-        
-      if (error) {
-        console.error("Ошибка загрузки уведомлений:", error);
-      } else if (data) {
-        setNotifications(data);
-      }
-    } catch (error) {
-      console.error("Ошибка загрузки уведомлений:", error);
+      return [];
     }
   };
 

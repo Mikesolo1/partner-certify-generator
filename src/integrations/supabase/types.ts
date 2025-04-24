@@ -347,6 +347,28 @@ export type Database = {
         Args: { p_client_id: string }
         Returns: boolean
       }
+      get_all_clients: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          partner_id: string
+          phone: string | null
+          registration_date: string | null
+          updated_at: string | null
+        }[]
+      }
+      get_all_notifications: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+        }[]
+      }
       get_all_partners: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -363,6 +385,31 @@ export type Database = {
           phone: string
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
+      get_all_payments: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          amount: number
+          client_id: string
+          commission_amount: number
+          created_at: string | null
+          created_by: string | null
+          date: string | null
+          id: string
+          status: string
+          updated_at: string | null
+        }[]
+      }
+      get_all_test_questions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          correct_answer: number
+          created_at: string | null
+          id: string
+          options: Json
+          question: string
           updated_at: string | null
         }[]
       }
@@ -414,6 +461,18 @@ export type Database = {
           partner_id: string
           phone: string | null
           registration_date: string | null
+          updated_at: string | null
+        }[]
+      }
+      get_partner_payment_details: {
+        Args: { p_partner_id: string }
+        Returns: {
+          created_at: string | null
+          details: Json
+          id: string
+          is_primary: boolean | null
+          partner_id: string
+          payment_type: string
           updated_at: string | null
         }[]
       }
