@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Partner } from '@/types';
 import { Badge } from '@/components/ui/badge';
@@ -43,8 +44,8 @@ export const PartnersList: React.FC<PartnersListProps> = ({
 }) => {
   const getTestStatusBadge = (passed: boolean) => {
     return passed 
-      ? { variant: "default", className: "bg-green-600", children: "Пройден" }
-      : { variant: "default", className: "bg-yellow-600", children: "Не пройден" };
+      ? { variant: "default" as const, className: "bg-green-600", children: "Пройден" }
+      : { variant: "default" as const, className: "bg-yellow-600", children: "Не пройден" };
   };
 
   return (
@@ -70,7 +71,9 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                 <TableCell className="font-medium">{p.companyName || p.company_name}</TableCell>
                 <TableCell>{p.contactPerson || p.contact_person}</TableCell>
                 <TableCell>{p.email}</TableCell>
-                <TableCell>{getTestStatusBadge(p.testPassed || p.test_passed || false)}</TableCell>
+                <TableCell>
+                  <Badge {...getTestStatusBadge(p.testPassed || p.test_passed || false)} />
+                </TableCell>
                 <TableCell>
                   <Badge {...getRoleBadge(p.role || 'user')} />
                 </TableCell>
