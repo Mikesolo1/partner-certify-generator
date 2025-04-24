@@ -59,31 +59,58 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    // Создаем нового партнера
-    const newPartner: Partner = {
-      companyName: data.companyName,
-      contactPerson: data.contactPerson,
-      email: data.email,
-      password: data.password,
-      partnerLevel: 'Бронзовый', // Начальный уровень для новых партнеров
-      joinDate: new Date().toISOString().split('T')[0],
-      certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
-    };
-    
-    addPartner(newPartner);
-    loginPartner(data.email, data.password);
-    
-    toast({
-      title: "Регистрация успешна",
-      description: "Добро пожаловать в партнерскую программу S3!",
-    });
-    
-    if (onSuccess) {
-      onSuccess();
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      // Проверяем, не существует ли уже пользователь с таким email
+      const { data: existingUser } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('email', data.email)
+        .single();
+        
+      if (existingUser) {
+        toast({
+          title: "Ошибка регистрации",
+          description: "Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Создаем нового партнера
+      const newPartner: Partner = {
+        companyName: data.companyName,
+        contactPerson: data.contactPerson,
+        email: data.email,
+        password: data.password,
+        partnerLevel: 'Бронзовый', // Начальный уровень для новых партнеров
+        joinDate: new Date().toISOString().split('T')[0],
+        certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+      };
+      
+      const createdPartner = await addPartner(newPartner);
+      const loggedInPartner = await loginPartner(data.email, data.password);
+      
+      if (loggedInPartner) {
+        toast({
+          title: "Регистрация успешна",
+          description: "Добро пожаловать в партнерскую программу S3!",
+        });
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error("Ошибка при регистрации:", error);
+      toast({
+        title: "Ошибка регистрации",
+        description: "Произошла ошибка при создании аккаунта. Пожалуйста, попробуйте снова.",
+        variant: "destructive",
+      });
     }
-    
-    navigate('/dashboard');
   };
 
   return (

@@ -27,10 +27,30 @@ export const fetchPartnerById = async (id: string) => {
     throw error;
   }
   
-  return data;
+  // Маппинг полей из базы данных к формату, используемому в приложении
+  const partner: Partner = {
+    id: data.id,
+    companyName: data.company_name,
+    company_name: data.company_name,
+    contactPerson: data.contact_person,
+    contact_person: data.contact_person,
+    email: data.email,
+    partnerLevel: data.partner_level,
+    partner_level: data.partner_level,
+    joinDate: data.join_date,
+    join_date: data.join_date,
+    certificateId: data.certificate_id,
+    certificate_id: data.certificate_id,
+    testPassed: data.test_passed,
+    test_passed: data.test_passed,
+    commission: data.commission,
+    role: data.role
+  };
+  
+  return partner;
 };
 
-export const createPartner = async (partner: Omit<Partner, "id">) => {
+export const createPartner = async (partner: any) => {
   const { data, error } = await supabase
     .from("partners")
     .insert([partner])
@@ -42,10 +62,30 @@ export const createPartner = async (partner: Omit<Partner, "id">) => {
     throw error;
   }
   
-  return data;
+  // Преобразуем ответ к формату, используемому в приложении
+  const newPartner: Partner = {
+    id: data.id,
+    companyName: data.company_name,
+    company_name: data.company_name,
+    contactPerson: data.contact_person,
+    contact_person: data.contact_person,
+    email: data.email,
+    partnerLevel: data.partner_level,
+    partner_level: data.partner_level,
+    joinDate: data.join_date,
+    join_date: data.join_date,
+    certificateId: data.certificate_id,
+    certificate_id: data.certificate_id,
+    testPassed: data.test_passed,
+    test_passed: data.test_passed,
+    commission: data.commission,
+    role: data.role
+  };
+  
+  return newPartner;
 };
 
-export const updatePartner = async (id: string, partner: Partial<Partner>) => {
+export const updatePartner = async (id: string, partner: any) => {
   const { data, error } = await supabase
     .from("partners")
     .update(partner)
@@ -58,7 +98,27 @@ export const updatePartner = async (id: string, partner: Partial<Partner>) => {
     throw error;
   }
   
-  return data;
+  // Преобразуем ответ к формату, используемому в приложении
+  const updatedPartner: Partner = {
+    id: data.id,
+    companyName: data.company_name,
+    company_name: data.company_name,
+    contactPerson: data.contact_person,
+    contact_person: data.contact_person,
+    email: data.email,
+    partnerLevel: data.partner_level,
+    partner_level: data.partner_level,
+    joinDate: data.join_date,
+    join_date: data.join_date,
+    certificateId: data.certificate_id,
+    certificate_id: data.certificate_id,
+    testPassed: data.test_passed,
+    test_passed: data.test_passed,
+    commission: data.commission,
+    role: data.role
+  };
+  
+  return updatedPartner;
 };
 
 export const fetchPartnerClients = async (partnerId: string) => {
@@ -141,7 +201,10 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
 export const completeTest = async (partnerId: string) => {
   const { data, error } = await supabase
     .from("partners")
-    .update({ test_passed: true })
+    .update({ 
+      test_passed: true,
+      role: 'partner' // Повышаем роль с "user" до "partner" после прохождения теста
+    })
     .eq("id", partnerId)
     .select()
     .single();
@@ -151,7 +214,27 @@ export const completeTest = async (partnerId: string) => {
     throw error;
   }
   
-  return data;
+  // Преобразуем ответ к формату, используемому в приложении
+  const updatedPartner: Partner = {
+    id: data.id,
+    companyName: data.company_name,
+    company_name: data.company_name,
+    contactPerson: data.contact_person,
+    contact_person: data.contact_person,
+    email: data.email,
+    partnerLevel: data.partner_level,
+    partner_level: data.partner_level,
+    joinDate: data.join_date,
+    join_date: data.join_date,
+    certificateId: data.certificate_id,
+    certificate_id: data.certificate_id,
+    testPassed: data.test_passed,
+    test_passed: data.test_passed,
+    commission: data.commission,
+    role: data.role
+  };
+  
+  return updatedPartner;
 };
 
 // Рассчитать уровень партнера на основе количества клиентов с оплатой
@@ -226,7 +309,7 @@ export const updatePartnerLevel = async (partnerId: string) => {
     
     // Обновляем уровень и комиссию партнера
     await updatePartner(partnerId, {
-      partnerLevel: level,
+      partner_level: level,
       commission: commission
     });
     
@@ -235,4 +318,34 @@ export const updatePartnerLevel = async (partnerId: string) => {
     console.error("Error updating partner level:", error);
     throw error;
   }
+};
+
+export const createNotification = async (title: string, content: string) => {
+  const { data, error } = await supabase
+    .from("notifications")
+    .insert([{ title, content }])
+    .select()
+    .single();
+  
+  if (error) {
+    console.error("Error creating notification:", error);
+    throw error;
+  }
+  
+  return data;
+};
+
+export const fetchNotifications = async (limit = 5) => {
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  
+  if (error) {
+    console.error("Error fetching notifications:", error);
+    throw error;
+  }
+  
+  return data || [];
 };

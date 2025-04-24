@@ -26,11 +26,7 @@ const formSchema = z.object({
   }),
 });
 
-interface LoginFormProps {
-  onSuccess?: () => void;
-}
-
-const LoginForm = ({ onSuccess }: LoginFormProps) => {
+const LoginForm = () => {
   const { loginPartner } = usePartners();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -43,24 +39,28 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    const partner = loginPartner(data.email, data.password);
-    
-    if (partner) {
-      toast({
-        title: "Вход выполнен успешно",
-        description: `Добро пожаловать, ${partner.contactPerson}!`,
-      });
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      const partner = await loginPartner(data.email, data.password);
       
-      if (onSuccess) {
-        onSuccess();
+      if (partner) {
+        toast({
+          title: "Успешный вход",
+          description: `Добро пожаловать, ${partner.contactPerson || partner.contact_person}!`,
+        });
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Ошибка входа",
+          description: "Неверный email или пароль, либо пользователь не зарегистрирован",
+          variant: "destructive",
+        });
       }
-      
-      navigate('/dashboard');
-    } else {
+    } catch (error) {
+      console.error(error);
       toast({
         title: "Ошибка входа",
-        description: "Неверные email или пароль. Пожалуйста, попробуйте снова.",
+        description: "Произошла ошибка при входе. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
     }
@@ -68,7 +68,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -76,7 +76,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="partner@example.com" {...field} />
+                <Input placeholder="ivan@example.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -174,14 +174,15 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addPartner = async (partner: Partner) => {
     try {
       const newPartnerData = {
-        company_name: partner.companyName,
-        contact_person: partner.contactPerson,
+        company_name: partner.companyName || partner.company_name,
+        contact_person: partner.contactPerson || partner.contact_person,
         email: partner.email,
         partner_level: "Бронзовый",
         join_date: new Date().toISOString(),
         certificate_id: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         password: partner.password,
         test_passed: false,
+        role: 'user', // Роль по умолчанию - обычный пользователь
         commission: 20 // Базовая комиссия
       };
       
@@ -202,6 +203,7 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         email: updatedPartner.email,
         partner_level: updatedPartner.partnerLevel || updatedPartner.partner_level,
         test_passed: updatedPartner.testPassed || updatedPartner.test_passed,
+        role: updatedPartner.role,
         commission: updatedPartner.commission
       };
       
@@ -257,7 +259,8 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         certificateId: data.certificate_id,
         password: data.password,
         testPassed: data.test_passed,
-        commission: data.commission
+        commission: data.commission,
+        role: data.role
       };
       
       setCurrentPartner(partner);

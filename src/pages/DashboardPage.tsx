@@ -10,6 +10,7 @@ import { Award, FileText, Users, Star, Trophy, CircleCheck } from 'lucide-react'
 import PartnerLevelProgress from '@/components/PartnerLevelProgress';
 import { PARTNER_LEVELS } from '@/types/partner';
 import { Badge } from '@/components/ui/badge';
+import NotificationsPanel from '@/components/NotificationsPanel';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel, partnerLevel } = usePartners();
@@ -35,7 +36,7 @@ const DashboardPage = () => {
   const clientCount = currentPartner?.clients?.length || 0;
   
   const getCurrentLevelInfo = () => {
-    return PARTNER_LEVELS.find(level => level.level === currentPartner.partnerLevel);
+    return PARTNER_LEVELS.find(level => level.level === currentPartner.partnerLevel || currentPartner.partner_level);
   };
   
   const currentLevelInfo = getCurrentLevelInfo();
@@ -44,15 +45,15 @@ const DashboardPage = () => {
     <DashboardLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          Добро пожаловать, {currentPartner?.contactPerson}!
+          Добро пожаловать, {currentPartner?.contactPerson || currentPartner?.contact_person}!
         </h1>
         <div className="flex items-center gap-2">
           <span className="text-gray-600">
             Ваш партнерский уровень: 
           </span>
           <span className="font-semibold flex items-center gap-1">
-            {currentLevelInfo && getCurrentLevelIcon(currentPartner.partnerLevel)}
-            {currentPartner?.partnerLevel}
+            {currentLevelInfo && getCurrentLevelIcon(currentPartner.partnerLevel || currentPartner.partner_level)}
+            {currentPartner?.partnerLevel || currentPartner?.partner_level}
           </span>
         </div>
       </div>
@@ -72,167 +73,176 @@ const DashboardPage = () => {
         </Alert>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-2">
-            <Users className="h-8 w-8 text-brand opacity-15" />
-          </div>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Клиентов</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold">{clientCount}</p>
-              {clientCount > 0 && getClientCountBadge(clientCount)}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-2">
-            <Award className="h-8 w-8 text-brand opacity-15" />
-          </div>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Комиссия</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{totalCommission.toLocaleString('ru-RU')} ₽</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-2">
-            <FileText className="h-8 w-8 text-brand opacity-15" />
-          </div>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Статус сертификата</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <p className="text-xl font-bold">
-                {currentPartner?.testPassed ? 'Доступен' : 'Требуется тест'}
-              </p>
-              {currentPartner?.testPassed && (
-                <CircleCheck className="h-5 w-5 text-green-500" />
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Быстрые действия</h2>
-          {currentPartner?.testPassed && partnerLevel && partnerLevel.progress >= 50 && partnerLevel.nextLevelAt && (
-            <div className="bg-brand/10 text-sm px-3 py-1 rounded-full flex items-center gap-1">
-              <CircleCheck className="h-4 w-4 text-brand" />
-              <span>Близко к следующему уровню!</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {currentPartner?.testPassed ? (
-            <>
-              <Link to="/dashboard/certificate">
-                <Button
-                  variant="outline"
-                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-                >
-                  <FileText className="h-8 w-8 mb-2 text-brand" />
-                  <div>
-                    <p className="font-medium">Сертификат</p>
-                    <p className="text-xs text-gray-500">Просмотр и скачивание</p>
-                  </div>
-                </Button>
-              </Link>
-              
-              <Link to="/dashboard/clients">
-                <Button
-                  variant="outline"
-                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-                >
-                  <Users className="h-8 w-8 mb-2 text-brand" />
-                  <div>
-                    <p className="font-medium">Мои клиенты</p>
-                    <p className="text-xs text-gray-500">Управление клиентами</p>
-                  </div>
-                </Button>
-              </Link>
-            </>
-          ) : (
-            <Link to="/dashboard/test">
-              <Button
-                variant="outline"
-                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-              >
-                <Award className="h-8 w-8 mb-2 text-brand" />
-                <div>
-                  <p className="font-medium">Пройти тест</p>
-                  <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
-                </div>
-              </Button>
-            </Link>
-          )}
-          
-          <Link to="/partners">
-            <Button
-              variant="outline"
-              className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-            >
-              <Star className="h-8 w-8 mb-2 text-brand" />
-              <div>
-                <p className="font-medium">Лучшие партнеры</p>
-                <p className="text-xs text-gray-500">Мотивационный рейтинг</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2">
+                <Users className="h-8 w-8 text-brand opacity-15" />
               </div>
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Уровни партнерства */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Уровни партнерства S3</CardTitle>
-          <CardDescription>
-            Растите вместе с нами и увеличивайте свою прибыль
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {PARTNER_LEVELS.map((level, index) => (
-              <div 
-                key={level.level}
-                className={`p-4 rounded-lg border ${currentPartner.partnerLevel === level.level 
-                  ? 'border-brand bg-brand/5' 
-                  : 'border-gray-200'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {getLevelIconByType(level.icon)}
-                  <h3 className="font-bold">{level.level}</h3>
-                  {currentPartner.partnerLevel === level.level && (
-                    <Badge className="bg-brand text-white ml-auto">Текущий</Badge>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Клиентов</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-3xl font-bold">{clientCount}</p>
+                  {clientCount > 0 && getClientCountBadge(clientCount)}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2">
+                <Award className="h-8 w-8 text-brand opacity-15" />
+              </div>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Комиссия</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{totalCommission.toLocaleString('ru-RU')} ₽</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2">
+                <FileText className="h-8 w-8 text-brand opacity-15" />
+              </div>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Статус сертификата</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <p className="text-xl font-bold">
+                    {currentPartner?.testPassed || currentPartner?.test_passed ? 'Доступен' : 'Требуется тест'}
+                  </p>
+                  {(currentPartner?.testPassed || currentPartner?.test_passed) && (
+                    <CircleCheck className="h-5 w-5 text-green-500" />
                   )}
                 </div>
-                <div className="mb-2 text-sm text-gray-700">
-                  {level.description}
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Комиссия:</span>
-                  <span className="font-bold">{level.commission}%</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Клиентов с оплатой:</span>
-                  <span className="font-medium">
-                    {level.minClients}{level.maxClients ? `-${level.maxClients}` : "+"}
-                  </span>
-                </div>
-              </div>
-            ))}
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Быстрые действия</h2>
+              {(currentPartner?.testPassed || currentPartner?.test_passed) && partnerLevel && partnerLevel.progress >= 50 && partnerLevel.nextLevelAt && (
+                <div className="bg-brand/10 text-sm px-3 py-1 rounded-full flex items-center gap-1">
+                  <CircleCheck className="h-4 w-4 text-brand" />
+                  <span>Близко к следующему уровню!</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(currentPartner?.testPassed || currentPartner?.test_passed) ? (
+                <>
+                  <Link to="/dashboard/certificate">
+                    <Button
+                      variant="outline"
+                      className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+                    >
+                      <FileText className="h-8 w-8 mb-2 text-brand" />
+                      <div>
+                        <p className="font-medium">Сертификат</p>
+                        <p className="text-xs text-gray-500">Просмотр и скачивание</p>
+                      </div>
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/dashboard/clients">
+                    <Button
+                      variant="outline"
+                      className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+                    >
+                      <Users className="h-8 w-8 mb-2 text-brand" />
+                      <div>
+                        <p className="font-medium">Мои клиенты</p>
+                        <p className="text-xs text-gray-500">Управление клиентами</p>
+                      </div>
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Link to="/dashboard/test">
+                  <Button
+                    variant="outline"
+                    className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+                  >
+                    <Award className="h-8 w-8 mb-2 text-brand" />
+                    <div>
+                      <p className="font-medium">Пройти тест</p>
+                      <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
+                    </div>
+                  </Button>
+                </Link>
+              )}
+              
+              <Link to="/partners">
+                <Button
+                  variant="outline"
+                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+                >
+                  <Star className="h-8 w-8 mb-2 text-brand" />
+                  <div>
+                    <p className="font-medium">Лучшие партнеры</p>
+                    <p className="text-xs text-gray-500">Мотивационный рейтинг</p>
+                  </div>
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Уровни партнерства */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Уровни партнерства S3</CardTitle>
+              <CardDescription>
+                Растите вместе с нами и увеличивайте свою прибыль
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {PARTNER_LEVELS.map((level, index) => (
+                  <div 
+                    key={level.level}
+                    className={`p-4 rounded-lg border ${(currentPartner.partnerLevel === level.level || currentPartner.partner_level === level.level)
+                      ? 'border-brand bg-brand/5' 
+                      : 'border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      {getLevelIconByType(level.icon)}
+                      <h3 className="font-bold">{level.level}</h3>
+                      {(currentPartner.partnerLevel === level.level || currentPartner.partner_level === level.level) && (
+                        <Badge className="bg-brand text-white ml-auto">Текущий</Badge>
+                      )}
+                    </div>
+                    <div className="mb-2 text-sm text-gray-700">
+                      {level.description}
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Комиссия:</span>
+                      <span className="font-bold">{level.commission}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Клиентов с оплатой:</span>
+                      <span className="font-medium">
+                        {level.minClients}{level.maxClients ? `-${level.maxClients}` : "+"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Блок с уведомлениями */}
+        <div>
+          <NotificationsPanel />
+        </div>
+      </div>
     </DashboardLayout>
   );
 };
