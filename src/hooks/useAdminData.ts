@@ -36,7 +36,10 @@ export const useAdminData = () => {
         setPartners(formattedPartners);
       }
       
-      const { data: clientData, error: clientError } = await supabase.rpc("get_all_clients");
+      // Get the client data from the database directly since get_all_clients function doesn't exist
+      const { data: clientData, error: clientError } = await supabase
+        .from("clients")
+        .select("*");
       
       if (clientError) {
         console.error("Error fetching clients:", clientError);
@@ -46,28 +49,49 @@ export const useAdminData = () => {
           variant: "destructive",
         });
       } else {
-        setClients(clientData || []);
+        const formattedClients = clientData?.map(c => ({
+          id: c.id,
+          name: c.name,
+          email: c.email,
+          phone: c.phone || '',
+          registrationDate: c.registration_date,
+          partner_id: c.partner_id
+        })) || [];
+        setClients(formattedClients);
       }
       
-      const { data: paymentData, error: paymentError } = await supabase.rpc("get_all_payments");
+      // Get payment data directly from the table
+      const { data: paymentData, error: paymentError } = await supabase
+        .from("payments")
+        .select("*");
         
       if (paymentError) {
         console.error("Error fetching payments:", paymentError);
       } else {
-        setPayments(paymentData || []);
+        const formattedPayments = paymentData?.map(p => ({
+          id: p.id,
+          client_id: p.client_id,
+          amount: p.amount,
+          date: p.date,
+          status: p.status,
+          commission_amount: p.commission_amount
+        })) || [];
+        setPayments(formattedPayments);
       }
       
-      const { data: questionsData, error: questionsError } = await supabase.from("test_questions").select("*");
+      const { data: questionsData, error: questionsError } = await supabase
+        .from("test_questions")
+        .select("*");
         
       if (questionsError) {
         console.error("Error fetching test questions:", questionsError);
       } else {
-        const formattedQuestions = questionsData.map(q => ({
+        const formattedQuestions = questionsData?.map(q => ({
           id: q.id,
           question: q.question,
           options: q.options,
           correctAnswer: q.correct_answer
-        }));
+        })) || [];
         setTestQuestions(formattedQuestions);
       }
       

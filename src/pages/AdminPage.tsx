@@ -22,13 +22,16 @@ const AdminPage = () => {
           variant: "destructive",
         });
         navigate('/dashboard');
-      } else {
-        adminData.fetchData();
+        return;
       }
+      
+      // Only fetch data once on initial mount
+      adminData.fetchData();
     };
     
     checkAdminAccess();
-  }, [currentPartner, navigate, toast, adminData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPartner, navigate, toast]); // Remove adminData dependency to prevent infinite loop
 
   return (
     <div className="min-h-screen bg-brand-light">
