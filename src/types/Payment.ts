@@ -12,4 +12,5 @@ export interface Payment {
   payment_destination?: string;
   tariff_start_date?: string;
   tariff_end_date?: string;
+  created_by?: string; // Added missing field for admin who created the payment
 }
