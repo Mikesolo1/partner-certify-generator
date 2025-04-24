@@ -2,11 +2,9 @@
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
-import { usePartners } from '@/contexts/PartnersContext';
 
-export const useClientManagement = () => {
+export const useClientManagement = (currentPartner: any = null) => {
   const { toast } = useToast();
-  const { currentPartner } = usePartners();
 
   const addClient = async (client: Omit<Client, "id" | "registrationDate" | "payments">) => {
     try {

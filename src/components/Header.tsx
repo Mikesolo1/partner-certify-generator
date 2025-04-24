@@ -8,16 +8,22 @@ const Header = () => {
   const [partner, setPartner] = React.useState(null);
   const [contextError, setContextError] = React.useState(false);
   
-  React.useEffect(() => {
-    try {
-      const partnersContext = usePartners();
-      setPartner(partnersContext.currentPartner);
-      setContextError(false);
-    } catch (error) {
+  try {
+    // Safely try to use the context
+    const partnersContext = usePartners();
+    React.useEffect(() => {
+      if (partnersContext) {
+        setPartner(partnersContext.currentPartner);
+        setContextError(false);
+      }
+    }, [partnersContext?.currentPartner]);
+  } catch (error) {
+    // If context is not available, handle it gracefully
+    if (!contextError) {
       console.error("Error accessing partners context:", error);
       setContextError(true);
     }
-  }, []);
+  }
 
   // If we had an error accessing the context, render a simpler header
   if (contextError) {

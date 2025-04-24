@@ -33,7 +33,9 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   
   const { partnerLevel, setPartnerLevel, calculateLevel } = usePartnerLevel();
   const { currentPartner, setCurrentPartner, loginPartner, logoutPartner } = usePartnerAuth();
-  const { addClient, removeClient, updateClient, addPayment } = useClientManagement();
+  
+  // Pass currentPartner directly to useClientManagement
+  const { addClient, removeClient, updateClient, addPayment } = useClientManagement(currentPartner);
 
   useEffect(() => {
     const initializeData = async () => {

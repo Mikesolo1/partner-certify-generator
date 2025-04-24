@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -13,16 +12,14 @@ import ClientForm from '@/components/ClientForm';
 import { Navigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import * as api from '@/api/partnersApi';
-import { useClientManagement } from '@/hooks/useClientManagement';
 
 const ClientsPage = () => {
-  const { currentPartner } = usePartners();
+  const { currentPartner, addClient, updateClient, removeClient, addPayment } = usePartners();
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { addClient, updateClient, removeClient, addPayment } = useClientManagement();
   
   useEffect(() => {
     const fetchClients = async () => {
