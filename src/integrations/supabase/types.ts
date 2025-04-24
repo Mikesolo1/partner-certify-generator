@@ -265,6 +265,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_client_exists: {
+        Args: { p_email: string; p_phone?: string }
+        Returns: {
+          does_exist: boolean
+          existing_partner_company: string
+        }[]
+      }
       check_partner_exists: {
         Args: { p_email: string }
         Returns: boolean

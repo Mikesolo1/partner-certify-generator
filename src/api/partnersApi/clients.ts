@@ -20,7 +20,7 @@ export const fetchPartnerClients = async (partnerId: string) => {
   }
 };
 
-export const createClient = async (client: Omit<Client, "id">) => {
+export const createClient = async (client: Omit<Client, "id" | "registrationDate">) => {
   try {
     console.log("Creating client with data:", client);
     const { data, error } = await supabase.rpc("create_client", {
