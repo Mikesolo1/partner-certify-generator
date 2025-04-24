@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { usePartners } from '@/contexts/PartnersContext';
 import { Partner } from '@/types/partner';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   companyName: z.string().min(2, {

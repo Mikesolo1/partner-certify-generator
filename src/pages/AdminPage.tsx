@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "../integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +44,7 @@ interface ClientRow {
   name: string;
   email: string;
   phone: string;
+  registration_date: string;
 }
 
 interface PaymentRow {
@@ -83,7 +83,6 @@ const AdminPage = () => {
   const { currentPartner } = usePartners();
 
   useEffect(() => {
-    // Проверка, что доступ к админке имеет только администратор
     const checkAdminAccess = async () => {
       if (!currentPartner || currentPartner.role !== 'admin') {
         toast({
@@ -93,7 +92,6 @@ const AdminPage = () => {
         });
         navigate('/dashboard');
       } else {
-        // Загрузка данных, если пользователь админ
         fetchData();
       }
     };
@@ -104,7 +102,6 @@ const AdminPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Загрузка партнеров
       const { data: partnerData, error: partnerError } = await supabase
         .from("partners")
         .select("*");
@@ -120,7 +117,6 @@ const AdminPage = () => {
         setPartners(partnerData || []);
       }
       
-      // Загрузка клиентов
       const { data: clientData, error: clientError } = await supabase
         .from("clients")
         .select("*");
@@ -131,7 +127,6 @@ const AdminPage = () => {
         setClients(clientData || []);
       }
       
-      // Загрузка платежей
       const { data: paymentData, error: paymentError } = await supabase
         .from("payments")
         .select("*");
@@ -142,7 +137,6 @@ const AdminPage = () => {
         setPayments(paymentData || []);
       }
       
-      // Загрузка вопросов теста
       const { data: questionsData, error: questionsError } = await supabase
         .from("test_questions")
         .select("*");
@@ -153,7 +147,6 @@ const AdminPage = () => {
         setTestQuestions(questionsData || []);
       }
       
-      // Загрузка уведомлений
       const { data: notificationsData, error: notificationsError } = await supabase
         .from("notifications")
         .select("*")

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,42 @@ import { ArrowLeft } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 import CertificateGenerator from '@/components/CertificateGenerator';
 import Header from '@/components/Header';
+import { Partner } from '@/types/partner';
 
 const CertificatePage = () => {
   const { id } = useParams<{ id: string }>();
   const { getPartnerById } = usePartners();
   const navigate = useNavigate();
+  const [partner, setPartner] = useState<Partner | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   
-  const partner = id ? getPartnerById(id) : undefined;
+  useEffect(() => {
+    const fetchPartner = async () => {
+      if (id) {
+        try {
+          const partnerData = await getPartnerById(id);
+          setPartner(partnerData);
+        } catch (error) {
+          console.error("Error fetching partner:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    fetchPartner();
+  }, [id, getPartnerById]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!partner) {
     return (
@@ -51,10 +80,10 @@ const CertificatePage = () => {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="text-2xl font-bold">
-                Certificate for {partner.companyName}
+                Certificate for {partner.companyName || partner.company_name}
               </CardTitle>
               <CardDescription>
-                {partner.partnerLevel} Partner - Certificate ID: {partner.certificateId}
+                {partner.partnerLevel || partner.partner_level} Partner - Certificate ID: {partner.certificateId || partner.certificate_id}
               </CardDescription>
             </CardHeader>
             <CardContent>

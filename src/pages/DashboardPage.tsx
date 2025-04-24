@@ -1,5 +1,4 @@
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePartners } from '@/contexts/PartnersContext';
@@ -8,32 +7,57 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Award, FileText, Users, Star, Trophy, CircleCheck } from 'lucide-react';
 import PartnerLevelProgress from '@/components/PartnerLevelProgress';
-import { PARTNER_LEVELS } from '@/types/partner';
+import { PARTNER_LEVELS, Client } from '@/types/partner';
 import { Badge } from '@/components/ui/badge';
 import NotificationsPanel from '@/components/NotificationsPanel';
+import { supabase } from '@/integrations/supabase/client';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel, partnerLevel } = usePartners();
+  const [clients, setClients] = useState<Client[]>([]);
   
   useEffect(() => {
     // Обновляем уровень партнера при загрузке страницы
     if (currentPartner?.id) {
       refreshPartnerLevel(currentPartner.id);
+      // Загружаем клиентов партнера
+      fetchPartnerClients(currentPartner.id);
     }
   }, [currentPartner?.id, refreshPartnerLevel]);
+  
+  const fetchPartnerClients = async (partnerId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select(`
+          *,
+          payments(*)
+        `)
+        .eq("partner_id", partnerId);
+      
+      if (error) {
+        console.error("Error fetching clients:", error);
+      } else {
+        setClients(data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching partner clients:", error);
+    }
+  };
   
   if (!currentPartner) {
     return <div>Загрузка...</div>;
   }
   
-  const totalCommission = currentPartner?.clients?.reduce((total, client) => {
+  // Calculate total commission from clients
+  const totalCommission = clients.reduce((total, client) => {
     const clientTotal = client.payments?.reduce((sum, payment) => {
       return sum + (payment.status === 'оплачено' ? (payment.commissionAmount || payment.commission_amount || 0) : 0);
     }, 0) || 0;
     return total + clientTotal;
-  }, 0) || 0;
+  }, 0);
   
-  const clientCount = currentPartner?.clients?.length || 0;
+  const clientCount = clients.length || 0;
   
   const getCurrentLevelInfo = () => {
     return PARTNER_LEVELS.find(level => level.level === currentPartner.partnerLevel || currentPartner.partner_level);

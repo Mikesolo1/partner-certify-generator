@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
@@ -13,8 +13,25 @@ const EditPartnerPage = () => {
   const { getPartnerById, updatePartner } = usePartners();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [partner, setPartner] = useState<Partner | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   
-  const partner = id ? getPartnerById(id) : undefined;
+  useEffect(() => {
+    const fetchPartner = async () => {
+      if (id) {
+        try {
+          const partnerData = await getPartnerById(id);
+          setPartner(partnerData);
+        } catch (error) {
+          console.error("Error fetching partner:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    fetchPartner();
+  }, [id, getPartnerById]);
   
   const handleUpdatePartner = (data: Partner) => {
     if (id) {
@@ -22,6 +39,17 @@ const EditPartnerPage = () => {
       navigate('/partners');
     }
   };
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!partner) {
     return (
@@ -51,7 +79,7 @@ const EditPartnerPage = () => {
             <CardHeader>
               <CardTitle className="text-2xl font-bold">Edit Partner</CardTitle>
               <CardDescription>
-                Update the details for {partner.companyName}
+                Update the details for {partner.companyName || partner.company_name}
               </CardDescription>
             </CardHeader>
             <CardContent>

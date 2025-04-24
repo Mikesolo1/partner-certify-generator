@@ -198,7 +198,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
           </DialogHeader>
           
           {/* Форма редактирования клиента */}
-          <Form>
+          <div>
             <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -244,7 +244,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
                 </Button>
               </DialogFooter>
             </form>
-          </Form>
+          </div>
         </DialogContent>
       </Dialog>
       
