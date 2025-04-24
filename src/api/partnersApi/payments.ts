@@ -1,5 +1,5 @@
 
-import { supabase, safeQuery } from "@/integrations/supabase/client";
+import { supabase, safeQuery, retryQuery } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 
 export const createPayment = async (payment: Omit<Payment, "id">) => {
@@ -17,8 +17,8 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
       commission_amount: payment.commission_amount || 0
     };
     
-    // Используем safeQuery для более надежного выполнения запроса
-    const { data, error } = await safeQuery(() => 
+    // Используем retryQuery для более надежного выполнения запроса
+    const { data, error } = await retryQuery(() => 
       supabase
         .from("payments")
         .insert([finalPayment])
@@ -31,13 +31,13 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
       throw error;
     }
     
-    console.log("Payment created:", data);
+    console.log("Payment created successfully:", data);
     
     // После успешного добавления платежа обновляем партнерский уровень
     if (payment.client_id) {
       try {
         // Получаем partner_id для клиента
-        const { data: clientData, error: clientError } = await safeQuery(() => 
+        const { data: clientData, error: clientError } = await retryQuery(() => 
           supabase
             .from("clients")
             .select("partner_id")
@@ -69,7 +69,7 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
 const updatePartnerLevel = async (partnerId: string) => {
   try {
     // Получаем всех клиентов партнера с их платежами
-    const { data: clients, error } = await safeQuery(() => 
+    const { data: clients, error } = await retryQuery(() => 
       supabase
         .from("clients")
         .select(`
@@ -100,7 +100,7 @@ const updatePartnerLevel = async (partnerId: string) => {
     console.log(`New level for partner ${partnerId}: ${level}, commission: ${commission}%`);
     
     // Обновляем партнера
-    const { error: updateError } = await safeQuery(() => 
+    const { error: updateError } = await retryQuery(() => 
       supabase
         .from("partners")
         .update({

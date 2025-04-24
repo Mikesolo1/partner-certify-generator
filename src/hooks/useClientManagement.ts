@@ -110,7 +110,13 @@ export const useClientManagement = (currentPartner: any = null) => {
       };
       
       console.log("Adding payment with data:", fullPaymentData);
+      
+      // Ensure we're using the right method with proper error handling
       const newPayment = await api.createPayment(fullPaymentData);
+      
+      if (!newPayment) {
+        throw new Error("Payment creation failed - no data returned");
+      }
       
       toast({
         title: "Платеж добавлен",

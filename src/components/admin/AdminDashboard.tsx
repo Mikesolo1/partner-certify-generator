@@ -10,6 +10,7 @@ import { NotificationForm } from "@/components/admin/NotificationForm";
 import { NotificationsList } from "@/components/admin/NotificationsList";
 import { TestQuestionsManager } from "@/components/admin/TestQuestionsManager";
 import { usePartnerActions } from "@/hooks/usePartnerActions";
+import { RefreshCw } from 'lucide-react';
 
 interface AdminDashboardProps {
   partners: Partner[];
@@ -39,6 +40,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const { updatePartnerRole, getPartnerClients, getTotalEarnings } = usePartnerActions(partners, setPartners);
 
+  // Убедимся, что клиенты правильно фильтруются по partner_id
+  const partnerClients = selectedPartnerId 
+    ? clients.filter(client => client.partner_id === selectedPartnerId)
+    : [];
+    
+  console.log("Selected partner ID:", selectedPartnerId);
+  console.log("Total clients:", clients.length);
+  console.log("Filtered clients for partner:", partnerClients.length);
+
   return (
     <Card>
       <CardHeader>
@@ -47,7 +57,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <CardContent>
         {loading ? (
           <div className="flex justify-center items-center py-8">
-            <p className="text-brand">Загрузка данных...</p>
+            <RefreshCw className="h-10 w-10 animate-spin text-brand mb-2" />
+            <p className="text-brand ml-2">Загрузка данных...</p>
           </div>
         ) : (
           <Tabs defaultValue="partners">
@@ -71,7 +82,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {selectedPartnerId && (
                 <div className="mt-6">
                   <ClientsList
-                    clients={clients.filter(client => client.partner_id === selectedPartnerId)}
+                    clients={partnerClients}
                     getClientPayments={(clientId) => 
                       payments.filter(payment => payment.client_id === clientId)
                     }
@@ -118,7 +129,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <Button 
             onClick={onRefresh} 
             className="bg-brand text-white"
+            disabled={loading}
           >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Обновить данные
           </Button>
         </div>
