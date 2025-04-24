@@ -1,5 +1,5 @@
 
-import { supabase, safeQuery, retryQuery } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 
 export const createPayment = async (payment: Omit<Payment, "id">) => {
@@ -17,17 +17,15 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
       commission_amount: payment.commission_amount || 0
     };
     
-    // Используем retryQuery для более надежного выполнения запроса
-    const { data, error } = await retryQuery(() => 
-      supabase
-        .rpc('add_payment_as_admin', {
-          p_client_id: finalPayment.client_id,
-          p_amount: finalPayment.amount,
-          p_date: finalPayment.date || new Date().toISOString(),
-          p_status: finalPayment.status,
-          p_admin_id: supabase.auth.getUser().then(({ data }) => data.user?.id)
-        })
-    );
+    // Используем RPC вместо прямого доступа к таблице
+    const { data, error } = await supabase
+      .rpc('add_payment_as_admin', {
+        p_client_id: finalPayment.client_id,
+        p_amount: finalPayment.amount,
+        p_date: finalPayment.date || new Date().toISOString(),
+        p_status: finalPayment.status,
+        p_admin_id: null // This should be set on the server side
+      });
     
     if (error) {
       console.error("Error creating payment:", error);

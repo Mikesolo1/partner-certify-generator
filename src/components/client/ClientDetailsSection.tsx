@@ -11,14 +11,22 @@ export const ClientDetailsSection: React.FC<ClientDetailsSectionProps> = ({ clie
   const totalPayments = client.payments?.length || 0;
   const totalAmount = client.payments?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
   
-  // Fix date formatting to handle multiple date field possibilities
+  // Improved date formatting to handle any date format
   const getFormattedDate = () => {
     const dateStr = client.registrationDate || client.registration_date || client.date;
     if (!dateStr) return "Нет данных";
     
     try {
+      // Handle common date formats
       const date = new Date(dateStr);
-      return date.toLocaleDateString();
+      
+      // Check if date is valid before formatting
+      if (isNaN(date.getTime())) {
+        return "Нет данных";
+      }
+      
+      // Format the date in Russian locale
+      return date.toLocaleDateString('ru-RU');
     } catch (error) {
       console.error("Error formatting date:", error);
       return "Нет данных";
@@ -38,7 +46,7 @@ export const ClientDetailsSection: React.FC<ClientDetailsSectionProps> = ({ clie
           <Receipt className="h-4 w-4" />
           <div>
             <div>Всего платежей: {totalPayments}</div>
-            <div>Общая сумма: {totalAmount.toLocaleString()} ₽</div>
+            <div>Общая сумма: {totalAmount.toLocaleString('ru-RU')} ₽</div>
           </div>
         </div>
       </div>

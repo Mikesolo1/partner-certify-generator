@@ -1,49 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-// Function to retry queries on temporary errors
-export async function retryQuery(queryFn, maxRetries = 5, initialDelay = 500) {
-  let lastError;
-  let delay = initialDelay;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const result = await queryFn();
-      if (!result.error) {
-        return result;
-      }
-      
-      lastError = result.error;
-      
-      if (!isRetryableError(result.error)) {
-        throw result.error;
-      }
-      
-      console.log(`Retrying query attempt ${attempt + 1}/${maxRetries} after error:`, result.error);
-      
-      if (attempt < maxRetries) {
-        await new Promise(r => setTimeout(r, delay));
-        delay *= 2; // Exponential backoff
-      }
-    } catch (error) {
-      lastError = error;
-      
-      if (!isRetryableError(error)) {
-        throw error;
-      }
-      
-      console.log(`Retrying query attempt ${attempt + 1}/${maxRetries} after exception:`, error);
-      
-      if (attempt < maxRetries) {
-        await new Promise(r => setTimeout(r, delay));
-        delay *= 2;
-      }
-    }
-  }
-  
-  throw lastError;
-}
-
 // Function to determine retryable errors
 function isRetryableError(error) {
   if (!error) return false;
@@ -55,8 +12,7 @@ function isRetryableError(error) {
     'temporarily unavailable',
     'too many connections',
     'rate limit',
-    'network error',
-    'infinite recursion'
+    'network error'
   ];
   
   if (error.code && retryableCodes.includes(error.code)) {
@@ -72,18 +28,13 @@ function isRetryableError(error) {
   return false;
 }
 
-// Helper function for query processing with error handling
-export async function safeQuery(queryFn) {
+// Simple query helper that doesn't cause recursion issues
+export async function simpleQuery(queryFn) {
   try {
     const result = await queryFn();
     
     if (result.error) {
       console.error("Supabase query error:", result.error);
-      
-      if (result.error.code === '42501' || result.error.code === '403') {
-        console.warn("Access denied error. This might be related to RLS policies or permissions.");
-      }
-      
       throw result.error;
     }
     

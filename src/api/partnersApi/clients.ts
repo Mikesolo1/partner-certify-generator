@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Client } from "@/types";
 
@@ -44,6 +45,7 @@ export const createClient = async (client: Omit<Client, "id" | "registrationDate
 
 export const updateClient = async (id: string, client: Partial<Client>) => {
   try {
+    // Using update_client RPC function would be better than direct table access
     const { data, error } = await supabase
       .from("clients")
       .update(client)
