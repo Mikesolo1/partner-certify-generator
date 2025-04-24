@@ -72,8 +72,8 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateTemplateProps>
     return (
       <div 
         ref={ref}
-        className="w-full mx-auto bg-white border-8 relative p-6 md:p-8 rounded-lg shadow-xl"
-        style={{ aspectRatio: '1.414/1' }} // A4 aspect ratio
+        className={`w-full mx-auto bg-white border-8 ${getBorderColor()} relative p-6 md:p-8 rounded-lg shadow-xl`}
+        style={{ aspectRatio: '1/1.414' }} // A4 aspect ratio for portrait
       >
         {/* Логотип компании */}
         <div className="absolute top-4 md:top-6 left-4 md:left-8 flex items-center">

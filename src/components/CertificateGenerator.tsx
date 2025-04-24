@@ -36,16 +36,16 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
 
       const imgData = canvas.toDataURL('image/png', 1.0);
       
-      // Create PDF with correct aspect ratio
+      // Create PDF with portrait orientation (A4)
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
 
-      // A4 dimensions in mm (landscape)
-      const imgWidth = 297; 
-      const imgHeight = 210;
+      // A4 dimensions in mm (portrait)
+      const imgWidth = 210; 
+      const imgHeight = 297;
       
       // Add image while preserving aspect ratio
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
