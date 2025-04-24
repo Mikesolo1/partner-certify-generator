@@ -28,7 +28,8 @@ export const usePartnersData = () => {
         certificateId: p.certificate_id,
         testPassed: p.test_passed,
         commission: p.commission,
-        role: p.role
+        role: p.role,
+        phone: p.phone || '' // Include phone with fallback
       }));
       
       setPartners(formattedPartners);

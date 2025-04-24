@@ -1,3 +1,4 @@
+
 export interface Partner {
   id?: string;
   companyName: string;

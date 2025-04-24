@@ -1,3 +1,4 @@
+
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
@@ -104,7 +105,7 @@ export const useClientManagement = (currentPartner: any = null) => {
       const fullPaymentData = {
         ...paymentData,
         client_id: clientId,
-        commission_amount: commissionAmount,
+        commission_amount: commissionAmount, // Use the snake_case property name
         status: paymentData.status || "оплачено"
       };
       

@@ -47,8 +47,13 @@ export const usePartnerAuth = () => {
       
       if (partner) {
         console.log("Login successful, setting partner data");
-        setCurrentPartner(partner);
-        return partner;
+        // Ensure all required fields are present
+        const completePartner: Partner = {
+          ...partner,
+          phone: partner.phone || ''
+        };
+        setCurrentPartner(completePartner);
+        return completePartner;
       }
       
       console.log("Login failed: Invalid credentials");

@@ -30,6 +30,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     defaultValues: {
       companyName: '',
       contactPerson: '',
+      phone: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -113,6 +114,20 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
               <FormLabel>Контактное лицо</FormLabel>
               <FormControl>
                 <Input placeholder="Иван Иванов" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Телефон</FormLabel>
+              <FormControl>
+                <Input placeholder="+7 (999) 123-45-67" type="tel" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

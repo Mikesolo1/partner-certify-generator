@@ -6,7 +6,7 @@ export const fetchPartners = async () => {
   try {
     const { data, error } = await supabase
       .from("partners")
-      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role");
+      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, phone");
     
     if (error) {
       console.error("Error fetching partners:", error);
@@ -24,7 +24,7 @@ export const fetchPartnerById = async (id: string) => {
   try {
     const { data, error } = await supabase
       .from("partners")
-      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role")
+      .select("id, company_name, contact_person, email, partner_level, join_date, certificate_id, test_passed, commission, role, phone")
       .eq("id", id)
       .maybeSingle();
     
@@ -47,7 +47,8 @@ export const fetchPartnerById = async (id: string) => {
       certificateId: data.certificate_id,
       testPassed: data.test_passed,
       commission: data.commission,
-      role: data.role
+      role: data.role,
+      phone: data.phone || '' // Include phone with fallback
     };
     
     return partner;

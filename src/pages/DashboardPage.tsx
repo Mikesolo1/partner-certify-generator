@@ -74,7 +74,7 @@ const DashboardPage = () => {
   
   const totalCommission = clients.reduce((total, client) => {
     const clientTotal = client.payments?.reduce((sum, payment) => {
-      return sum + (payment.status === 'оплачено' ? (payment.commissionAmount || 0) : 0);
+      return sum + (payment.status === 'оплачено' ? (payment.commission_amount || 0) : 0);
     }, 0) || 0;
     return total + clientTotal;
   }, 0);

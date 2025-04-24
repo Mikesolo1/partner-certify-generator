@@ -27,7 +27,8 @@ export const useRegistration = () => {
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         testPassed: false,
         role: 'partner',  // Explicitly set to 'partner'
-        commission: 20
+        commission: 20,
+        phone: formData.phone || '' // Include phone with default empty string
       };
       
       try {
