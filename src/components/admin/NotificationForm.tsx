@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { createNotification } from '@/api/partnersApi';
 
 interface NotificationFormProps {
   onCreateNotification: (title: string, content: string) => void;
@@ -12,17 +13,41 @@ export const NotificationForm: React.FC<NotificationFormProps> = ({
   onCreateNotification,
 }) => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    
     const form = e.target as HTMLFormElement;
     const title = (form.elements.namedItem('title') as HTMLInputElement).value;
     const content = (form.elements.namedItem('content') as HTMLTextAreaElement).value;
     
     if (title && content) {
-      onCreateNotification(title, content);
-      form.reset();
+      try {
+        console.log("Creating notification with:", { title, content });
+        // Сначала вызываем API напрямую для создания уведомления
+        await createNotification(title, content);
+        
+        // Если успешно, вызываем колбэк для обновления UI
+        onCreateNotification(title, content);
+        toast({
+          title: "Уведомление создано",
+          description: "Новое уведомление успешно опубликовано.",
+        });
+        form.reset();
+      } catch (error) {
+        console.error("Error creating notification:", error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось создать уведомление. Проверьте права доступа.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
+      setIsSubmitting(false);
       toast({
         title: "Ошибка",
         description: "Заполните все поля",
@@ -64,7 +89,9 @@ export const NotificationForm: React.FC<NotificationFormProps> = ({
             />
           </div>
           
-          <Button type="submit">Опубликовать уведомление</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Публикация..." : "Опубликовать уведомление"}
+          </Button>
         </form>
       </CardContent>
     </Card>

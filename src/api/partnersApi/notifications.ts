@@ -1,16 +1,23 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { Notification } from "@/types";
 
-export const createNotification = async (title: string, content: string) => {
+export const createNotification = async (title: string, content: string): Promise<Notification> => {
   try {
+    console.log("Creating notification:", { title, content });
+    
     const { data, error } = await supabase
       .from("notifications")
       .insert([{ title, content }])
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error("Error creating notification:", error);
+      throw error;
+    }
     
+    console.log("Notification created:", data);
     return data;
   } catch (error) {
     console.error("Error creating notification:", error);

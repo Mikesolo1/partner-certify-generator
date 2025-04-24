@@ -48,6 +48,7 @@ const ClientForm = ({ onSubmit, defaultValues, isEditing = false }: ClientFormPr
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     try {
+      console.log("Form submitted with data:", data);
       // Передаем только необходимые данные в колбэк
       onSubmit({
         name: data.name,

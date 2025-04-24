@@ -22,6 +22,7 @@ export const fetchPartnerClients = async (partnerId: string) => {
 
 export const createClient = async (client: Omit<Client, "id">) => {
   try {
+    console.log("Creating client with data:", client);
     const { data, error } = await supabase.rpc("create_client", {
       p_partner_id: client.partner_id,
       p_name: client.name,
@@ -29,9 +30,13 @@ export const createClient = async (client: Omit<Client, "id">) => {
       p_phone: client.phone || null
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error("Error creating client:", error);
+      throw error;
+    }
     
-    return data && Array.isArray(data) && data.length > 0 ? data[0] : null;
+    console.log("Client creation response:", data);
+    return data;
   } catch (error) {
     console.error("Error creating client:", error);
     throw error;

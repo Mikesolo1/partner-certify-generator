@@ -13,14 +13,16 @@ import ClientForm from '@/components/ClientForm';
 import { Navigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import * as api from '@/api/partnersApi';
+import { useClientManagement } from '@/hooks/useClientManagement';
 
 const ClientsPage = () => {
-  const { currentPartner, addClient, updateClient, removeClient, addPayment } = usePartners();
+  const { currentPartner } = usePartners();
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { addClient, updateClient, removeClient, addPayment } = useClientManagement();
   
   useEffect(() => {
     const fetchClients = async () => {
@@ -29,6 +31,7 @@ const ClientsPage = () => {
       setLoading(true);
       try {
         const clientsData = await api.fetchPartnerClients(currentPartner.id);
+        console.log("Fetched clients:", clientsData);
         setClients(clientsData);
       } catch (error) {
         console.error('Error fetching clients:', error);
@@ -55,18 +58,27 @@ const ClientsPage = () => {
     (client.phone && client.phone.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
-  const handleAddClient = async (client: Omit<Client, "id">) => {
+  const handleAddClient = async (client: Omit<Client, "id" | "partner_id" | "registrationDate" | "payments">) => {
     if (!currentPartner?.id) return;
     
     try {
-      // Updated to match new function signature that expects only one parameter
-      const newClient = await addClient(client as Client);
-      setClients(prev => [...prev, newClient]);
-      setIsAddClientDialogOpen(false);
-      toast({
-        title: 'Клиент добавлен',
-        description: `Клиент ${client.name} успешно добавлен`
-      });
+      console.log("Adding client:", client);
+      const newClient = await addClient(client);
+      console.log("New client added:", newClient);
+      
+      // Если newClient это массив, берем первый элемент
+      const clientToAdd = Array.isArray(newClient) ? newClient[0] : newClient;
+      
+      if (clientToAdd) {
+        setClients(prev => [...prev, clientToAdd]);
+        setIsAddClientDialogOpen(false);
+        toast({
+          title: 'Клиент добавлен',
+          description: `Клиент ${client.name} успешно добавлен`
+        });
+      } else {
+        throw new Error("Не удалось получить данные нового клиента");
+      }
     } catch (error) {
       console.error('Error adding client:', error);
       toast({
@@ -81,7 +93,6 @@ const ClientsPage = () => {
     if (!currentPartner?.id) return;
     
     try {
-      // Updated to match new function signature that expects only one parameter
       await updateClient(updatedClient);
       setClients(prev => 
         prev.map(client => client.id === updatedClient.id ? updatedClient : client)
@@ -128,6 +139,7 @@ const ClientsPage = () => {
         status: 'оплачено'
       };
       
+      console.log("Adding payment:", payment, "for client:", clientId);
       await addPayment(clientId, payment);
       
       // Получаем обновленный список клиентов после добавления платежа

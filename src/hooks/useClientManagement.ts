@@ -2,14 +2,25 @@
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
+import { usePartners } from '@/contexts/PartnersContext';
 
 export const useClientManagement = () => {
   const { toast } = useToast();
+  const { currentPartner } = usePartners();
 
   const addClient = async (client: Omit<Client, "id" | "registrationDate" | "payments">) => {
     try {
-      // We now handle the partner_id in the API layer with security definer functions
-      const newClient = await api.createClient(client);
+      if (!currentPartner?.id) {
+        throw new Error("Не удалось определить текущего партнера");
+      }
+      
+      const clientData = {
+        ...client,
+        partner_id: currentPartner.id
+      };
+      
+      console.log("Sending client data to API:", clientData);
+      const newClient = await api.createClient(clientData);
       
       toast({
         title: "Клиент добавлен",
@@ -80,16 +91,22 @@ export const useClientManagement = () => {
 
   const addPayment = async (clientId: string, payment: Omit<Payment, 'id' | 'client_id'>) => {
     try {
+      // Добавляем комиссию в зависимости от уровня партнера
+      const commission = currentPartner?.commission || 0;
+      const commissionAmount = payment.amount * (commission / 100);
+      
       const paymentData = {
         ...payment,
-        client_id: clientId
+        client_id: clientId,
+        commission_amount: commissionAmount
       };
       
+      console.log("Adding payment with data:", paymentData);
       const newPayment = await api.createPayment(paymentData);
       
       toast({
         title: "Платеж добавлен",
-        description: `Платеж на сумму ${payment.amount} успешно добавлен.`,
+        description: `Платеж на сумму ${payment.amount} успешно добавлен. Ваша комиссия: ${commissionAmount.toFixed(2)}.`,
       });
       
       return newPayment;
