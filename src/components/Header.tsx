@@ -5,7 +5,43 @@ import { Button } from '@/components/ui/button';
 import { usePartners } from '@/contexts/PartnersContext';
 
 const Header = () => {
-  const { currentPartner } = usePartners();
+  // Create a safer way to access the context
+  let currentPartner = null;
+  let contextError = false;
+  
+  try {
+    const partnersContext = usePartners();
+    currentPartner = partnersContext.currentPartner;
+  } catch (error) {
+    console.error("Error accessing partners context:", error);
+    contextError = true;
+  }
+
+  // If we had an error accessing the context, render a simpler header
+  if (contextError) {
+    return (
+      <header className="border-b bg-white shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="h-16 flex items-center justify-between">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="font-bold text-2xl text-brand">S3</div>
+              <div className="text-xl font-medium text-brand-dark">Tech</div>
+            </Link>
+            
+            <div className="flex items-center space-x-4">
+              <Link to="/login">
+                <Button
+                  className="bg-brand text-white hover:bg-brand-dark transition"
+                >
+                  Вход для партнеров
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="border-b bg-white shadow-sm">
