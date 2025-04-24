@@ -46,7 +46,7 @@ export const useAdminData = () => {
       
       // Загружаем клиентов напрямую из таблицы
       try {
-        const { data: clientData, error: clientError } = await safeQuery(() => 
+        const { data: clientData, error: clientError } = await retryQuery(() => 
           supabase.from("clients").select("*")
         );
         
@@ -70,7 +70,7 @@ export const useAdminData = () => {
       
       // Загружаем платежи напрямую из таблицы
       try {
-        const { data: paymentData, error: paymentError } = await safeQuery(() => 
+        const { data: paymentData, error: paymentError } = await retryQuery(() => 
           supabase.from("payments").select("*")
         );
           
@@ -94,7 +94,7 @@ export const useAdminData = () => {
       
       // Загружаем вопросы теста напрямую из таблицы
       try {
-        const { data: questionsData, error: questionsError } = await safeQuery(() => 
+        const { data: questionsData, error: questionsError } = await retryQuery(() => 
           supabase.from("test_questions").select("*")
         );
           
@@ -116,7 +116,7 @@ export const useAdminData = () => {
       
       // Загружаем уведомления напрямую из таблицы
       try {
-        const { data: notificationsData, error: notificationsError } = await safeQuery(() => 
+        const { data: notificationsData, error: notificationsError } = await retryQuery(() => 
           supabase.from("notifications").select("*").order('created_at', { ascending: false })
         );
           

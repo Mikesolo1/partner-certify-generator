@@ -69,12 +69,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               />
               
               {selectedPartnerId && (
-                <ClientsList
-                  clients={getPartnerClients(selectedPartnerId, clients)}
-                  getClientPayments={(clientId) => 
-                    payments.filter(payment => payment.client_id === clientId)
-                  }
-                />
+                <div className="mt-6">
+                  <ClientsList
+                    clients={clients.filter(client => client.partner_id === selectedPartnerId)}
+                    getClientPayments={(clientId) => 
+                      payments.filter(payment => payment.client_id === clientId)
+                    }
+                  />
+                </div>
               )}
             </TabsContent>
             

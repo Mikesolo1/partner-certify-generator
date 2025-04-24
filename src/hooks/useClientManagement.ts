@@ -105,7 +105,7 @@ export const useClientManagement = (currentPartner: any = null) => {
       const fullPaymentData = {
         ...paymentData,
         client_id: clientId,
-        commission_amount: commissionAmount, // Use the snake_case property name
+        commission_amount: commissionAmount,
         status: paymentData.status || "оплачено"
       };
       

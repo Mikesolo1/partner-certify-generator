@@ -27,6 +27,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // Helper function for query processing with error handling
 export async function safeQuery(queryFn) {
   try {
+    // Add a short delay before query to prevent race conditions
+    await new Promise(r => setTimeout(r, 100));
+    
     const result = await queryFn();
     
     // Check for errors in response
@@ -49,12 +52,15 @@ export async function safeQuery(queryFn) {
 }
 
 // Function to retry queries on temporary errors
-export async function retryQuery(queryFn, maxRetries = 5, initialDelay = 500) {
+export async function retryQuery(queryFn, maxRetries = 3, initialDelay = 500) {
   let lastError;
   let delay = initialDelay;
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
+      // Add a short delay before query to prevent race conditions
+      await new Promise(r => setTimeout(r, 100));
+      
       const result = await queryFn();
       if (!result.error) {
         return result;
@@ -64,7 +70,7 @@ export async function retryQuery(queryFn, maxRetries = 5, initialDelay = 500) {
       
       // Don't retry if it's not a retryable error
       if (!isRetryableError(result.error)) {
-        throw result.error;
+        return result;
       }
       
       console.log(`Retrying query attempt ${attempt + 1}/${maxRetries} after error:`, result.error);
@@ -77,7 +83,7 @@ export async function retryQuery(queryFn, maxRetries = 5, initialDelay = 500) {
       lastError = error;
       
       if (!isRetryableError(error)) {
-        throw error;
+        return { data: null, error };
       }
       
       console.log(`Retrying query attempt ${attempt + 1}/${maxRetries} after exception:`, error);
@@ -89,7 +95,8 @@ export async function retryQuery(queryFn, maxRetries = 5, initialDelay = 500) {
     }
   }
   
-  throw lastError;
+  // If we've exhausted all retries, return the last error
+  return { data: null, error: lastError };
 }
 
 // Function to determine retryable errors

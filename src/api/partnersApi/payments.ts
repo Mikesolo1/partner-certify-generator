@@ -1,16 +1,30 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, safeQuery } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 
 export const createPayment = async (payment: Omit<Payment, "id">) => {
   try {
     console.log("Creating payment:", payment);
     
-    const { data, error } = await supabase
-      .from("payments")
-      .insert([payment])
-      .select()
-      .single();
+    // Проверяем, что все необходимые поля присутствуют
+    if (!payment.client_id || !payment.amount || !payment.status) {
+      throw new Error("Missing required payment fields");
+    }
+    
+    // Убеждаемся, что commission_amount задан
+    const finalPayment = {
+      ...payment,
+      commission_amount: payment.commission_amount || 0
+    };
+    
+    // Используем safeQuery для более надежного выполнения запроса
+    const { data, error } = await safeQuery(() => 
+      supabase
+        .from("payments")
+        .insert([finalPayment])
+        .select()
+        .single()
+    );
     
     if (error) {
       console.error("Error creating payment:", error);
@@ -23,11 +37,13 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
     if (payment.client_id) {
       try {
         // Получаем partner_id для клиента
-        const { data: clientData, error: clientError } = await supabase
-          .from("clients")
-          .select("partner_id")
-          .eq("id", payment.client_id)
-          .single();
+        const { data: clientData, error: clientError } = await safeQuery(() => 
+          supabase
+            .from("clients")
+            .select("partner_id")
+            .eq("id", payment.client_id)
+            .single()
+        );
           
         if (clientError) throw clientError;
         
@@ -53,13 +69,15 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
 const updatePartnerLevel = async (partnerId: string) => {
   try {
     // Получаем всех клиентов партнера с их платежами
-    const { data: clients, error } = await supabase
-      .from("clients")
-      .select(`
-        id,
-        payments(status)
-      `)
-      .eq("partner_id", partnerId);
+    const { data: clients, error } = await safeQuery(() => 
+      supabase
+        .from("clients")
+        .select(`
+          id,
+          payments(status)
+        `)
+        .eq("partner_id", partnerId)
+    );
     
     if (error) {
       console.error("Error fetching clients for partner level update:", error);
@@ -82,13 +100,15 @@ const updatePartnerLevel = async (partnerId: string) => {
     console.log(`New level for partner ${partnerId}: ${level}, commission: ${commission}%`);
     
     // Обновляем партнера
-    const { error: updateError } = await supabase
-      .from("partners")
-      .update({
-        partner_level: level,
-        commission: commission
-      })
-      .eq("id", partnerId);
+    const { error: updateError } = await safeQuery(() => 
+      supabase
+        .from("partners")
+        .update({
+          partner_level: level,
+          commission: commission
+        })
+        .eq("id", partnerId)
+    );
     
     if (updateError) {
       console.error("Error updating partner level:", updateError);
