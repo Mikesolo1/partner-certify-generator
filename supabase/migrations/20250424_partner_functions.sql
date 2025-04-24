@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION public.get_partner_by_credentials(
 RETURNS SETOF partners
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   RETURN QUERY

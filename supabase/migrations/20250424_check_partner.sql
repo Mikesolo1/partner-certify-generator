@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION public.check_partner_exists(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   partner_exists BOOLEAN;

@@ -5,10 +5,10 @@ export const checkPartnerExists = async (email: string) => {
   try {
     console.log("Checking if partner exists with email:", email);
     
-    // Нормализуем email перед проверкой
+    // Normalize email before checking
     const normalizedEmail = email.trim().toLowerCase();
     
-    // Вызываем RPC функцию для проверки существования партнера
+    // Call the RPC function for checking partner existence
     const { data, error } = await supabase.rpc('check_partner_exists', {
       p_email: normalizedEmail
     });
@@ -30,10 +30,10 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
   try {
     console.log("Logging in partner with email:", email);
     
-    // Нормализуем email перед проверкой
+    // Normalize email before login
     const normalizedEmail = email.trim().toLowerCase();
     
-    // Вызываем RPC функцию для получения партнера по учетным данным
+    // Call the RPC function to get partner by credentials
     const { data, error } = await supabase.rpc('get_partner_by_credentials', {
       p_email: normalizedEmail,
       p_password: password
