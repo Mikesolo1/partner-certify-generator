@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; 
 
 interface PaymentDetails {
   id: string;
@@ -25,6 +26,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<string>("payment-methods");
 
   const fetchPaymentDetails = async () => {
     try {
@@ -91,10 +93,18 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
     }
   };
 
+  const handlePayCommission = async () => {
+    // В реальном проекте, здесь был бы API-вызов для регистрации выплаты комиссии партнёру
+    toast({
+      title: "Выплата комиссии",
+      description: "Функция находится в разработке. Вы можете отметить комиссии как выплаченные в разделе клиентов партнёра."
+    });
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Способы получения комиссии</CardTitle>
+        <CardTitle>Финансовая информация</CardTitle>
         <Button 
           variant="outline" 
           size="sm" 
@@ -106,53 +116,86 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         </Button>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        ) : error ? (
-          <div className="flex items-center gap-2 text-red-500 mb-2 p-4 bg-red-50 rounded-md border border-red-100">
-            <AlertCircle className="h-5 w-5" />
-            <p>{error}</p>
-          </div>
-        ) : paymentDetails.length === 0 ? (
-          <p className="text-gray-500 p-4 bg-gray-50 rounded-md border border-gray-100">
-            Партнер еще не указал способы получения комиссии
-          </p>
-        ) : (
-          <div className="grid gap-4">
-            {paymentDetails.map((detail) => (
-              <div
-                key={detail.id}
-                className="flex items-start gap-4 p-4 bg-gray-50 border rounded-lg"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    {renderPaymentTypeIcon(detail.payment_type)}
-                    <h3 className="font-medium">
-                      {detail.payment_type}
-                      {detail.is_primary && (
-                        <Badge className="ml-2 bg-green-500">Основной</Badge>
-                      )}
-                    </h3>
-                  </div>
-                  {detail.details && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {Object.entries(detail.details).map(([key, value]) => (
-                        <div key={key} className="flex gap-2 text-sm">
-                          <span className="text-gray-500 font-medium min-w-20">{key}:</span>
-                          <span>{String(value)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+        <Tabs defaultValue="payment-methods" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="payment-methods">Способы получения</TabsTrigger>
+            <TabsTrigger value="commissions">Комиссии</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="payment-methods">
+            {loading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
               </div>
-            ))}
-          </div>
-        )}
+            ) : error ? (
+              <div className="flex items-center gap-2 text-red-500 mb-2 p-4 bg-red-50 rounded-md border border-red-100">
+                <AlertCircle className="h-5 w-5" />
+                <p>{error}</p>
+              </div>
+            ) : paymentDetails.length === 0 ? (
+              <p className="text-gray-500 p-4 bg-gray-50 rounded-md border border-gray-100">
+                Партнер еще не указал способы получения комиссии
+              </p>
+            ) : (
+              <div className="grid gap-4">
+                {paymentDetails.map((detail) => (
+                  <div
+                    key={detail.id}
+                    className="flex items-start gap-4 p-4 bg-gray-50 border rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        {renderPaymentTypeIcon(detail.payment_type)}
+                        <h3 className="font-medium">
+                          {detail.payment_type}
+                          {detail.is_primary && (
+                            <Badge className="ml-2 bg-green-500">Основной</Badge>
+                          )}
+                        </h3>
+                      </div>
+                      {detail.details && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {Object.entries(detail.details).map(([key, value]) => (
+                            <div key={key} className="flex gap-2 text-sm">
+                              <span className="text-gray-500 font-medium min-w-20">{key}:</span>
+                              <span>{String(value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="commissions">
+            <div className="space-y-4">
+              <div className="p-4 border rounded-md">
+                <h3 className="font-medium text-lg mb-2">Выплаты комиссий</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Здесь вы можете отметить комиссии как выплаченные партнеру. 
+                  Для детальной информации о комиссиях перейдите в раздел клиентов партнера.
+                </p>
+                <Button onClick={handlePayCommission}>
+                  Отметить комиссии как выплаченные
+                </Button>
+              </div>
+              
+              <div className="p-4 bg-green-50 border border-green-100 rounded-md">
+                <h3 className="font-medium text-green-700 mb-1">Совет</h3>
+                <p className="text-sm text-green-600">
+                  Чтобы отметить конкретную комиссию как выплаченную, перейдите 
+                  в список клиентов партнера и отметьте соответствующие платежи.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
         {debugInfo && (
           <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
             <div className="flex items-center gap-2 mb-2">

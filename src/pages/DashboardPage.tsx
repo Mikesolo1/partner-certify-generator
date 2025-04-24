@@ -108,14 +108,30 @@ const DashboardPage = () => {
       </div>
     </DashboardLayout>;
   }
+
+  // Разделим расчет комиссии на выплаченную и ожидающую выплаты
+  let paidCommission = 0;
+  let pendingCommission = 0;
   
-  const totalCommission = clients.reduce((total, client) => {
-    const clientTotal = client.payments?.reduce((sum, payment) => {
-      return sum + (payment.status === 'оплачено' ? (payment.commission_amount || 0) : 0);
-    }, 0) || 0;
-    return total + clientTotal;
-  }, 0);
+  // Рассчитаем суммы комиссий
+  clients.forEach(client => {
+    if (client.payments) {
+      client.payments.forEach(payment => {
+        const commissionAmount = payment.commission_amount || 0;
+        
+        if (payment.status === 'оплачено') {
+          // Если у платежа есть флаг "commission_paid", значит комиссия уже выплачена
+          if (payment.commission_paid) {
+            paidCommission += commissionAmount;
+          } else {
+            pendingCommission += commissionAmount;
+          }
+        }
+      });
+    }
+  });
   
+  const totalCommission = paidCommission + pendingCommission;
   const clientCount = clients.length || 0;
   const contactPersonName = currentPartner.contactPerson || currentPartner.contact_person || 'партнер';
   const currentPartnerLevel = currentPartner.partnerLevel || currentPartner.partner_level || 'Бронзовый';
@@ -131,6 +147,8 @@ const DashboardPage = () => {
       <DashboardStatistics
         clientCount={clientCount}
         totalCommission={totalCommission}
+        paidCommission={paidCommission}
+        pendingCommission={pendingCommission}
         testPassed={testPassed}
         latestPaymentDate={latestPaymentDate}
         error={hasError}

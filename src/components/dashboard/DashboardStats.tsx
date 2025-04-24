@@ -9,6 +9,8 @@ import { AlertTriangle } from 'lucide-react';
 interface DashboardStatsProps {
   clientCount: number;
   totalCommission: number;
+  paidCommission: number;
+  pendingCommission: number;
   testPassed?: boolean;
   latestPaymentDate?: string;
   error?: boolean;
@@ -17,6 +19,8 @@ interface DashboardStatsProps {
 const DashboardStats = ({ 
   clientCount, 
   totalCommission, 
+  paidCommission,
+  pendingCommission,
   testPassed,
   latestPaymentDate,
   error = false
@@ -35,7 +39,11 @@ const DashboardStats = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <ClientCountCard clientCount={clientCount} />
-      <CommissionCard totalCommission={totalCommission} />
+      <CommissionCard 
+        totalCommission={totalCommission} 
+        paidCommission={paidCommission} 
+        pendingCommission={pendingCommission} 
+      />
       <CertificateStatusCard testPassed={testPassed} />
       <NextPaymentCard latestPaymentDate={latestPaymentDate} />
     </div>

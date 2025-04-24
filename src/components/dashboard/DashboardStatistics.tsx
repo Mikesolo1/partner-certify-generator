@@ -6,6 +6,8 @@ import QuickActions from './QuickActions';
 interface DashboardStatisticsProps {
   clientCount: number;
   totalCommission: number;
+  paidCommission: number;
+  pendingCommission: number;
   testPassed?: boolean;
   latestPaymentDate?: string;
   error?: boolean;
@@ -14,6 +16,8 @@ interface DashboardStatisticsProps {
 const DashboardStatistics = ({
   clientCount,
   totalCommission,
+  paidCommission,
+  pendingCommission,
   testPassed,
   latestPaymentDate,
   error = false
@@ -23,6 +27,8 @@ const DashboardStatistics = ({
       <DashboardStats 
         clientCount={clientCount}
         totalCommission={totalCommission}
+        paidCommission={paidCommission}
+        pendingCommission={pendingCommission}
         testPassed={testPassed}
         latestPaymentDate={latestPaymentDate}
         error={error}
