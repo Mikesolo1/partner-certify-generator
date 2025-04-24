@@ -203,7 +203,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_partner_exists: {
+        Args: { p_email: string }
+        Returns: boolean
+      }
+      get_partner_by_credentials: {
+        Args: { p_email: string; p_password: string }
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
     }
     Enums: {
       user_role: "admin" | "partner"

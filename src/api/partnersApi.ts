@@ -1,3 +1,4 @@
+
 import { supabase, safeQuery } from "@/integrations/supabase/client";
 import { Partner, Client, Payment } from "@/types";
 
@@ -83,21 +84,38 @@ export const fetchPartnerById = async (id: string) => {
 
 export const createPartner = async (partner: Partner) => {
   try {
-    // Transform data to Supabase format
+    // First check if partner already exists using our new function
+    const { data: exists, error: checkError } = await supabase.rpc('check_partner_exists', {
+      p_email: partner.email
+    });
+
+    if (checkError) {
+      console.error("Error checking partner existence:", checkError);
+      throw new Error("Ошибка при проверке существующего партнера");
+    }
+
+    if (exists) {
+      throw new Error("Партнер с таким email уже существует");
+    }
+
+    // Transform to database format
     const partnerData = {
       company_name: partner.companyName,
       contact_person: partner.contactPerson,
       email: partner.email,
+      password: partner.password,
       partner_level: partner.partnerLevel || "Бронзовый",
       join_date: partner.joinDate || new Date().toISOString(),
       certificate_id: partner.certificateId || `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
-      password: partner.password,
       test_passed: partner.testPassed || false,
       role: partner.role || 'user',
       commission: partner.commission || 20
     };
     
-    console.log("Creating new partner with data:", partnerData);
+    console.log("Creating new partner with data:", {
+      ...partnerData,
+      password: '[REDACTED]'
+    });
     
     const { data, error } = await supabase
       .from("partners")
@@ -110,7 +128,10 @@ export const createPartner = async (partner: Partner) => {
       throw error;
     }
     
-    console.log("Partner created successfully:", data);
+    console.log("Partner created successfully:", {
+      ...data,
+      password: '[REDACTED]'
+    });
     
     // Transform response to application format
     const newPartner: Partner = {

@@ -17,7 +17,6 @@ export const usePartnerAuth = () => {
   });
   const { toast } = useToast();
 
-  // Update localStorage when currentPartner changes
   useEffect(() => {
     if (currentPartner) {
       try {
@@ -58,7 +57,10 @@ export const usePartnerAuth = () => {
         return null;
       }
       
-      console.log("Login successful, partner data:", data);
+      console.log("Login successful, partner data:", {
+        ...data,
+        password: '[REDACTED]'
+      });
       
       const partner: Partner = {
         id: data.id,

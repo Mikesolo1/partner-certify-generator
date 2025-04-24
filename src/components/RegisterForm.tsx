@@ -64,32 +64,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     try {
       setIsLoading(true);
       
-      // Check if a user with this email already exists using RPC
-      const { data: existingUser, error } = await supabase.rpc('check_partner_exists', {
-        p_email: data.email
-      });
-        
-      if (error) {
-        console.error("Ошибка при проверке существующего пользователя:", error);
-        toast({
-          title: "Ошибка регистрации",
-          description: "Произошла ошибка при проверке данных. Пожалуйста, попробуйте снова.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      if (existingUser) {
-        toast({
-          title: "Ошибка регистрации",
-          description: "Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
       // Create new partner
       const newPartner: Partner = {
         companyName: data.companyName,
@@ -104,47 +78,47 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         commission: 20
       };
       
-      console.log("Registering new partner:", newPartner);
+      console.log("Attempting to register new partner:", {
+        ...newPartner,
+        password: '[REDACTED]'
+      });
       
-      try {
-        const createdPartner = await addPartner(newPartner);
-        console.log("Partner created successfully:", createdPartner);
-        
-        // Auto login after registration
-        const loggedInPartner = await loginPartner(data.email, data.password);
-        
-        if (loggedInPartner) {
-          toast({
-            title: "Регистрация успешна",
-            description: "Добро пожаловать в партнерскую программу S3!",
-          });
-          
-          if (onSuccess) {
-            onSuccess();
-          }
-          
-          navigate('/dashboard');
-        } else {
-          toast({
-            title: "Ошибка входа",
-            description: "Регистрация выполнена успешно, но не удалось автоматически войти в систему.",
-            variant: "default",
-          });
-          navigate('/login');
-        }
-      } catch (createError) {
-        console.error("Ошибка при создании партнера:", createError);
+      const createdPartner = await addPartner(newPartner);
+      console.log("Partner created successfully:", {
+        ...createdPartner,
+        password: '[REDACTED]'
+      });
+      
+      // Auto login after registration
+      const loggedInPartner = await loginPartner(data.email, data.password);
+      
+      if (loggedInPartner) {
         toast({
-          title: "Ошибка регистрации",
-          description: "Произошла ошибка при создании аккаунта. Пожалуйста, попробуйте снова.",
-          variant: "destructive",
+          title: "Регистрация успешна",
+          description: "Добро пожаловать в партнерскую программу S3!",
         });
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Ошибка входа",
+          description: "Регистрация выполнена успешно, но не удалось автоматически войти в систему.",
+          variant: "default",
+        });
+        navigate('/login');
       }
     } catch (error) {
-      console.error("Ошибка при регистрации:", error);
+      console.error("Error during registration:", error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
+      
       toast({
         title: "Ошибка регистрации",
-        description: "Произошла ошибка при создании аккаунта. Пожалуйста, попробуйте снова.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
