@@ -7,6 +7,7 @@ import { ClientsList } from '@/components/admin/ClientsList';
 import { PartnerHeader } from '@/components/admin/PartnerHeader';
 import { PartnerInfo } from '@/components/admin/PartnerInfo';
 import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails';
+import { PartnerCommissionDetails } from '@/components/admin/partner-details/PartnerCommissionDetails';
 import Header from '@/components/Header';
 
 interface PartnerDetailsContentProps {
@@ -39,6 +40,7 @@ export const PartnerDetailsContent = ({
         </div>
         <div className="grid gap-6">
           <PartnerInfo partner={partner} />
+          <PartnerCommissionDetails partnerId={partnerId} />
           <PartnerPaymentDetails partnerId={partnerId} />
           <Card>
             <CardHeader>

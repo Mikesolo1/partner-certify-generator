@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Client } from '@/types';
@@ -17,13 +16,37 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [latestPaymentDate, setLatestPaymentDate] = useState<string | undefined>();
+  const [paidCommission, setPaidCommission] = useState(0);
+  const [pendingCommission, setPendingCommission] = useState(0);
   const navigate = useNavigate();
   
   useEffect(() => {
     if (currentPartner?.id) {
       const loadData = async () => {
         try {
-          await fetchPartnerClients(currentPartner.id);
+          const [clientsResponse, commissionsResponse] = await Promise.all([
+            fetchPartnerClients(currentPartner.id),
+            safeRPC('get_partner_commission_totals', { 
+              p_partner_id: currentPartner.id 
+            })
+          ]);
+
+          if (commissionsResponse.error) {
+            console.error("Error loading commission data:", commissionsResponse.error);
+            setHasError(true);
+            return;
+          }
+
+          const commissionData = commissionsResponse.data?.[0] || {
+            total_commission: 0,
+            paid_commission: 0,
+            pending_commission: 0,
+            client_count: 0
+          };
+
+          setClients(clientsResponse || []);
+          setPaidCommission(commissionData.paid_commission || 0);
+          setPendingCommission(commissionData.pending_commission || 0);
         } catch (error) {
           console.error("Error loading dashboard data:", error);
           setHasError(true);
@@ -109,28 +132,6 @@ const DashboardPage = () => {
     </DashboardLayout>;
   }
 
-  // Разделим расчет комиссии на выплаченную и ожидающую выплаты
-  let paidCommission = 0;
-  let pendingCommission = 0;
-  
-  // Рассчитаем суммы комиссий
-  clients.forEach(client => {
-    if (client.payments) {
-      client.payments.forEach(payment => {
-        const commissionAmount = payment.commission_amount || 0;
-        
-        if (payment.status === 'оплачено') {
-          // Если у платежа есть флаг "commission_paid", значит комиссия уже выплачена
-          if (payment.commission_paid) {
-            paidCommission += commissionAmount;
-          } else {
-            pendingCommission += commissionAmount;
-          }
-        }
-      });
-    }
-  });
-  
   const totalCommission = paidCommission + pendingCommission;
   const clientCount = clients.length || 0;
   const contactPersonName = currentPartner.contactPerson || currentPartner.contact_person || 'партнер';

@@ -197,6 +197,7 @@ export type Database = {
           amount: number
           client_id: string
           commission_amount: number
+          commission_paid: boolean | null
           created_at: string | null
           created_by: string | null
           date: string | null
@@ -211,6 +212,7 @@ export type Database = {
           amount: number
           client_id: string
           commission_amount: number
+          commission_paid?: boolean | null
           created_at?: string | null
           created_by?: string | null
           date?: string | null
@@ -225,6 +227,7 @@ export type Database = {
           amount?: number
           client_id?: string
           commission_amount?: number
+          commission_paid?: boolean | null
           created_at?: string | null
           created_by?: string | null
           date?: string | null
@@ -296,6 +299,7 @@ export type Database = {
           amount: number
           client_id: string
           commission_amount: number
+          commission_paid: boolean | null
           created_at: string | null
           created_by: string | null
           date: string | null
@@ -322,6 +326,7 @@ export type Database = {
           amount: number
           client_id: string
           commission_amount: number
+          commission_paid: boolean | null
           created_at: string | null
           created_by: string | null
           date: string | null
@@ -432,6 +437,7 @@ export type Database = {
           amount: number
           client_id: string
           commission_amount: number
+          commission_paid: boolean | null
           created_at: string | null
           created_by: string | null
           date: string | null
@@ -505,6 +511,15 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      get_partner_commission_totals: {
+        Args: { p_partner_id: string }
+        Returns: {
+          total_commission: number
+          paid_commission: number
+          pending_commission: number
+          client_count: number
+        }[]
+      }
       get_partner_payment_details: {
         Args: { p_partner_id: string }
         Returns: {
@@ -515,6 +530,19 @@ export type Database = {
           partner_id: string
           payment_type: string
           updated_at: string | null
+        }[]
+      }
+      get_partner_payments_with_commission: {
+        Args: { p_partner_id: string }
+        Returns: {
+          id: string
+          client_id: string
+          client_name: string
+          amount: number
+          date: string
+          status: string
+          commission_amount: number
+          commission_paid: boolean
         }[]
       }
       insert_partner_direct: {
@@ -556,6 +584,10 @@ export type Database = {
       }
       is_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      mark_commission_paid: {
+        Args: { p_payment_id: string }
         Returns: boolean
       }
       save_partner_payment_details: {
