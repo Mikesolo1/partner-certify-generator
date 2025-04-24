@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,6 +10,7 @@ import { NotificationsList } from "@/components/admin/NotificationsList";
 import { TestQuestionsManager } from "@/components/admin/TestQuestionsManager";
 import { usePartnerActions } from "@/hooks/usePartnerActions";
 import { RefreshCw } from 'lucide-react';
+import { AllClientsTab } from "./AllClientsTab";
 
 interface AdminDashboardProps {
   partners: Partner[];
@@ -43,14 +43,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   console.log("Selected partner ID:", selectedPartnerId);
   console.log("Total clients:", clients.length);
   
-  // Filter clients by the selected partner ID
   const partnerClients = selectedPartnerId 
     ? clients.filter(client => client.partner_id === selectedPartnerId)
     : [];
     
   console.log("Filtered clients for partner:", partnerClients.length);
 
-  // Function to get payments for a specific client
   const getClientPayments = (clientId: string) => {
     return payments.filter(payment => payment.client_id === clientId);
   };
@@ -70,11 +68,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <Tabs defaultValue="partners">
             <TabsList className="mb-6">
               <TabsTrigger value="partners">Партнёры</TabsTrigger>
+              <TabsTrigger value="clients">Все клиенты</TabsTrigger>
               <TabsTrigger value="notifications">Уведомления</TabsTrigger>
               <TabsTrigger value="test">Вопросы теста</TabsTrigger>
             </TabsList>
             
-            {/* Partners Tab Content */}
             <TabsContent value="partners">
               <PartnersList
                 partners={partners}
@@ -92,8 +90,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 />
               )}
             </TabsContent>
-            
-            {/* Notifications Tab Content */}
+
+            <TabsContent value="clients">
+              <AllClientsTab
+                clients={clients}
+                getClientPayments={getClientPayments}
+              />
+            </TabsContent>
+
             <TabsContent value="notifications">
               <div className="mb-6 space-y-4">
                 <NotificationForm onCreateNotification={(title, content) => {
@@ -103,7 +107,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </TabsContent>
 
-            {/* Test Questions Tab Content */}
             <TabsContent value="test">
               <TestQuestionsManager 
                 questions={testQuestions}
