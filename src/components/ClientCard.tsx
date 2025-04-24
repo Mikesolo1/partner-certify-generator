@@ -13,26 +13,24 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
-import { usePartners } from '@/contexts/PartnersContext';
 import { Pencil, Trash, Plus, CreditCard } from 'lucide-react';
 
 interface ClientCardProps {
   client: Client;
   onUpdate: (client: Client) => void;
   onDelete: (id: string) => void;
-  onAddPayment?: (clientId: string, amount: number) => void;
+  onAddPayment: (clientId: string, amount: number) => void;
 }
 
 const paymentSchema = z.object({
   amount: z.coerce.number().min(1, { message: "Сумма должна быть больше 0" }),
 });
 
-const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) => {
+const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete, onAddPayment }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { addPayment } = usePartners();
   
   const formatDate = (dateString: string) => {
     try {
@@ -51,11 +49,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
   
   const handleAddPayment = async (data: z.infer<typeof paymentSchema>) => {
     try {
-      await addPayment(client.id, {
-        amount: data.amount,
-        date: new Date().toISOString(),
-        status: 'оплачено'
-      });
+      await onAddPayment(client.id, data.amount);
       
       toast({
         title: "Платеж добавлен",
@@ -122,13 +116,20 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
           <div className="flex justify-between">
             <span className="text-gray-500">Оплаченных счетов:</span>
             <Badge variant="outline" className="font-medium">
-              {paymentsCount}
+              {client.payments ? client.payments.filter(p => p.status === 'оплачено').length : 0}
             </Badge>
           </div>
           
           <div className="flex justify-between">
             <span className="text-gray-500">Общая сумма:</span>
-            <span className="font-medium text-brand-dark">{totalPaid.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-medium text-brand-dark">
+              {client.payments
+                ? client.payments
+                    .filter(p => p.status === 'оплачено')
+                    .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                    .toLocaleString('ru-RU')
+                : 0} ₽
+            </span>
           </div>
         </div>
       </CardContent>

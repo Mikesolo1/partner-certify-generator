@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -130,14 +131,8 @@ const ClientsPage = () => {
   
   const handleAddPayment = async (clientId: string, amount: number) => {
     try {
-      const payment: Omit<Payment, "id" | "client_id"> = {
-        amount,
-        date: new Date().toISOString(),
-        status: 'оплачено'
-      };
-      
-      console.log("Adding payment:", payment, "for client:", clientId);
-      await addPayment(clientId, payment);
+      console.log("Adding payment:", amount, "for client:", clientId);
+      await addPayment(clientId, amount);
       
       // Получаем обновленный список клиентов после добавления платежа
       if (currentPartner?.id) {

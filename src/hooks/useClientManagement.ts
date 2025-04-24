@@ -87,24 +87,33 @@ export const useClientManagement = (currentPartner: any = null) => {
     }
   };
 
-  const addPayment = async (clientId: string, payment: Omit<Payment, 'id' | 'client_id'>) => {
+  const addPayment = async (clientId: string, payment: Omit<Payment, 'id' | 'client_id'> | number) => {
     try {
+      // Handle case where payment might be just a number (amount)
+      const paymentData = typeof payment === 'number' 
+        ? { 
+            amount: payment, 
+            date: new Date().toISOString(), 
+            status: 'оплачено' 
+          }
+        : payment;
+      
       // Добавляем комиссию в зависимости от уровня партнера
       const commission = currentPartner?.commission || 0;
-      const commissionAmount = payment.amount * (commission / 100);
+      const commissionAmount = paymentData.amount * (commission / 100);
       
-      const paymentData = {
-        ...payment,
+      const fullPaymentData = {
+        ...paymentData,
         client_id: clientId,
         commission_amount: commissionAmount
       };
       
-      console.log("Adding payment with data:", paymentData);
-      const newPayment = await api.createPayment(paymentData);
+      console.log("Adding payment with data:", fullPaymentData);
+      const newPayment = await api.createPayment(fullPaymentData);
       
       toast({
         title: "Платеж добавлен",
-        description: `Платеж на сумму ${payment.amount} успешно добавлен. Ваша комиссия: ${commissionAmount.toFixed(2)}.`,
+        description: `Платеж на сумму ${paymentData.amount} успешно добавлен. Ваша комиссия: ${commissionAmount.toFixed(2)}.`,
       });
       
       return newPayment;
