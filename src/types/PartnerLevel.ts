@@ -1,51 +1,3 @@
-export interface Partner {
-  id?: string;
-  companyName?: string;
-  contactPerson?: string;
-  email: string;
-  partnerLevel?: string;
-  joinDate?: string;
-  certificateId?: string;
-  password?: string;
-  testPassed?: boolean;
-  commission?: number;
-  company_name?: string;
-  contact_person?: string;
-  partner_level?: string;
-  certificate_id?: string;
-  test_passed?: boolean;
-  join_date?: string;
-  role?: string;
-}
-
-export interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  registrationDate?: string;
-  registration_date?: string;
-  date?: string;
-  partner_id?: string;
-  payments?: Payment[];
-}
-
-export interface Payment {
-  id: string;
-  amount: number;
-  date: string;
-  status: 'оплачено' | 'в ожидании' | 'отменено';
-  commissionAmount?: number;
-  commission_amount?: number;
-  client_id?: string;
-}
-
-export interface TestQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
 
 export interface PartnerLevelInfo {
   level: string;
@@ -104,10 +56,3 @@ export const PARTNER_LEVELS: PartnerLevelInfo[] = [
     description: "Максимальный уровень. Получайте 50% комиссии и эксклюзивные привилегии"
   }
 ];
-
-export interface Notification {
-  id?: string;
-  title: string;
-  content: string;
-  created_at?: string;
-}

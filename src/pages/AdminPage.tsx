@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Partner, Client, Payment, TestQuestion, Notification } from '@/types';
 
 interface PartnerRow {
   id: string;

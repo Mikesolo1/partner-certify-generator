@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Client, Payment } from '@/types/partner';
+import { Client, Payment } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -145,7 +145,6 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
         </Button>
       </CardFooter>
       
-      {/* Dialog для добавления платежа */}
       <Dialog open={isAddPaymentDialogOpen} onOpenChange={setIsAddPaymentDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -187,7 +186,6 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
         </DialogContent>
       </Dialog>
       
-      {/* Диалоги редактирования и удаления */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -197,7 +195,6 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onUpdate, onDelete }) =
             </DialogDescription>
           </DialogHeader>
           
-          {/* Форма редактирования клиента */}
           <div>
             <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

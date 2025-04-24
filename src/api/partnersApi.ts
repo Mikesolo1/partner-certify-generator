@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Partner, Client, Payment } from "@/types/partner";
+import { Partner, Client, Payment } from "@/types";
 
 export const fetchPartners = async () => {
   const { data, error } = await supabase
