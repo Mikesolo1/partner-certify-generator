@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Partner } from '@/types';
 import { usePartners } from '@/contexts/PartnersContext';
 import { RegisterFormValues } from '@/validations/authSchemas';
-import { checkPartnerExists } from '@/api/partnersApi/auth';
 
 export const useRegistration = () => {
   const { addPartner, loginPartner } = usePartners();

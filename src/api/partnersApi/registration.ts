@@ -1,14 +1,35 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Partner } from "@/types";
-import { checkPartnerExists } from "./auth";
+
+// Direct function to check if email exists without using RLS policies
+const checkEmailExists = async (email: string): Promise<boolean> => {
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Use RPC to avoid RLS policy issues
+    const { data, error } = await supabase.rpc('check_partner_exists', {
+      p_email: normalizedEmail
+    });
+    
+    if (error) {
+      console.error("Error checking email existence:", error);
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Exception in checkEmailExists:", error);
+    throw error;
+  }
+};
 
 export const createPartner = async (partner: Partner) => {
   try {
     console.log("Starting partner creation process:", partner.email);
     
     // Check if email exists first
-    const exists = await checkPartnerExists(partner.email);
+    const exists = await checkEmailExists(partner.email);
     
     if (exists) {
       console.warn("Partner creation failed: Email already exists:", partner.email);
@@ -34,6 +55,7 @@ export const createPartner = async (partner: Partner) => {
       password: '[REDACTED]'
     });
     
+    // Use a direct insert with maybeSingle to avoid potential RLS issues
     const { data, error } = await supabase
       .from("partners")
       .insert([partnerData])
