@@ -30,10 +30,14 @@ const AdminPartnerDetailsPage = () => {
         setLoading(true);
         console.log("Fetching partner details for ID:", partnerId);
 
+        // Updated to include delay property
         const { data, error: rpcError } = await safeRPC(
           'get_partner_by_id', 
           { p_id: partnerId },
-          { retries: 2 }
+          { 
+            retries: 2, 
+            delay: 1000 // Add a 1-second delay between retries
+          }
         );
 
         if (rpcError) {

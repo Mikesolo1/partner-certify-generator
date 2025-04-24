@@ -30,11 +30,14 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         console.log("Fetching payment details for partner:", partnerId);
         setLoading(true);
         
-        // Используем safeRPC вместо прямого вызова RPC для улучшенной обработки ошибок
+        // Updated to include delay property
         const { data, error } = await safeRPC(
           'get_partner_payment_details',
           { p_partner_id: partnerId },
-          { retries: 2 } // Добавляем 2 повторных попытки
+          { 
+            retries: 2, 
+            delay: 1000 // Add a 1-second delay between retries
+          }
         );
           
         if (error) {
