@@ -1,10 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import { supabase, retryQuery } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, BanknoteIcon, AlertCircle, Bug } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { simpleQuery } from "@/api/utils/queryHelpers";
 
 interface PaymentDetails {
   id: string;
@@ -30,8 +31,8 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         console.log("Fetching payment details for partner:", partnerId);
         setLoading(true);
         
-        // Using retryQuery for better error handling with RLS issues
-        const { data, error } = await retryQuery(() => 
+        // Using simpleQuery instead of retryQuery
+        const { data, error } = await simpleQuery(() => 
           supabase
             .from('payment_details')
             .select('*')

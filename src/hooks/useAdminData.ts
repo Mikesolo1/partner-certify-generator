@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
-import { supabase, retryQuery } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Partner, Client, Payment, TestQuestion } from '@/types';
 import { fetchPartners } from '@/api/partnersApi';
+import { simpleQuery } from "@/api/utils/queryHelpers";
 
 export const useAdminData = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -68,7 +69,7 @@ export const useAdminData = () => {
 
   const fetchAllClients = async () => {
     try {
-      const { data, error } = await retryQuery(() => 
+      const { data, error } = await simpleQuery(() => 
         supabase.from("clients").select("*")
       );
       
@@ -93,7 +94,7 @@ export const useAdminData = () => {
 
   const fetchAllPayments = async () => {
     try {
-      const { data, error } = await retryQuery(() => 
+      const { data, error } = await simpleQuery(() => 
         supabase.from("payments").select("*")
       );
         
@@ -118,7 +119,7 @@ export const useAdminData = () => {
 
   const fetchAllTestQuestions = async () => {
     try {
-      const { data, error } = await retryQuery(() => 
+      const { data, error } = await simpleQuery(() => 
         supabase.from("test_questions").select("*")
       );
         
@@ -140,7 +141,7 @@ export const useAdminData = () => {
 
   const fetchAllNotifications = async () => {
     try {
-      const { data, error } = await retryQuery(() => 
+      const { data, error } = await simpleQuery(() => 
         supabase.from("notifications").select("*").order('created_at', { ascending: false })
       );
         
