@@ -26,7 +26,7 @@ export const useRegistration = () => {
         joinDate: new Date().toISOString(),
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         testPassed: false,
-        role: 'partner',  // Changed from 'user' to 'partner'
+        role: 'partner',  // Explicitly set to 'partner'
         commission: 20
       };
       
