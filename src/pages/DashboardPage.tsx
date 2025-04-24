@@ -6,9 +6,10 @@ import { usePartners } from '@/contexts/PartnersContext';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Award, FileText, Users, Star, Trophy, CircleCheck, CircleUp } from 'lucide-react';
+import { Award, FileText, Users, Star, Trophy, CircleCheck } from 'lucide-react';
 import PartnerLevelProgress from '@/components/PartnerLevelProgress';
 import { PARTNER_LEVELS } from '@/types/partner';
+import { Badge } from '@/components/ui/badge';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel, partnerLevel } = usePartners();
@@ -124,7 +125,7 @@ const DashboardPage = () => {
           <h2 className="text-xl font-bold">Быстрые действия</h2>
           {currentPartner?.testPassed && partnerLevel && partnerLevel.progress >= 50 && partnerLevel.nextLevelAt && (
             <div className="bg-brand/10 text-sm px-3 py-1 rounded-full flex items-center gap-1">
-              <CircleUp className="h-4 w-4 text-brand" />
+              <CircleCheck className="h-4 w-4 text-brand" />
               <span>Близко к следующему уровню!</span>
             </div>
           )}
