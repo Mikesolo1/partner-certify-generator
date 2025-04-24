@@ -20,12 +20,15 @@ export const createNotification = async (title: string, content: string): Promis
     
     console.log("Notification created successfully:", data);
 
+    // Type assertion to handle the unknown type returned from RPC
+    const typedData = data as Record<string, any>;
+    
     // Ensure the returned data matches the Notification type
     const notification: Notification = {
-      id: data.id,
-      title: data.title,
-      content: data.content,
-      created_at: data.created_at
+      id: typedData.id,
+      title: typedData.title,
+      content: typedData.content,
+      created_at: typedData.created_at
     };
     
     return notification;
