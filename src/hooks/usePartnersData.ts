@@ -52,8 +52,13 @@ export const usePartnersData = () => {
   const addPartner = async (partner: Partner) => {
     try {
       const newPartner = await api.createPartner(partner);
-      setPartners((prev) => [...prev, newPartner]);
-      return newPartner;
+      // Ensure newPartner has all required fields including phone
+      const completePartner: Partner = {
+        ...newPartner,
+        phone: newPartner.phone || ''
+      };
+      setPartners((prev) => [...prev, completePartner]);
+      return completePartner;
     } catch (error) {
       console.error('Error adding partner:', error);
       throw error;
@@ -63,8 +68,13 @@ export const usePartnersData = () => {
   const updatePartner = async (id: string, updatedPartner: Partner) => {
     try {
       const updated = await api.updatePartner(id, updatedPartner);
-      setPartners(prev => prev.map(partner => partner.id === id ? updated : partner));
-      return updated;
+      // Ensure updated partner has all required fields including phone
+      const completePartner: Partner = {
+        ...updated,
+        phone: updated.phone || ''
+      };
+      setPartners(prev => prev.map(partner => partner.id === id ? completePartner : partner));
+      return completePartner;
     } catch (error) {
       console.error('Error updating partner:', error);
       throw error;

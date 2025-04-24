@@ -48,7 +48,8 @@ export const createPartner = async (partner: Partner) => {
       p_email: partner.email.trim().toLowerCase(),
       p_password: partner.password,
       p_partner_level: 'Бронзовый',
-      p_commission: 20
+      p_commission: 20,
+      p_phone: partner.phone || ''  // Add phone parameter
     });
     
     if (error) {
@@ -75,7 +76,8 @@ export const createPartner = async (partner: Partner) => {
       certificateId: createdPartner.certificate_id,
       testPassed: createdPartner.test_passed,
       commission: createdPartner.commission,
-      role: createdPartner.role
+      role: createdPartner.role,
+      phone: createdPartner.phone || '' // Include phone in returned data
     };
   } catch (error) {
     console.error("Error in createPartner:", error);

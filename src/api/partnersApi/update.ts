@@ -22,7 +22,8 @@ export const updatePartner = async (id: string, partner: any) => {
       certificateId: data.certificate_id,
       testPassed: data.test_passed,
       commission: data.commission,
-      role: data.role
+      role: data.role,
+      phone: data.phone || '' // Include phone in returned data
     };
   } catch (error) {
     console.error("Error updating partner:", error);
@@ -55,7 +56,8 @@ export const completeTest = async (partnerId: string) => {
       certificateId: updatedPartner.certificate_id,
       testPassed: updatedPartner.test_passed,
       commission: updatedPartner.commission,
-      role: updatedPartner.role
+      role: updatedPartner.role,
+      phone: updatedPartner.phone || '' // Include phone in returned data
     };
   } catch (error) {
     console.error("Error completing test:", error);

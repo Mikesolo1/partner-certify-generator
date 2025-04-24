@@ -64,7 +64,8 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setCurrentPartner({ 
           ...currentPartner, 
           testPassed: true,
-          role: updated.role 
+          role: updated.role,
+          phone: updated.phone || currentPartner.phone || ''
         });
       }
       
