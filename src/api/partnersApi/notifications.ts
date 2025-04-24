@@ -4,12 +4,13 @@ import { Notification } from "@/types";
 
 export const createNotification = async (title: string, content: string): Promise<Notification> => {
   try {
-    console.log("Creating notification:", { title, content });
+    console.log("Creating notification using RPC:", { title, content });
     
     const { data, error } = await supabase
-      .from("notifications")
-      .insert([{ title, content }])
-      .select()
+      .rpc('create_notification', {
+        p_title: title,
+        p_content: content
+      })
       .single();
     
     if (error) {
@@ -17,10 +18,10 @@ export const createNotification = async (title: string, content: string): Promis
       throw error;
     }
     
-    console.log("Notification created:", data);
+    console.log("Notification created successfully:", data);
     return data;
   } catch (error) {
-    console.error("Error creating notification:", error);
+    console.error("Error in createNotification:", error);
     throw error;
   }
 };

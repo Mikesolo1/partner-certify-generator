@@ -386,6 +386,15 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      create_notification: {
+        Args: { p_title: string; p_content: string }
+        Returns: {
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+        }[]
+      }
       delete_client: {
         Args: { p_client_id: string }
         Returns: boolean

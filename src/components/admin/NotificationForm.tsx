@@ -23,36 +23,35 @@ export const NotificationForm: React.FC<NotificationFormProps> = ({
     const title = (form.elements.namedItem('title') as HTMLInputElement).value;
     const content = (form.elements.namedItem('content') as HTMLTextAreaElement).value;
     
-    if (title && content) {
-      try {
-        console.log("Creating notification with:", { title, content });
-        // Сначала вызываем API напрямую для создания уведомления
-        await createNotification(title, content);
-        
-        // Если успешно, вызываем колбэк для обновления UI
-        onCreateNotification(title, content);
-        toast({
-          title: "Уведомление создано",
-          description: "Новое уведомление успешно опубликовано.",
-        });
-        form.reset();
-      } catch (error) {
-        console.error("Error creating notification:", error);
-        toast({
-          title: "Ошибка",
-          description: "Не удалось создать уведомление. Проверьте права доступа.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
+    if (!title || !content) {
       setIsSubmitting(false);
       toast({
         title: "Ошибка",
         description: "Заполните все поля",
         variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      console.log("Submitting notification:", { title, content });
+      const notification = await createNotification(title, content);
+      
+      onCreateNotification(title, content);
+      toast({
+        title: "Уведомление создано",
+        description: "Новое уведомление успешно опубликовано.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать уведомление",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
