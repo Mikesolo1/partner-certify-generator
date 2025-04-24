@@ -19,7 +19,21 @@ export const useClientsList = () => {
       try {
         const clientsData = await api.fetchPartnerClients(currentPartner.id);
         console.log("Fetched clients:", clientsData);
-        setClients(clientsData);
+        
+        // Fetch payments for each client
+        const clientsWithPayments = await Promise.all(
+          clientsData.map(async (client) => {
+            try {
+              const payments = await api.getClientPayments(client.id);
+              return { ...client, payments };
+            } catch (error) {
+              console.error(`Error fetching payments for client ${client.id}:`, error);
+              return { ...client, payments: [] };
+            }
+          })
+        );
+        
+        setClients(clientsWithPayments);
       } catch (error) {
         console.error('Error fetching clients:', error);
         toast({

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 import { safeRPC } from "@/api/utils/queryHelpers";
@@ -56,7 +57,7 @@ export const getClientPayments = async (clientId: string) => {
       return [];
     }
 
-    const { data, error } = await safeRPC('get_client_payments', {
+    const { data, error } = await safeRPC('get_client_payments_with_commission', {
       p_client_id: clientId
     });
     
