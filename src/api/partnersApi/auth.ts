@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { safeRPC } from "@/api/utils/queryHelpers";
 
 export const checkPartnerExists = async (email: string) => {
   try {
@@ -9,7 +10,7 @@ export const checkPartnerExists = async (email: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     
     // Call the RPC function for checking partner existence
-    const { data, error } = await supabase.rpc('check_partner_exists', {
+    const { data, error } = await safeRPC('check_partner_exists', {
       p_email: normalizedEmail
     });
     
@@ -34,7 +35,7 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
     const normalizedEmail = email.trim().toLowerCase();
     
     // Call the RPC function to get partner by credentials
-    const { data, error } = await supabase.rpc('get_partner_by_credentials', {
+    const { data, error } = await safeRPC('get_partner_by_credentials', {
       p_email: normalizedEmail,
       p_password: password
     });

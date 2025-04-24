@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Partner, Client, Payment, TestQuestion } from '@/types';
 import { fetchPartners } from '@/api/partnersApi';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 export const useAdminData = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -20,39 +21,39 @@ export const useAdminData = () => {
       setLoading(true);
       setFetchError(null);
       
-      // Load all data in parallel for better performance using our new RPC functions
+      // Загружаем все данные параллельно для лучшей производительности, используя безопасные RPC функции
       const [partnersResult, clientsResult, paymentsResult, questionsResult, notificationsResult] = 
         await Promise.all([
           fetchAllPartners(),
-          supabase.rpc('get_all_clients'),
-          supabase.rpc('get_all_payments'),
-          supabase.rpc('get_all_test_questions'),
-          supabase.rpc('get_all_notifications')
+          safeRPC('get_all_clients'),
+          safeRPC('get_all_payments'),
+          safeRPC('get_all_test_questions'),
+          safeRPC('get_all_notifications')
         ]);
 
-      // Handle partners data
+      // Обрабатываем данные партнеров
       if (partnersResult) {
         setPartners(partnersResult);
       }
 
-      // Handle clients data
+      // Обрабатываем данные клиентов
       if (clientsResult.data) {
         console.log("Loaded clients:", clientsResult.data.length);
         setClients(clientsResult.data);
       }
 
-      // Handle payments data
+      // Обрабатываем данные платежей
       if (paymentsResult.data) {
         console.log("Loaded payments:", paymentsResult.data.length);
         setPayments(paymentsResult.data);
       }
 
-      // Handle test questions data
+      // Обрабатываем данные вопросов теста
       if (questionsResult.data) {
         setTestQuestions(questionsResult.data);
       }
 
-      // Handle notifications data
+      // Обрабатываем данные уведомлений
       if (notificationsResult.data) {
         setNotifications(notificationsResult.data);
       }
@@ -71,7 +72,7 @@ export const useAdminData = () => {
     }
   };
 
-  // Reuse existing fetchAllPartners function since it's already working
+  // Повторно используем существующую функцию fetchAllPartners, так как она уже работает
   const fetchAllPartners = async () => {
     try {
       const partnerData = await fetchPartners();

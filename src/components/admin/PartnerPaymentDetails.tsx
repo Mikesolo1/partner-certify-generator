@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, BanknoteIcon, AlertCircle, Bug } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 interface PaymentDetails {
   id: string;
@@ -29,9 +30,11 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
         console.log("Fetching payment details for partner:", partnerId);
         setLoading(true);
         
-        const { data, error } = await supabase.rpc(
+        // Используем safeRPC вместо прямого вызова RPC для улучшенной обработки ошибок
+        const { data, error } = await safeRPC(
           'get_partner_payment_details',
-          { p_partner_id: partnerId }
+          { p_partner_id: partnerId },
+          { retries: 2 } // Добавляем 2 повторных попытки
         );
           
         if (error) {

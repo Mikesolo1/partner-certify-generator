@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-// Function to determine retryable errors
+// Функция для определения повторяемых ошибок
 function isRetryableError(error) {
   if (!error) return false;
   
@@ -29,7 +29,7 @@ function isRetryableError(error) {
   return false;
 }
 
-// Simple query helper for safer query execution
+// Простой помощник запросов для более безопасного выполнения запросов
 export async function simpleQuery(queryFn) {
   try {
     const result = await queryFn();
@@ -37,7 +37,7 @@ export async function simpleQuery(queryFn) {
     if (result.error) {
       console.error("Supabase query error:", result.error);
       
-      // If this is a recursion error, suggest using RPC functions
+      // Если это ошибка рекурсии, предложить использовать RPC функции
       if (result.error.message && 
           result.error.message.toLowerCase().includes('infinite recursion')) {
         console.warn("Recursion error detected. Consider using RPC functions with SECURITY DEFINER instead of direct table access");
@@ -53,19 +53,44 @@ export async function simpleQuery(queryFn) {
   }
 }
 
-// Helper function to safely call RPC with better error handling
-export async function safeRPC(functionName, params = {}) {
-  try {
-    const { data, error } = await supabase.rpc(functionName, params);
-    
-    if (error) {
-      console.error(`Error calling RPC function ${functionName}:`, error);
+// Функция-помощник для безопасного вызова RPC с улучшенной обработкой ошибок
+export async function safeRPC(functionName, params = {}, options = { retries: 1, delay: 1000 }) {
+  let attempts = 0;
+  const maxAttempts = options.retries + 1;
+  
+  while (attempts < maxAttempts) {
+    attempts++;
+    try {
+      console.log(`Вызов RPC функции ${functionName} (попытка ${attempts}/${maxAttempts})`, params);
+      const { data, error } = await supabase.rpc(functionName, params);
+      
+      if (error) {
+        console.error(`Ошибка вызова RPC функции ${functionName}:`, error);
+        
+        // Проверяем, можно ли повторить запрос
+        if (attempts < maxAttempts && isRetryableError(error)) {
+          console.log(`Повторная попытка через ${options.delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, options.delay));
+          continue;
+        }
+        
+        return { data: null, error };
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error(`Исключение при вызове RPC функции ${functionName}:`, error);
+      
+      // Проверяем, можно ли повторить запрос
+      if (attempts < maxAttempts && isRetryableError(error)) {
+        console.log(`Повторная попытка через ${options.delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, options.delay));
+        continue;
+      }
+      
       return { data: null, error };
     }
-    
-    return { data, error: null };
-  } catch (error) {
-    console.error(`Exception calling RPC function ${functionName}:`, error);
-    return { data: null, error };
   }
+  
+  return { data: null, error: { message: `Все попытки вызова функции ${functionName} исчерпаны` } };
 }

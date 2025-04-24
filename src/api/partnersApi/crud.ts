@@ -1,12 +1,12 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Partner } from "@/types";
+import { safeRPC } from "@/api/utils/queryHelpers";
 
 export const fetchPartners = async () => {
   try {
-    // Use the secure database function instead of direct table access
-    const { data, error } = await supabase
-      .rpc('get_all_partners');
+    // Используем безопасную RPC функцию вместо прямого доступа к таблице
+    const { data, error } = await safeRPC('get_all_partners');
     
     if (error) {
       console.error("Error fetching partners:", error);
@@ -22,9 +22,8 @@ export const fetchPartners = async () => {
 
 export const fetchPartnerById = async (id: string) => {
   try {
-    // Use the secure database function instead of direct table access
-    const { data, error } = await supabase
-      .rpc('get_partner_by_id', { p_id: id });
+    // Используем безопасную RPC функцию вместо прямого доступа к таблице
+    const { data, error } = await safeRPC('get_partner_by_id', { p_id: id });
     
     if (error) {
       console.error("Error fetching partner:", error);
