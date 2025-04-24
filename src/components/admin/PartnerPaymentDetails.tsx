@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, BanknoteIcon, AlertCircle, Bug } from 'lucide-react';
+import { CreditCard, BanknoteIcon, AlertCircle, Bug, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { safeRPC } from '@/api/utils/queryHelpers';
+import { Button } from '@/components/ui/button';
 
 interface PaymentDetails {
   id: string;
@@ -24,55 +25,55 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchPaymentDetails = async () => {
-      try {
-        console.log("Fetching payment details for partner:", partnerId);
-        setLoading(true);
-        
-        // Updated to include delay property
-        const { data, error } = await safeRPC(
-          'get_partner_payment_details',
-          { p_partner_id: partnerId },
-          { 
-            retries: 2, 
-            delay: 1000 // Add a 1-second delay between retries
-          }
-        );
-          
-        if (error) {
-          console.error("Error fetching payment details:", error);
-          setError("Не удалось загрузить способы получения комиссии");
-          setDebugInfo(error);
-          
-          toast({
-            title: "Ошибка загрузки данных",
-            description: `Детали оплаты: ${error.message || "Неизвестная ошибка"}`,
-            variant: "destructive"
-          });
-          return;
+  const fetchPaymentDetails = async () => {
+    try {
+      console.log("Fetching payment details for partner:", partnerId);
+      setLoading(true);
+      
+      // Updated to include delay property and use RPC
+      const { data, error } = await safeRPC(
+        'get_partner_payment_details',
+        { p_partner_id: partnerId },
+        { 
+          retries: 3, 
+          delay: 1000 // Add a 1-second delay between retries
         }
+      );
         
-        console.log("Payment details loaded:", data?.length || 0, data);
-        setPaymentDetails(data || []);
-        setError(null);
-        setDebugInfo(null);
-      } catch (error: any) {
-        console.error('Error fetching payment details:', error);
-        setError(`Ошибка: ${error.message || "Неизвестная ошибка"}`);
+      if (error) {
+        console.error("Error fetching payment details:", error);
+        setError("Не удалось загрузить способы получения комиссии");
         setDebugInfo(error);
-      } finally {
-        setLoading(false);
+        
+        toast({
+          title: "Ошибка загрузки данных",
+          description: `Детали оплаты: ${error.message || "Неизвестная ошибка"}`,
+          variant: "destructive"
+        });
+        return;
       }
-    };
+      
+      console.log("Payment details loaded:", data?.length || 0, data);
+      setPaymentDetails(data || []);
+      setError(null);
+      setDebugInfo(null);
+    } catch (error: any) {
+      console.error('Error fetching payment details:', error);
+      setError(`Ошибка: ${error.message || "Неизвестная ошибка"}`);
+      setDebugInfo(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (partnerId) {
       fetchPaymentDetails();
     } else {
       setLoading(false);
       setError("ID партнера не указан");
     }
-  }, [partnerId, toast]);
+  }, [partnerId]);
 
   const renderPaymentTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
@@ -101,8 +102,17 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Способы получения комиссии</CardTitle>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={fetchPaymentDetails}
+          disabled={loading}
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Обновить
+        </Button>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -127,11 +137,7 @@ export const PartnerPaymentDetails: React.FC<PartnerPaymentDetailsProps> = ({ pa
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    {detail.payment_type.toLowerCase().includes('bank') ? (
-                      <CreditCard className="h-4 w-4 mr-2" />
-                    ) : (
-                      <BanknoteIcon className="h-4 w-4 mr-2" />
-                    )}
+                    {renderPaymentTypeIcon(detail.payment_type)}
                     <h3 className="font-medium">
                       {detail.payment_type}
                       {detail.is_primary && (

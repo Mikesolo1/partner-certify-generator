@@ -11,12 +11,14 @@ import QuickActions from '@/components/dashboard/QuickActions';
 import { usePartners } from '@/contexts/PartnersContext';
 import PaymentDetailsForm from '@/components/PaymentDetailsForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 const DashboardPage = () => {
   const { currentPartner, refreshPartnerLevel } = usePartners();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [latestPaymentDate, setLatestPaymentDate] = useState<string | undefined>();
+  const { toast } = useToast();
   
   useEffect(() => {
     if (currentPartner?.id) {
@@ -36,7 +38,6 @@ const DashboardPage = () => {
   }, [currentPartner?.id, refreshPartnerLevel]);
 
   useEffect(() => {
-    // Find latest payment date from all clients' payments
     const findLatestPaymentDate = () => {
       let latestDate: Date | undefined;
       
@@ -111,7 +112,6 @@ const DashboardPage = () => {
   const currentPartnerLevel = currentPartner.partnerLevel || currentPartner.partner_level || 'Бронзовый';
   const testPassed = currentPartner.testPassed || currentPartner.test_passed || false;
   
-  // Use the currentPartnerLevel variable, not partnerLevel
   return (
     <DashboardLayout>
       <div className="mb-8">

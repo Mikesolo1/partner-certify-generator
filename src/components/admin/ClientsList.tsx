@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Client, Payment } from '@/types';
 import {
@@ -15,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { createPayment } from '@/api/partnersApi';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePartners } from '@/contexts/PartnersContext';
 
 interface ClientsListProps {
   clients: Client[];
@@ -33,9 +33,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   const [tariffStartDate, setTariffStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [tariffEndDate, setTariffEndDate] = useState<string>('');
   const { toast } = useToast();
+  const { currentPartner } = usePartners();
 
   const handleAddPayment = async () => {
-    if (!selectedClientId || paymentAmount <= 0) return;
+    if (!selectedClientId || paymentAmount <= 0 || !currentPartner?.id) return;
 
     try {
       await createPayment({
@@ -46,7 +47,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         commission_amount: 0, // Будет рассчитано на бэкенде
         payment_destination: paymentDestination,
         tariff_start_date: tariffStartDate,
-        tariff_end_date: tariffEndDate || undefined
+        tariff_end_date: tariffEndDate || undefined,
+        created_by: currentPartner.id // Add the admin's ID as creator
       });
 
       toast({

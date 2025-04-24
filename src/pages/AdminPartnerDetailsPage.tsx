@@ -12,103 +12,117 @@ import { PartnerHeader } from '@/components/admin/PartnerHeader';
 import { PartnerInfo } from '@/components/admin/PartnerInfo';
 import { ErrorDisplay } from '@/components/admin/ErrorDisplay';
 import { safeRPC } from '@/api/utils/queryHelpers';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 const AdminPartnerDetailsPage = () => {
   const { partnerId } = useParams();
-  const { clients, payments, loading: adminDataLoading } = useAdminData();
+  const { clients, payments, loading: adminDataLoading, fetchData } = useAdminData();
   const { toast } = useToast();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchPartnerDetails = async () => {
-      if (!partnerId) return;
-      
-      try {
-        setLoading(true);
-        console.log("Fetching partner details for ID:", partnerId);
+  const fetchPartnerDetails = async () => {
+    if (!partnerId) return;
+    
+    try {
+      setLoading(true);
+      console.log("Fetching partner details for ID:", partnerId);
 
-        // Updated to include delay property
-        const { data, error: rpcError } = await safeRPC(
-          'get_partner_by_id', 
-          { p_id: partnerId },
-          { 
-            retries: 2, 
-            delay: 1000 // Add a 1-second delay between retries
-          }
-        );
-
-        if (rpcError) {
-          console.error("RPC Error fetching partner:", rpcError);
-          setError(`Ошибка загрузки: ${rpcError.message}`);
-          setDebugInfo({
-            method: 'RPC get_partner_by_id',
-            error: rpcError
-          });
-          
-          toast({
-            title: "Ошибка",
-            description: `Не удалось загрузить данные партнера: ${rpcError.message}`,
-            variant: "destructive"
-          });
-          return;
+      // Increased retries and delay
+      const { data, error: rpcError } = await safeRPC(
+        'get_partner_by_id', 
+        { p_id: partnerId },
+        { 
+          retries: 3, 
+          delay: 1500 // Add a 1.5-second delay between retries
         }
+      );
 
-        if (!data || data.length === 0) {
-          console.error("No partner data returned for ID:", partnerId);
-          setError("Партнер не найден в базе данных");
-          setDebugInfo({
-            method: 'Data check',
-            error: 'No data returned',
-            partnerId
-          });
-          
-          toast({
-            title: "Ошибка",
-            description: "Партнер не найден в базе данных",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        const partnerData = data[0];
-        setPartner({
-          id: partnerData.id,
-          companyName: partnerData.company_name,
-          contactPerson: partnerData.contact_person,
-          email: partnerData.email,
-          partnerLevel: partnerData.partner_level,
-          joinDate: partnerData.join_date,
-          certificateId: partnerData.certificate_id,
-          testPassed: partnerData.test_passed,
-          commission: partnerData.commission,
-          role: partnerData.role,
-          phone: partnerData.phone || ''
-        });
-        setError(null);
-        setDebugInfo(null);
-      } catch (err: any) {
-        console.error("Exception in fetchPartnerDetails:", err);
-        setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
+      if (rpcError) {
+        console.error("RPC Error fetching partner:", rpcError);
+        setError(`Ошибка загрузки: ${rpcError.message}`);
         setDebugInfo({
-          method: 'Exception',
-          error: err
+          method: 'RPC get_partner_by_id',
+          error: rpcError
         });
         
         toast({
-          title: "Критическая ошибка",
-          description: err.message || "Произошла неизвестная ошибка",
+          title: "Ошибка",
+          description: `Не удалось загрузить данные партнера: ${rpcError.message}`,
           variant: "destructive"
         });
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
+      if (!data || data.length === 0) {
+        console.error("No partner data returned for ID:", partnerId);
+        setError("Партнер не найден в базе данных");
+        setDebugInfo({
+          method: 'Data check',
+          error: 'No data returned',
+          partnerId
+        });
+        
+        toast({
+          title: "Ошибка",
+          description: "Партнер не найден в базе данных",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const partnerData = data[0];
+      setPartner({
+        id: partnerData.id,
+        companyName: partnerData.company_name,
+        contactPerson: partnerData.contact_person,
+        email: partnerData.email,
+        partnerLevel: partnerData.partner_level,
+        joinDate: partnerData.join_date,
+        certificateId: partnerData.certificate_id,
+        testPassed: partnerData.test_passed,
+        commission: partnerData.commission,
+        role: partnerData.role,
+        phone: partnerData.phone || ''
+      });
+      setError(null);
+      setDebugInfo(null);
+    } catch (err: any) {
+      console.error("Exception in fetchPartnerDetails:", err);
+      setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
+      setDebugInfo({
+        method: 'Exception',
+        error: err
+      });
+      
+      toast({
+        title: "Критическая ошибка",
+        description: err.message || "Произошла неизвестная ошибка",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchPartnerDetails();
   }, [partnerId, toast]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([fetchPartnerDetails(), fetchData()]);
+    setRefreshing(false);
+    
+    toast({
+      title: "Данные обновлены",
+      description: "Информация о партнере успешно обновлена"
+    });
+  };
   
   if (!partnerId) {
     return <Navigate to="/admin" />;
@@ -142,6 +156,12 @@ const AdminPartnerDetailsPage = () => {
             partnerId={partnerId}
             debugInfo={debugInfo}
           />
+          <div className="mt-6">
+            <Button onClick={handleRefresh} disabled={refreshing}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Попробовать снова
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -156,41 +176,28 @@ const AdminPartnerDetailsPage = () => {
     <div className="min-h-screen bg-brand-light">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        {loading || adminDataLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-center">
-              <div className="h-12 w-12 border-4 border-t-blue-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <h2 className="text-xl font-semibold mb-2">Загрузка данных партнера...</h2>
-              <p className="text-gray-500">ID: {partnerId}</p>
-              <p className="text-gray-500 text-sm mt-4">Пожалуйста, подождите</p>
-            </div>
-          </div>
-        ) : error || !partner ? (
-          <ErrorDisplay 
-            error={error || "Партнер не найден"} 
-            partnerId={partnerId}
-            debugInfo={debugInfo}
-          />
-        ) : (
-          <>
-            <PartnerHeader partner={partner} />
-            <div className="grid gap-6">
-              <PartnerInfo partner={partner} />
-              <PartnerPaymentDetails partnerId={partnerId} />
-              <Card>
-                <CardHeader>
-                  <CardTitle>Клиенты партнера</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ClientsList
-                    clients={partnerClients}
-                    getClientPayments={getClientPayments}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        )}
+        <div className="flex justify-between items-center mb-6">
+          <PartnerHeader partner={partner} />
+          <Button onClick={handleRefresh} disabled={refreshing} variant="outline">
+            <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Обновить
+          </Button>
+        </div>
+        <div className="grid gap-6">
+          <PartnerInfo partner={partner} />
+          <PartnerPaymentDetails partnerId={partnerId} />
+          <Card>
+            <CardHeader>
+              <CardTitle>Клиенты партнера</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ClientsList
+                clients={partnerClients}
+                getClientPayments={getClientPayments}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
