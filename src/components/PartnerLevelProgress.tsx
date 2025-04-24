@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { Award, Badge, Medal, Diamond, Star } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PARTNER_LEVELS } from '@/types';
+import { PARTNER_LEVELS } from '@/types/PartnerLevelData';
 import { cn } from '@/lib/utils';
 
 interface PartnerLevelProgressProps {
