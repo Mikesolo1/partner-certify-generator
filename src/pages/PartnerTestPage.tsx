@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -11,7 +12,7 @@ import { Label } from '@/components/ui/label';
 const PartnerTestPage = () => {
   const { testQuestions, currentPartner, completeTest } = usePartners();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<Array<number | undefined>>(new Array(testQuestions.length));
   const [showResults, setShowResults] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -100,12 +101,12 @@ const PartnerTestPage = () => {
     } else {
       toast({
         title: "Тест не пройден",
-        description: `Вы правильно ответили тольк�� на ${result.score} из ${result.total} вопросов. Требуется 60% для прохождения.`,
+        description: `Вы правильно ответили только на ${result.score} из ${result.total} вопросов. Требуется 60% для прохождения.`,
         variant: "destructive",
       });
       
       setCurrentQuestionIndex(0);
-      setSelectedAnswers([]);
+      setSelectedAnswers(new Array(testQuestions.length));
       setShowResults(false);
     }
   };
@@ -140,7 +141,7 @@ const PartnerTestPage = () => {
                   <div className="ml-4">
                     <p>
                       Ваш ответ: <span className={isCorrect ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                        {question.options[selectedAnswers[index]]}
+                        {question.options[selectedAnswers[index] as number]}
                       </span>
                     </p>
                     
@@ -169,7 +170,7 @@ const PartnerTestPage = () => {
             {calculateScore().percentage < 60 && (
               <Button variant="outline" onClick={() => {
                 setCurrentQuestionIndex(0);
-                setSelectedAnswers([]);
+                setSelectedAnswers(new Array(testQuestions.length));
                 setShowResults(false);
               }}>
                 Пройти заново
