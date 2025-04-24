@@ -21,14 +21,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   db: {
     schema: 'public'
-  },
-  // Add cache control for better performance
-  fetch: (url, options) => {
-    return fetch(url, {
-      ...options,
-      cache: 'default'  // Better caching strategy
-    });
   }
+  // Removed invalid fetch property that was causing the TypeScript error
 });
 
 // Helper function for query processing with improved error handling
