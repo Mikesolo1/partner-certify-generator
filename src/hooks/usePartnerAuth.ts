@@ -47,7 +47,7 @@ export const usePartnerAuth = () => {
       
       if (partner) {
         console.log("Login successful, setting partner data");
-        // Ensure all required fields are present
+        // Ensure all required fields are present including phone
         const completePartner: Partner = {
           ...partner,
           phone: partner.phone || ''
