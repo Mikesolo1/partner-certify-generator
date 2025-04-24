@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Award, ArrowRight, Users, FileText, Shield } from 'lucide-react';
+import { Award, ArrowRight, Users, FileText, Shield, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
+import PartnerLevelsSection from '@/components/PartnerLevelsSection';
 
 const PartnerProgramSection = () => (
   <section className="py-16 bg-white">
@@ -108,6 +109,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      {/* Уровни партнерства */}
+      <PartnerLevelsSection />
       
       <PartnerProgramSection />
       

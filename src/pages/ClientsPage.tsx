@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,65 +11,141 @@ import { Client, Payment } from '@/types/partner';
 import ClientCard from '@/components/ClientCard';
 import ClientForm from '@/components/ClientForm';
 import { Navigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import * as api from '@/api/partnersApi';
 
 const ClientsPage = () => {
-  const { currentPartner, updateClient, addClient, removeClient } = usePartners();
+  const { currentPartner, addClient, updateClient, removeClient, addPayment } = usePartners();
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const fetchClients = async () => {
+      if (!currentPartner?.id) return;
+      
+      setLoading(true);
+      try {
+        const clientsData = await api.fetchPartnerClients(currentPartner.id);
+        setClients(clientsData);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось загрузить клиентов',
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchClients();
+  }, [currentPartner?.id, toast]);
   
   if (!currentPartner?.testPassed) {
     return <Navigate to="/dashboard/test" />;
   }
   
-  const clients = currentPartner?.clients || [];
-  
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    (client.phone && client.phone.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
-  const handleAddClient = (client: Client) => {
-    if (currentPartner?.id) {
-      addClient(currentPartner.id, client);
-      setIsAddClientDialogOpen(false);
-    }
-  };
-  
-  const handleUpdateClient = (updatedClient: Client) => {
-    if (currentPartner?.id) {
-      updateClient(currentPartner.id, updatedClient);
-    }
-  };
-  
-  const handleDeleteClient = (clientId: string) => {
-    if (currentPartner?.id) {
-      removeClient(currentPartner.id, clientId);
-    }
-  };
-  
-  const handleAddPayment = (clientId: string, amount: number) => {
+  const handleAddClient = async (client: Omit<Client, "id">) => {
     if (!currentPartner?.id) return;
     
-    const client = clients.find(c => c.id === clientId);
-    if (!client) return;
+    try {
+      const newClient = await addClient(currentPartner.id, client as Client);
+      setClients(prev => [...prev, newClient]);
+      setIsAddClientDialogOpen(false);
+      toast({
+        title: 'Клиент добавлен',
+        description: `Клиент ${client.name} успешно добавлен`
+      });
+    } catch (error) {
+      console.error('Error adding client:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось добавить клиента',
+        variant: 'destructive'
+      });
+    }
+  };
+  
+  const handleUpdateClient = async (updatedClient: Client) => {
+    if (!currentPartner?.id) return;
     
-    // Создание нового платежа
-    const newPayment: Payment = {
-      id: `p-${Date.now()}`,
-      amount,
-      date: new Date().toISOString().split('T')[0],
-      status: 'оплачено',
-      commissionAmount: Math.round(amount * ((currentPartner?.commission || 10) / 100))
-    };
+    try {
+      await updateClient(currentPartner.id, updatedClient);
+      setClients(prev => 
+        prev.map(client => client.id === updatedClient.id ? updatedClient : client)
+      );
+      toast({
+        title: 'Клиент обновлен',
+        description: `Клиент ${updatedClient.name} успешно обновлен`
+      });
+    } catch (error) {
+      console.error('Error updating client:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить клиента',
+        variant: 'destructive'
+      });
+    }
+  };
+  
+  const handleDeleteClient = async (clientId: string) => {
+    if (!currentPartner?.id) return;
     
-    // Добавление платежа к клиенту
-    const updatedClient = {
-      ...client,
-      payments: [...client.payments, newPayment]
-    };
-    
-    updateClient(currentPartner.id, updatedClient);
+    try {
+      await removeClient(currentPartner.id, clientId);
+      setClients(prev => prev.filter(client => client.id !== clientId));
+      toast({
+        title: 'Клиент удален',
+        description: 'Клиент успешно удален'
+      });
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить клиента',
+        variant: 'destructive'
+      });
+    }
+  };
+  
+  const handleAddPayment = async (clientId: string, amount: number) => {
+    try {
+      const payment: Omit<Payment, "id" | "client_id"> = {
+        amount,
+        date: new Date().toISOString(),
+        status: 'оплачено'
+      };
+      
+      await addPayment(clientId, payment);
+      
+      // Получаем обновленный список клиентов после добавления платежа
+      if (currentPartner?.id) {
+        const updatedClients = await api.fetchPartnerClients(currentPartner.id);
+        setClients(updatedClients);
+      }
+      
+      toast({
+        title: 'Платеж добавлен',
+        description: `Платеж на сумму ${amount} ₽ успешно добавлен`
+      });
+    } catch (error) {
+      console.error('Error adding payment:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось добавить платеж',
+        variant: 'destructive'
+      });
+    }
   };
   
   return (
@@ -84,7 +160,7 @@ const ClientsPage = () => {
         
         <Button 
           onClick={() => setIsAddClientDialogOpen(true)}
-          className="bg-gradient-to-r from-certificate-blue to-certificate-darkBlue text-white"
+          className="bg-brand text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Добавить клиента
@@ -101,7 +177,11 @@ const ClientsPage = () => {
         />
       </div>
       
-      {filteredClients.length > 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <p className="text-lg text-gray-500">Загрузка клиентов...</p>
+        </div>
+      ) : filteredClients.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredClients.map((client) => (
             <ClientCard 
@@ -126,7 +206,7 @@ const ClientsPage = () => {
                 <p className="text-gray-500 mb-4">Добавьте своего первого клиента, чтобы начать отслеживать платежи и комиссии.</p>
                 <Button 
                   onClick={() => setIsAddClientDialogOpen(true)}
-                  className="bg-certificate-blue text-white"
+                  className="bg-brand text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Добавить клиента

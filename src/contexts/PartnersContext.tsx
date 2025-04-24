@@ -1,20 +1,32 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Partner, Client, Payment, TestQuestion } from '@/types/partner';
+import * as api from '@/api/partnersApi';
+import { supabase } from '@/integrations/supabase/client';
+import { calculatePartnerLevel } from '@/api/partnersApi';
+import { useToast } from '@/hooks/use-toast';
 
 interface PartnersContextType {
   partners: Partner[];
   currentPartner: Partner | null;
   testQuestions: TestQuestion[];
-  addPartner: (partner: Partner) => void;
-  updatePartner: (id: string, updatedPartner: Partner) => void;
-  getPartnerById: (id: string) => Partner | undefined;
-  loginPartner: (email: string, password: string) => Partner | null;
+  partnerLevel: {
+    level: string;
+    commission: number;
+    nextLevelAt: number | null;
+    progress: number;
+  } | null;
+  addPartner: (partner: Partner) => Promise<Partner>;
+  updatePartner: (id: string, updatedPartner: Partner) => Promise<Partner>;
+  getPartnerById: (id: string) => Promise<Partner>;
+  loginPartner: (email: string, password: string) => Promise<Partner | null>;
   logoutPartner: () => void;
-  addClient: (partnerId: string, client: Client) => void;
-  removeClient: (partnerId: string, clientId: string) => void;
-  updateClient: (partnerId: string, client: Client) => void;
-  completeTest: (partnerId: string) => void;
+  addClient: (partnerId: string, client: Client) => Promise<Client>;
+  removeClient: (partnerId: string, clientId: string) => Promise<boolean>;
+  updateClient: (partnerId: string, client: Client) => Promise<Client>;
+  completeTest: (partnerId: string) => Promise<Partner>;
+  addPayment: (clientId: string, payment: Omit<Payment, 'id' | 'client_id'>) => Promise<Payment>;
+  refreshPartnerLevel: (partnerId: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -32,6 +44,13 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [partners, setPartners] = useState<Partner[]>([]);
   const [currentPartner, setCurrentPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
+  const [partnerLevel, setPartnerLevel] = useState<{
+    level: string;
+    commission: number;
+    nextLevelAt: number | null;
+    progress: number;
+  } | null>(null);
+  const { toast } = useToast();
 
   // Вопросы для тестирования партнеров
   const testQuestions: TestQuestion[] = [
@@ -92,142 +111,58 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   ];
 
-  // Загрузка данных из localStorage при первом рендере
+  // Загрузка данных при первом рендере
   useEffect(() => {
-    const storedPartners = localStorage.getItem('partners');
-    const storedCurrentPartner = localStorage.getItem('currentPartner');
-    
-    if (storedPartners) {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        setPartners(JSON.parse(storedPartners));
-      } catch (error) {
-        console.error('Error parsing stored partners', error);
-        setPartners([]);
-      }
-    } else {
-      // Демо-данные для примера
-      const samplePartners: Partner[] = [
-        {
-          id: '1',
-          companyName: 'ТехноРешения',
-          contactPerson: 'Алексей Иванов',
-          email: 'alex@techsolutions.com',
-          password: 'password123',
-          partnerLevel: 'Золотой',
-          joinDate: '2023-01-15',
-          certificateId: 'CERT-123456',
-          testPassed: true,
-          clients: [
-            {
-              id: '101',
-              name: 'ООО "Звезда"',
-              email: 'info@zvezda.ru',
-              phone: '+7 (495) 123-45-67',
-              registrationDate: '2023-02-10',
-              payments: [
-                {
-                  id: 'p1',
-                  amount: 15000,
-                  date: '2023-03-01',
-                  status: 'оплачено',
-                  commissionAmount: 1500
-                }
-              ]
+        const partnersData = await api.fetchPartners();
+        setPartners(partnersData);
+        
+        // Проверяем наличие залогиненного партнера в localStorage
+        const storedCurrentPartner = localStorage.getItem('currentPartner');
+        if (storedCurrentPartner) {
+          try {
+            const parsedPartner = JSON.parse(storedCurrentPartner);
+            if (parsedPartner.id) {
+              // Получаем актуальные данные партнера из базы
+              const refreshedPartner = await api.fetchPartnerById(parsedPartner.id);
+              setCurrentPartner(refreshedPartner);
+              
+              // Получаем клиентов партнера
+              const clients = await api.fetchPartnerClients(refreshedPartner.id);
+              
+              // Считаем клиентов с оплатой
+              const clientsWithPayments = clients.filter(client => 
+                client.payments && client.payments.some(payment => payment.status === "оплачено")
+              ).length;
+              
+              // Рассчитываем уровень
+              const levelInfo = calculatePartnerLevel(clientsWithPayments);
+              setPartnerLevel(levelInfo);
             }
-          ],
-          commission: 10
-        },
-        {
-          id: '2',
-          companyName: 'Глобал Системс',
-          contactPerson: 'Мария Гарсия',
-          email: 'maria@globalsys.com',
-          password: 'password123',
-          partnerLevel: 'Серебряный',
-          joinDate: '2023-03-22',
-          certificateId: 'CERT-789012',
-          testPassed: false,
-          clients: [],
-          commission: 8
-        },
-        {
-          id: '3',
-          companyName: 'ДатаФлоу Аналитика',
-          contactPerson: 'Вэй Чжан',
-          email: 'wei@dataflow.io',
-          password: 'password123',
-          partnerLevel: 'Платиновый',
-          joinDate: '2022-11-05',
-          certificateId: 'CERT-345678',
-          testPassed: true,
-          clients: [
-            {
-              id: '201',
-              name: 'ИП Петров',
-              email: 'petrov@mail.ru',
-              phone: '+7 (903) 987-65-43',
-              registrationDate: '2022-12-15',
-              payments: [
-                {
-                  id: 'p2',
-                  amount: 25000,
-                  date: '2023-01-10',
-                  status: 'оплачено',
-                  commissionAmount: 3000
-                },
-                {
-                  id: 'p3',
-                  amount: 10000,
-                  date: '2023-04-05',
-                  status: 'оплачено',
-                  commissionAmount: 1200
-                }
-              ]
-            },
-            {
-              id: '202',
-              name: 'ООО "Меркурий"',
-              email: 'info@mercury.com',
-              phone: '+7 (495) 555-77-88',
-              registrationDate: '2023-02-20',
-              payments: [
-                {
-                  id: 'p4',
-                  amount: 30000,
-                  date: '2023-03-15',
-                  status: 'оплачено',
-                  commissionAmount: 3600
-                }
-              ]
-            }
-          ],
-          commission: 12
+          } catch (error) {
+            console.error('Error parsing stored partner or fetching data', error);
+            localStorage.removeItem('currentPartner');
+            setCurrentPartner(null);
+          }
         }
-      ];
-      setPartners(samplePartners);
-      localStorage.setItem('partners', JSON.stringify(samplePartners));
-    }
-
-    if (storedCurrentPartner) {
-      try {
-        setCurrentPartner(JSON.parse(storedCurrentPartner));
       } catch (error) {
-        console.error('Error parsing stored current partner', error);
-        setCurrentPartner(null);
+        console.error('Error fetching initial data', error);
+        toast({
+          title: "Ошибка загрузки данных",
+          description: "Не удалось загрузить данные с сервера",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
-    }
-    
-    setLoading(false);
-  }, []);
+    };
 
-  // Сохранение партнеров в localStorage при изменении
-  useEffect(() => {
-    if (partners.length > 0) {
-      localStorage.setItem('partners', JSON.stringify(partners));
-    }
-  }, [partners]);
+    fetchData();
+  }, [toast]);
 
-  // Сохранение текущего партнера в localStorage при изменении
+  // Обновление данных при изменении текущего партнера
   useEffect(() => {
     if (currentPartner) {
       localStorage.setItem('currentPartner', JSON.stringify(currentPartner));
@@ -236,128 +171,269 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [currentPartner]);
 
-  const addPartner = (partner: Partner) => {
-    const newPartner = {
-      ...partner,
-      id: `${Date.now()}`,
-      clients: [],
-      testPassed: false,
-      commission: 10 // Базовая комиссия для новых партнеров
-    };
-    setPartners((prevPartners) => [...prevPartners, newPartner]);
-  };
-
-  const updatePartner = (id: string, updatedPartner: Partner) => {
-    setPartners((prevPartners) =>
-      prevPartners.map((partner) =>
-        partner.id === id ? { ...updatedPartner, id } : partner
-      )
-    );
-    
-    // Обновляем текущего партнера, если он изменен
-    if (currentPartner && currentPartner.id === id) {
-      setCurrentPartner({ ...updatedPartner, id });
+  const addPartner = async (partner: Partner) => {
+    try {
+      const newPartnerData = {
+        company_name: partner.companyName,
+        contact_person: partner.contactPerson,
+        email: partner.email,
+        partner_level: "Бронзовый",
+        join_date: new Date().toISOString(),
+        certificate_id: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+        password: partner.password,
+        test_passed: false,
+        commission: 20 // Базовая комиссия
+      };
+      
+      const newPartner = await api.createPartner(newPartnerData);
+      setPartners((prev) => [...prev, newPartner]);
+      return newPartner;
+    } catch (error) {
+      console.error('Error adding partner:', error);
+      throw error;
     }
   };
 
-  const getPartnerById = (id: string) => {
-    return partners.find((partner) => partner.id === id);
+  const updatePartner = async (id: string, updatedPartner: Partner) => {
+    try {
+      const partnerData = {
+        company_name: updatedPartner.companyName || updatedPartner.company_name,
+        contact_person: updatedPartner.contactPerson || updatedPartner.contact_person,
+        email: updatedPartner.email,
+        partner_level: updatedPartner.partnerLevel || updatedPartner.partner_level,
+        test_passed: updatedPartner.testPassed || updatedPartner.test_passed,
+        commission: updatedPartner.commission
+      };
+      
+      const updated = await api.updatePartner(id, partnerData);
+      
+      setPartners((prev) => 
+        prev.map((partner) => partner.id === id ? updated : partner)
+      );
+      
+      // Если обновляем текущего партнера, обновляем его в стейте
+      if (currentPartner && currentPartner.id === id) {
+        setCurrentPartner(updated);
+      }
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating partner:', error);
+      throw error;
+    }
+  };
+
+  const getPartnerById = async (id: string) => {
+    try {
+      return await api.fetchPartnerById(id);
+    } catch (error) {
+      console.error('Error getting partner by ID:', error);
+      throw error;
+    }
   };
   
-  const loginPartner = (email: string, password: string) => {
-    const partner = partners.find(p => p.email === email && p.password === password);
-    if (partner) {
+  const loginPartner = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('email', email)
+        .eq('password', password)
+        .single();
+      
+      if (error || !data) {
+        console.error('Login failed:', error);
+        return null;
+      }
+      
+      // Преобразование полей к формату, используемому в приложении
+      const partner: Partner = {
+        id: data.id,
+        companyName: data.company_name,
+        contactPerson: data.contact_person,
+        email: data.email,
+        partnerLevel: data.partner_level,
+        joinDate: data.join_date,
+        certificateId: data.certificate_id,
+        password: data.password,
+        testPassed: data.test_passed,
+        commission: data.commission
+      };
+      
       setCurrentPartner(partner);
+      
+      // Получаем клиентов партнера для расчета уровня
+      const clients = await api.fetchPartnerClients(partner.id!);
+      
+      // Считаем клиентов с оплатой
+      const clientsWithPayments = clients.filter(client => 
+        client.payments && client.payments.some(payment => payment.status === "оплачено")
+      ).length;
+      
+      // Рассчитываем уровень
+      const levelInfo = calculatePartnerLevel(clientsWithPayments);
+      setPartnerLevel(levelInfo);
+      
       return partner;
+    } catch (error) {
+      console.error('Error during login:', error);
+      return null;
     }
-    return null;
   };
   
   const logoutPartner = () => {
     setCurrentPartner(null);
+    setPartnerLevel(null);
+    localStorage.removeItem('currentPartner');
   };
   
-  const addClient = (partnerId: string, client: Client) => {
-    setPartners((prevPartners) =>
-      prevPartners.map((partner) => {
-        if (partner.id === partnerId) {
-          const updatedClients = [...(partner.clients || []), client];
-          const updatedPartner = { ...partner, clients: updatedClients };
-          
-          // Обновляем текущего партнера, если он изменен
-          if (currentPartner && currentPartner.id === partnerId) {
-            setCurrentPartner(updatedPartner);
-          }
-          
-          return updatedPartner;
-        }
-        return partner;
-      })
-    );
+  const addClient = async (partnerId: string, client: Client) => {
+    try {
+      const clientData = {
+        name: client.name,
+        email: client.email,
+        phone: client.phone || '',
+        partner_id: partnerId,
+        registration_date: new Date().toISOString()
+      };
+      
+      const newClient = await api.createClient(clientData);
+      
+      // Если это текущий партнер, обновляем информацию о партнере
+      if (currentPartner && currentPartner.id === partnerId) {
+        refreshPartnerLevel(partnerId);
+      }
+      
+      return newClient;
+    } catch (error) {
+      console.error('Error adding client:', error);
+      throw error;
+    }
   };
   
-  const removeClient = (partnerId: string, clientId: string) => {
-    setPartners((prevPartners) =>
-      prevPartners.map((partner) => {
-        if (partner.id === partnerId && partner.clients) {
-          const updatedClients = partner.clients.filter(c => c.id !== clientId);
-          const updatedPartner = { ...partner, clients: updatedClients };
-          
-          // Обновляем текущего партнера, если он изменен
-          if (currentPartner && currentPartner.id === partnerId) {
-            setCurrentPartner(updatedPartner);
-          }
-          
-          return updatedPartner;
-        }
-        return partner;
-      })
-    );
+  const removeClient = async (partnerId: string, clientId: string) => {
+    try {
+      await api.deleteClient(clientId);
+      
+      // Если это текущий партнер, обновляем информацию о партнере
+      if (currentPartner && currentPartner.id === partnerId) {
+        refreshPartnerLevel(partnerId);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error removing client:', error);
+      throw error;
+    }
   };
   
-  const updateClient = (partnerId: string, updatedClient: Client) => {
-    setPartners((prevPartners) =>
-      prevPartners.map((partner) => {
-        if (partner.id === partnerId && partner.clients) {
-          const updatedClients = partner.clients.map(client => 
-            client.id === updatedClient.id ? updatedClient : client
-          );
-          const updatedPartner = { ...partner, clients: updatedClients };
-          
-          // Обновляем текущего партнера, если он изменен
-          if (currentPartner && currentPartner.id === partnerId) {
-            setCurrentPartner(updatedPartner);
-          }
-          
-          return updatedPartner;
-        }
-        return partner;
-      })
-    );
+  const updateClient = async (partnerId: string, client: Client) => {
+    try {
+      const clientData = {
+        name: client.name,
+        email: client.email,
+        phone: client.phone || '',
+      };
+      
+      const updated = await api.updateClient(client.id, clientData);
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating client:', error);
+      throw error;
+    }
   };
   
-  const completeTest = (partnerId: string) => {
-    setPartners((prevPartners) =>
-      prevPartners.map((partner) => {
-        if (partner.id === partnerId) {
-          const updatedPartner = { ...partner, testPassed: true };
-          
-          // Обновляем текущего партнера, если он изменен
-          if (currentPartner && currentPartner.id === partnerId) {
-            setCurrentPartner(updatedPartner);
-          }
-          
-          return updatedPartner;
-        }
-        return partner;
-      })
-    );
+  const completeTest = async (partnerId: string) => {
+    try {
+      const updated = await api.completeTest(partnerId);
+      
+      setPartners((prev) =>
+        prev.map((partner) => partner.id === partnerId ? { ...partner, testPassed: true } : partner)
+      );
+      
+      // Если это текущий партнер, обновляем его в стейте
+      if (currentPartner && currentPartner.id === partnerId) {
+        setCurrentPartner({ ...currentPartner, testPassed: true });
+      }
+      
+      return updated;
+    } catch (error) {
+      console.error('Error completing test:', error);
+      throw error;
+    }
+  };
+  
+  const addPayment = async (clientId: string, payment: Omit<Payment, 'id' | 'client_id'>) => {
+    try {
+      const partnerId = currentPartner?.id;
+      if (!partnerId) {
+        throw new Error('No current partner');
+      }
+      
+      // Рассчитываем комиссию на основе уровня партнера
+      const commissionRate = currentPartner.commission || 20;
+      const commissionAmount = Math.round(payment.amount * (commissionRate / 100));
+      
+      const paymentData = {
+        client_id: clientId,
+        amount: payment.amount,
+        date: payment.date || new Date().toISOString(),
+        status: payment.status || 'оплачено',
+        commission_amount: commissionAmount
+      };
+      
+      const newPayment = await api.createPayment(paymentData);
+      
+      // Обновляем уровень партнера после добавления платежа
+      await refreshPartnerLevel(partnerId);
+      
+      return newPayment;
+    } catch (error) {
+      console.error('Error adding payment:', error);
+      throw error;
+    }
+  };
+  
+  const refreshPartnerLevel = async (partnerId: string) => {
+    try {
+      // Получаем клиентов партнера
+      const clients = await api.fetchPartnerClients(partnerId);
+      
+      // Считаем клиентов с оплатой
+      const clientsWithPayments = clients.filter(client => 
+        client.payments && client.payments.some(payment => payment.status === "оплачено")
+      ).length;
+      
+      // Рассчитываем уровень
+      const levelInfo = calculatePartnerLevel(clientsWithPayments);
+      
+      // Обновляем уровень партнера в базе
+      await api.updatePartner(partnerId, {
+        partner_level: levelInfo.level,
+        commission: levelInfo.commission
+      });
+      
+      // Если это текущий партнер, обновляем информацию о его уровне в стейте
+      if (currentPartner && currentPartner.id === partnerId) {
+        setCurrentPartner({
+          ...currentPartner,
+          partnerLevel: levelInfo.level,
+          commission: levelInfo.commission
+        });
+        setPartnerLevel(levelInfo);
+      }
+    } catch (error) {
+      console.error('Error refreshing partner level:', error);
+      throw error;
+    }
   };
 
   const value = {
     partners,
     currentPartner,
     testQuestions,
+    partnerLevel,
     addPartner,
     updatePartner,
     getPartnerById,
@@ -367,6 +443,8 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     removeClient,
     updateClient,
     completeTest,
+    addPayment,
+    refreshPartnerLevel,
     loading,
   };
 
