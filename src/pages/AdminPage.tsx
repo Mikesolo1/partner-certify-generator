@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "../integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,17 +8,18 @@ import Header from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { usePartners } from "@/contexts/PartnersContext";
-import { Partner, Client, Payment } from '@/types';
+import { Partner, Client, Payment, TestQuestion } from '@/types';
 import { PartnersList } from "@/components/admin/PartnersList";
 import { ClientsList } from "@/components/admin/ClientsList";
 import { NotificationForm } from "@/components/admin/NotificationForm";
 import { NotificationsList } from "@/components/admin/NotificationsList";
+import { TestQuestionsManager } from "@/components/admin/TestQuestionsManager";
 
 const AdminPage = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [testQuestions, setTestQuestions] = useState<any[]>([]);
+  const [testQuestions, setTestQuestions] = useState<TestQuestion[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
@@ -169,6 +171,99 @@ const AdminPage = () => {
     }
   };
 
+  const updateTestQuestion = async (question: TestQuestion) => {
+    try {
+      const { error } = await supabase
+        .from('test_questions')
+        .update({
+          question: question.question,
+          options: question.options,
+          correct_answer: question.correctAnswer
+        })
+        .eq('id', question.id);
+        
+      if (error) throw error;
+      
+      setTestQuestions(testQuestions.map(q => 
+        q.id === question.id ? question : q
+      ));
+      
+      toast({
+        title: "Вопрос обновлен",
+        description: "Вопрос теста успешно обновлен",
+      });
+    } catch (error) {
+      console.error("Error updating test question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить вопрос теста",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const createTestQuestion = async (question: Omit<TestQuestion, 'id'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('test_questions')
+        .insert([{
+          question: question.question,
+          options: question.options,
+          correct_answer: question.correctAnswer
+        }])
+        .select();
+        
+      if (error) throw error;
+      
+      if (data) {
+        const newQuestion: TestQuestion = {
+          id: data[0].id,
+          question: data[0].question,
+          options: data[0].options,
+          correctAnswer: data[0].correct_answer
+        };
+        setTestQuestions([...testQuestions, newQuestion]);
+        
+        toast({
+          title: "Вопрос создан",
+          description: "Новый вопрос теста успешно добавлен",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating test question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать вопрос теста",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteTestQuestion = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('test_questions')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      setTestQuestions(testQuestions.filter(q => q.id !== id));
+      
+      toast({
+        title: "Вопрос удален",
+        description: "Вопрос теста успешно удален",
+      });
+    } catch (error) {
+      console.error("Error deleting test question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить вопрос теста",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getPartnerClients = (partnerId: string) => {
     return clients.filter(client => client.partner_id === partnerId);
   };
@@ -211,6 +306,7 @@ const AdminPage = () => {
                 <TabsList className="mb-6">
                   <TabsTrigger value="partners">Партнёры</TabsTrigger>
                   <TabsTrigger value="notifications">Уведомления</TabsTrigger>
+                  <TabsTrigger value="test">Вопросы теста</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="partners">
@@ -236,6 +332,15 @@ const AdminPage = () => {
                     <NotificationForm onCreateNotification={createNewNotification} />
                     <NotificationsList notifications={notifications} />
                   </div>
+                </TabsContent>
+
+                <TabsContent value="test">
+                  <TestQuestionsManager 
+                    questions={testQuestions}
+                    onUpdateQuestion={updateTestQuestion}
+                    onCreateQuestion={createTestQuestion}
+                    onDeleteQuestion={deleteTestQuestion}
+                  />
                 </TabsContent>
               </Tabs>
             )}
