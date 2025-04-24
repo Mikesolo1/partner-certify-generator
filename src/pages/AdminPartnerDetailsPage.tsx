@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import Header from '@/components/Header';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Partner } from '@/types';
 import { safeRPC } from '@/api/utils/queryHelpers';
@@ -49,6 +48,9 @@ const AdminPartnerDetailsPage = () => {
         return;
       }
 
+      // Add additional debug logging
+      console.log("Partner data response:", data);
+      
       if (!data || data.length === 0) {
         console.error("No partner data returned for ID:", partnerId);
         setError("Партнер не найден в базе данных");
@@ -67,6 +69,8 @@ const AdminPartnerDetailsPage = () => {
       }
 
       const partnerData = data[0];
+      console.log("Partner data found:", partnerData);
+      
       setPartner({
         id: partnerData.id,
         companyName: partnerData.company_name,
@@ -80,6 +84,7 @@ const AdminPartnerDetailsPage = () => {
         role: partnerData.role,
         phone: partnerData.phone || ''
       });
+      
       setError(null);
       setDebugInfo(null);
     } catch (err: any) {
@@ -101,8 +106,12 @@ const AdminPartnerDetailsPage = () => {
   };
 
   useEffect(() => {
+    console.log("AdminPartnerDetailsPage mounted with partnerId:", partnerId);
     fetchPartnerDetails();
-  }, [partnerId, toast]);
+    
+    // Remove adminData.fetchData from the initial mount to prevent unnecessary data fetching
+    // We'll only fetch the admin data when the refresh button is clicked
+  }, [partnerId]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -135,23 +144,23 @@ const AdminPartnerDetailsPage = () => {
     );
   }
 
+  // Add additional logging before rendering content
+  console.log("Rendering partner details content for:", partner.companyName);
+  
   const partnerClients = clients.filter(client => client.partner_id === partnerId);
   const getClientPayments = (clientId: string) => {
     return payments.filter(payment => payment.client_id === clientId);
   };
 
   return (
-    <div className="min-h-screen bg-brand-light">
-      <Header />
-      <PartnerDetailsContent 
-        partner={partner}
-        partnerClients={partnerClients}
-        partnerId={partnerId}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
-        getClientPayments={getClientPayments}
-      />
-    </div>
+    <PartnerDetailsContent 
+      partner={partner}
+      partnerClients={partnerClients}
+      partnerId={partnerId}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      getClientPayments={getClientPayments}
+    />
   );
 };
 

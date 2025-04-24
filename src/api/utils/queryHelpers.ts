@@ -26,6 +26,8 @@ export const safeRPC = async (
     ? new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout exceeded')), timeoutMs))
     : null;
 
+  console.log(`Calling RPC function ${functionName} with params:`, params);
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     if (attempt > 0) {
       console.log(`RPC retry ${attempt}/${retries} for ${functionName} after ${delay}ms`);
@@ -37,9 +39,13 @@ export const safeRPC = async (
     try {
       // If timeout is set, race between the RPC call and the timeout
       const rpcPromise = supabase.rpc(functionName, params);
-      const { data, error } = timeoutPromise 
+      const result = timeoutPromise 
         ? await Promise.race([rpcPromise, timeoutPromise]) as any
         : await rpcPromise;
+        
+      const { data, error } = result;
+      
+      console.log(`RPC ${functionName} result:`, { data, error });
 
       if (error) {
         console.error(`RPC error on attempt ${attempt + 1}/${retries + 1}:`, error);
