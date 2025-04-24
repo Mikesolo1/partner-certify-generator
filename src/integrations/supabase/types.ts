@@ -225,6 +225,32 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      insert_partner_direct: {
+        Args: {
+          p_company_name: string
+          p_contact_person: string
+          p_email: string
+          p_password: string
+          p_partner_level?: string
+          p_certificate_id?: string
+          p_commission?: number
+        }
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
     }
     Enums: {
       user_role: "admin" | "partner"

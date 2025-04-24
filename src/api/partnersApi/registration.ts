@@ -36,56 +36,46 @@ export const createPartner = async (partner: Partner) => {
       throw new Error("Партнер с таким email уже существует");
     }
 
-    // Prepare partner data with explicit field mapping
-    const partnerData = {
-      company_name: partner.companyName,
-      contact_person: partner.contactPerson,
-      email: partner.email.trim().toLowerCase(),
-      password: partner.password,
-      partner_level: 'Бронзовый',
-      join_date: new Date().toISOString(),
-      certificate_id: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
-      test_passed: false,
-      role: 'user',
-      commission: 20
-    };
-    
-    console.log("Attempting to insert new partner:", {
-      ...partnerData,
+    console.log("Attempting to create new partner:", {
+      ...partner,
       password: '[REDACTED]'
     });
     
-    // Use a direct insert with maybeSingle to avoid potential RLS issues
-    const { data, error } = await supabase
-      .from("partners")
-      .insert([partnerData])
-      .select()
-      .maybeSingle();
+    // Use our new secure RPC function to create partner
+    const { data, error } = await supabase.rpc('insert_partner_direct', {
+      p_company_name: partner.companyName,
+      p_contact_person: partner.contactPerson,
+      p_email: partner.email.trim().toLowerCase(),
+      p_password: partner.password,
+      p_partner_level: 'Бронзовый',
+      p_commission: 20
+    });
     
     if (error) {
       console.error("Database error during partner creation:", error);
       throw new Error("Ошибка создания партнера: " + error.message);
     }
     
-    if (!data) {
+    if (!data || !data[0]) {
       console.error("No data returned after partner creation");
       throw new Error("Не удалось создать партнера - данные не получены");
     }
     
-    console.log("Partner created successfully:", data.id);
+    const createdPartner = data[0];
+    console.log("Partner created successfully:", createdPartner.id);
     
     // Map response data back to Partner type
     return {
-      id: data.id,
-      companyName: data.company_name,
-      contactPerson: data.contact_person,
-      email: data.email,
-      partnerLevel: data.partner_level,
-      joinDate: data.join_date,
-      certificateId: data.certificate_id,
-      testPassed: data.test_passed,
-      commission: data.commission,
-      role: data.role
+      id: createdPartner.id,
+      companyName: createdPartner.company_name,
+      contactPerson: createdPartner.contact_person,
+      email: createdPartner.email,
+      partnerLevel: createdPartner.partner_level,
+      joinDate: createdPartner.join_date,
+      certificateId: createdPartner.certificate_id,
+      testPassed: createdPartner.test_passed,
+      commission: createdPartner.commission,
+      role: createdPartner.role
     };
   } catch (error) {
     console.error("Error in createPartner:", error);
