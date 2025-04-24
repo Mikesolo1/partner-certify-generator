@@ -57,7 +57,7 @@ export const usePartnerAuth = () => {
         toast({
           title: "Предупреждение",
           description: "Не удалось сохранить данные сессии",
-          variant: "warning"
+          variant: "default"  // Changed from "warning" to "default"
         });
       }
       
