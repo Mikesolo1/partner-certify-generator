@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Partner, Client, Payment, TestQuestion } from '@/types';
 import * as api from '@/api/partnersApi';
@@ -52,7 +51,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   } | null>(null);
   const { toast } = useToast();
 
-  // Вопросы для тестирования партнеров
   const testQuestions: TestQuestion[] = [
     {
       id: '1',
@@ -111,7 +109,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   ];
 
-  // Загрузка данных при первом рендере
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -119,25 +116,20 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const partnersData = await api.fetchPartners();
         setPartners(partnersData);
         
-        // Проверяем наличие залогиненного партнера в localStorage
         const storedCurrentPartner = localStorage.getItem('currentPartner');
         if (storedCurrentPartner) {
           try {
             const parsedPartner = JSON.parse(storedCurrentPartner);
             if (parsedPartner.id) {
-              // Получаем актуальные данные партнера из базы
               const refreshedPartner = await api.fetchPartnerById(parsedPartner.id);
               setCurrentPartner(refreshedPartner);
               
-              // Получаем клиентов партнера
               const clients = await api.fetchPartnerClients(refreshedPartner.id);
               
-              // Считаем клиентов с оплатой
               const clientsWithPayments = clients.filter(client => 
                 client.payments && client.payments.some(payment => payment.status === "оплачено")
               ).length;
               
-              // Рассчитываем уровень
               const levelInfo = calculatePartnerLevel(clientsWithPayments);
               setPartnerLevel(levelInfo);
             }
@@ -145,13 +137,19 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             console.error('Error parsing stored partner or fetching data', error);
             localStorage.removeItem('currentPartner');
             setCurrentPartner(null);
+            
+            toast({
+              title: "Ошибка авторизации",
+              description: "Не удалось восстановить сессию. Пожалуйста, войдите снова.",
+              variant: "destructive"
+            });
           }
         }
       } catch (error) {
         console.error('Error fetching initial data', error);
         toast({
           title: "Ошибка загрузки данных",
-          description: "Не удалось загрузить данные с сервера",
+          description: "Не удалось загрузить данные с сервера. Проверьте подключение.",
           variant: "destructive"
         });
       } finally {
@@ -162,7 +160,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     fetchData();
   }, [toast]);
 
-  // Обновление данных при изменении текущего партнера
   useEffect(() => {
     if (currentPartner) {
       localStorage.setItem('currentPartner', JSON.stringify(currentPartner));
@@ -182,8 +179,8 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         certificate_id: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         password: partner.password,
         test_passed: false,
-        role: 'user', // Роль по умолчанию - обычный пользователь
-        commission: 20 // Базовая комиссия
+        role: 'user',
+        commission: 20
       };
       
       const newPartner = await api.createPartner(newPartnerData);
@@ -213,7 +210,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         prev.map((partner) => partner.id === id ? updated : partner)
       );
       
-      // Если обновляем текущего партнера, обновляем его в стейте
       if (currentPartner && currentPartner.id === id) {
         setCurrentPartner(updated);
       }
@@ -248,7 +244,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return null;
       }
       
-      // Преобразование полей к формату, используемому в приложении
       const partner: Partner = {
         id: data.id,
         companyName: data.company_name,
@@ -265,15 +260,12 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       setCurrentPartner(partner);
       
-      // Получаем клиентов партнера для расчета уровня
       const clients = await api.fetchPartnerClients(partner.id!);
       
-      // Считаем клиентов с оплатой
       const clientsWithPayments = clients.filter(client => 
         client.payments && client.payments.some(payment => payment.status === "оплачено")
       ).length;
       
-      // Рассчитываем уровень
       const levelInfo = calculatePartnerLevel(clientsWithPayments);
       setPartnerLevel(levelInfo);
       
@@ -302,7 +294,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       const newClient = await api.createClient(clientData);
       
-      // Если это текущий партнер, обновляем информацию о партнере
       if (currentPartner && currentPartner.id === partnerId) {
         refreshPartnerLevel(partnerId);
       }
@@ -318,7 +309,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       await api.deleteClient(clientId);
       
-      // Если это текущий партнер, обновляем информацию о партнере
       if (currentPartner && currentPartner.id === partnerId) {
         refreshPartnerLevel(partnerId);
       }
@@ -355,7 +345,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         prev.map((partner) => partner.id === partnerId ? { ...partner, testPassed: true } : partner)
       );
       
-      // Если это текущий партнер, обновляем его в стейте
       if (currentPartner && currentPartner.id === partnerId) {
         setCurrentPartner({ ...currentPartner, testPassed: true });
       }
@@ -374,7 +363,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         throw new Error('No current partner');
       }
       
-      // Рассчитываем комиссию на основе уровня партнера
       const commissionRate = currentPartner.commission || 20;
       const commissionAmount = Math.round(payment.amount * (commissionRate / 100));
       
@@ -388,7 +376,6 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       const newPayment = await api.createPayment(paymentData);
       
-      // Обновляем уровень партнера после добавления платежа
       await refreshPartnerLevel(partnerId);
       
       return newPayment;
@@ -400,24 +387,19 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   
   const refreshPartnerLevel = async (partnerId: string) => {
     try {
-      // Получаем клиентов партнера
       const clients = await api.fetchPartnerClients(partnerId);
       
-      // Считаем клиентов с оплатой
       const clientsWithPayments = clients.filter(client => 
         client.payments && client.payments.some(payment => payment.status === "оплачено")
       ).length;
       
-      // Рассчитываем уровень
       const levelInfo = calculatePartnerLevel(clientsWithPayments);
       
-      // Обновляем уровень партнера в базе
       await api.updatePartner(partnerId, {
         partner_level: levelInfo.level,
         commission: levelInfo.commission
       });
       
-      // Если это текущий партнер, обновляем информацию о его уровне в стейте
       if (currentPartner && currentPartner.id === partnerId) {
         setCurrentPartner({
           ...currentPartner,
