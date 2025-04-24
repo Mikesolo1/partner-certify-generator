@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,6 +13,7 @@ const PartnerTestPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -63,21 +63,42 @@ const PartnerTestPage = () => {
     };
   };
   
-  const handleCompleteTest = () => {
+  const handleCompleteTest = async () => {
+    if (!currentPartner?.id) {
+      toast({
+        title: "Ошибка",
+        description: "Сессия не найдена. Пожалуйста, войдите снова.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const result = calculateScore();
     
     // Минимальный проходной балл - 60%
     if (result.percentage >= 60) {
-      if (currentPartner?.id) {
-        completeTest(currentPartner.id);
+      setIsSubmitting(true);
+      
+      try {
+        console.log("Completing test for partner ID:", currentPartner.id);
+        await completeTest(currentPartner.id);
+        
+        toast({
+          title: "Тест пройден успешно!",
+          description: `Вы правильно ответили на ${result.score} из ${result.total} вопросов. Сертификат доступен!`,
+        });
+        
+        navigate('/dashboard/certificate');
+      } catch (error) {
+        console.error("Error completing test:", error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось обработать результаты теста. Пожалуйста, попробуйте снова.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
       }
-      
-      toast({
-        title: "Тест пройден успешно!",
-        description: `Вы правильно ответили на ${result.score} из ${result.total} вопросов. Сертификат доступен!`,
-      });
-      
-      navigate('/dashboard/certificate');
     } else {
       toast({
         title: "Тест не пройден",
@@ -157,8 +178,11 @@ const PartnerTestPage = () => {
                 Пройти заново
               </Button>
             )}
-            <Button onClick={handleCompleteTest}>
-              {calculateScore().percentage >= 60 
+            <Button 
+              onClick={handleCompleteTest} 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Обработка...' : calculateScore().percentage >= 60 
                 ? "Перейти к сертификату"
                 : "Понятно"}
             </Button>

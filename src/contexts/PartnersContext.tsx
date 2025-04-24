@@ -53,10 +53,20 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const completeTest = async (partnerId: string) => {
     try {
+      console.log("Completing test for partner:", partnerId);
       const updated = await api.completeTest(partnerId);
+      
+      // Update current partner if it matches the one being modified
       if (currentPartner && currentPartner.id === partnerId) {
-        setCurrentPartner({ ...currentPartner, testPassed: true });
+        console.log("Updating currentPartner with new test status:", updated);
+        setCurrentPartner({ 
+          ...currentPartner, 
+          testPassed: true,
+          role: updated.role 
+        });
       }
+      
+      console.log("Test completed successfully for partner:", partnerId);
       return updated;
     } catch (error) {
       console.error('Error completing test:', error);

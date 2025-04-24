@@ -72,53 +72,53 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateTemplateProps>
     return (
       <div 
         ref={ref}
-        className={`w-full max-w-3xl mx-auto bg-white border-8 ${getBorderColor()} rounded-lg shadow-xl p-8 relative`}
+        className="w-full mx-auto bg-white border-8 relative p-6 md:p-8 rounded-lg shadow-xl"
         style={{ aspectRatio: '1.414/1' }} // A4 aspect ratio
       >
         {/* Логотип компании */}
-        <div className="absolute top-6 left-8 flex items-center">
-          <div className="text-3xl font-bold text-certificate-blue">S3</div>
-          <div className="ml-2 text-xl font-medium text-gray-600">Tech</div>
+        <div className="absolute top-4 md:top-6 left-4 md:left-8 flex items-center">
+          <div className="text-2xl md:text-3xl font-bold text-certificate-blue">S3</div>
+          <div className="ml-2 text-lg md:text-xl font-medium text-gray-600">Tech</div>
         </div>
         
         {/* Certificate Header */}
-        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-certificate-blue to-certificate-darkBlue rounded-t-lg" />
+        <div className="absolute top-0 left-0 right-0 h-16 md:h-24 bg-gradient-to-r from-certificate-blue to-certificate-darkBlue rounded-t-lg" />
         
         {/* Certificate Content */}
-        <div className="pt-32 pb-8 px-8 text-center">
-          <div className={`inline-block px-6 py-2 rounded-full text-white font-semibold mb-6 ${getBadgeColor()}`}>
+        <div className="pt-20 md:pt-32 pb-6 md:pb-8 px-4 md:px-8 text-center">
+          <div className={`inline-block px-4 md:px-6 py-1 md:py-2 rounded-full text-white text-sm md:text-base font-semibold mb-4 md:mb-6 ${getBadgeColor()}`}>
             {displayLevel} Партнер
           </div>
           
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Сертификат Партнера</h1>
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-3 md:mb-4">Сертификат Партнера</h1>
           
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-sm md:text-lg text-gray-600 mb-4 md:mb-8">
             Настоящим удостоверяется, что
           </p>
           
-          <h2 className="text-3xl font-bold text-certificate-blue mb-2">
+          <h2 className="text-xl md:text-3xl font-bold text-certificate-blue mb-2">
             {partner.companyName}
           </h2>
           
-          <p className="text-xl text-gray-700 mb-8">
+          <p className="text-base md:text-xl text-gray-700 mb-4 md:mb-8">
             в лице <span className="font-semibold">{partner.contactPerson}</span>
           </p>
           
-          <p className="text-lg text-gray-600 mb-12">
+          <p className="text-sm md:text-lg text-gray-600 mb-6 md:mb-12">
             является официальным {displayLevel.toLowerCase()} партнером S3 Tech
             <br />
             с {formatDate(partner.joinDate)}
           </p>
           
-          <div className="flex items-center justify-center mb-8">
-            <div className="w-32 h-px bg-gray-300 mr-4"></div>
-            <div className="w-20 h-20 bg-certificate-blue rounded-full flex items-center justify-center">
-              <span className="text-white text-xl font-bold">ПЕЧАТЬ</span>
+          <div className="flex items-center justify-center mb-4 md:mb-8">
+            <div className="w-16 md:w-32 h-px bg-gray-300 mr-2 md:mr-4"></div>
+            <div className="w-16 md:w-20 h-16 md:h-20 bg-certificate-blue rounded-full flex items-center justify-center">
+              <span className="text-white text-sm md:text-xl font-bold">ПЕЧАТЬ</span>
             </div>
-            <div className="w-32 h-px bg-gray-300 ml-4"></div>
+            <div className="w-16 md:w-32 h-px bg-gray-300 ml-2 md:ml-4"></div>
           </div>
           
-          <div className="text-sm text-gray-500">
+          <div className="text-xs md:text-sm text-gray-500">
             <p>Номер сертификата: {partner.certificateId}</p>
             <p>Дата выдачи: {format(new Date(), 'd MMMM yyyy', { locale: ru })}</p>
             <p>S3 Tech - официальный интегратор WhatsApp Business API</p>

@@ -42,11 +42,11 @@ export const usePartnerAuth = () => {
     try {
       console.log("Attempting to login with email:", email);
       
-      // Use direct query instead of security definer function to avoid infinite recursion
+      // Use direct query with case-insensitive and trimmed email
       const { data, error } = await supabase
         .from("partners")
         .select("*")
-        .eq("email", email)
+        .eq("email", email.trim().toLowerCase())
         .eq("password", password)
         .maybeSingle();
       

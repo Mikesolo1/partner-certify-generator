@@ -25,23 +25,29 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
         description: "Пожалуйста, подождите, пока мы генерируем ваш сертификат.",
       });
 
+      // Improved rendering options for better quality
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 2,
+        scale: 2, // Higher scale for better quality
         logging: false,
         useCORS: true,
         allowTaint: true,
+        backgroundColor: '#ffffff',
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      // Create PDF with correct aspect ratio
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4',
       });
 
-      const imgWidth = 297; // A4 landscape width in mm
-      const imgHeight = 210; // A4 landscape height in mm
+      // A4 dimensions in mm (landscape)
+      const imgWidth = 297; 
+      const imgHeight = 210;
       
+      // Add image while preserving aspect ratio
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
       pdf.save(`S3-${partner.companyName}-Сертификат.pdf`);
 
@@ -61,8 +67,10 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
 
   return (
     <div className="space-y-6">
-      <div className="overflow-hidden shadow-lg rounded-lg border border-gray-200">
-        <CertificateTemplate ref={certificateRef} partner={partner} />
+      <div className="overflow-hidden border border-gray-200 shadow-lg rounded-lg">
+        <div className="bg-white p-4">
+          <CertificateTemplate ref={certificateRef} partner={partner} />
+        </div>
       </div>
       
       <div className="flex justify-center">
