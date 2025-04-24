@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "../integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { ClientsList } from "@/components/admin/ClientsList";
 import { NotificationForm } from "@/components/admin/NotificationForm";
 import { NotificationsList } from "@/components/admin/NotificationsList";
 import { TestQuestionsManager } from "@/components/admin/TestQuestionsManager";
+import { fetchPartners } from "@/api/partnersApi";
 
 const AdminPage = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -47,34 +47,39 @@ const AdminPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: partnerData, error: partnerError } = await supabase
-        .from("partners")
-        .select("*");
       
-      if (partnerError) {
-        console.error("Error fetching partners:", partnerError);
-        toast({
-          title: "Ошибка загрузки",
-          description: "Не удалось загрузить список партнеров",
-          variant: "destructive",
-        });
-      } else {
-        setPartners(partnerData || []);
+      const partnerData = await fetchPartners();
+      if (partnerData) {
+        const formattedPartners = partnerData.map(p => ({
+          id: p.id,
+          companyName: p.company_name,
+          contactPerson: p.contact_person,
+          email: p.email,
+          partnerLevel: p.partner_level,
+          joinDate: p.join_date,
+          certificateId: p.certificate_id,
+          testPassed: p.test_passed,
+          commission: p.commission,
+          role: p.role,
+          phone: p.phone || ''
+        }));
+        setPartners(formattedPartners);
       }
       
-      const { data: clientData, error: clientError } = await supabase
-        .from("clients")
-        .select("*");
+      const { data: clientData, error: clientError } = await supabase.rpc("get_all_clients");
       
       if (clientError) {
         console.error("Error fetching clients:", clientError);
+        toast({
+          title: "Ошибка загрузки",
+          description: "Не удалось загрузить список клиентов",
+          variant: "destructive",
+        });
       } else {
         setClients(clientData || []);
       }
       
-      const { data: paymentData, error: paymentError } = await supabase
-        .from("payments")
-        .select("*");
+      const { data: paymentData, error: paymentError } = await supabase.rpc("get_all_payments");
         
       if (paymentError) {
         console.error("Error fetching payments:", paymentError);
@@ -82,14 +87,18 @@ const AdminPage = () => {
         setPayments(paymentData || []);
       }
       
-      const { data: questionsData, error: questionsError } = await supabase
-        .from("test_questions")
-        .select("*");
+      const { data: questionsData, error: questionsError } = await supabase.from("test_questions").select("*");
         
       if (questionsError) {
         console.error("Error fetching test questions:", questionsError);
       } else {
-        setTestQuestions(questionsData || []);
+        const formattedQuestions = questionsData.map(q => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correct_answer
+        }));
+        setTestQuestions(formattedQuestions);
       }
       
       const { data: notificationsData, error: notificationsError } = await supabase
