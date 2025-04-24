@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Search } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
-import { Client, Payment } from '@/types';
+import { Client } from '@/types';
 import ClientCard from '@/components/ClientCard';
 import ClientForm from '@/components/ClientForm';
 import { Navigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import * as api from '@/api/partnersApi';
 
 const ClientsPage = () => {
-  const { currentPartner, addClient, updateClient, removeClient, addPayment } = usePartners();
+  const { currentPartner, addClient, updateClient, removeClient } = usePartners();
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [clients, setClients] = useState<Client[]>([]);
@@ -129,31 +129,6 @@ const ClientsPage = () => {
     }
   };
   
-  const handleAddPayment = async (clientId: string, amount: number) => {
-    try {
-      console.log("Adding payment:", amount, "for client:", clientId);
-      await addPayment(clientId, amount);
-      
-      // Получаем обновленный список клиентов после добавления платежа
-      if (currentPartner?.id) {
-        const updatedClients = await api.fetchPartnerClients(currentPartner.id);
-        setClients(updatedClients);
-      }
-      
-      toast({
-        title: 'Платеж добавлен',
-        description: `Платеж на сумму ${amount} ₽ успешно добавлен`
-      });
-    } catch (error) {
-      console.error('Error adding payment:', error);
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось добавить платеж',
-        variant: 'destructive'
-      });
-    }
-  };
-  
   return (
     <DashboardLayout>
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -195,7 +170,6 @@ const ClientsPage = () => {
               client={client}
               onUpdate={handleUpdateClient}
               onDelete={handleDeleteClient}
-              onAddPayment={handleAddPayment}
             />
           ))}
         </div>
