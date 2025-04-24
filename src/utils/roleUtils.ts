@@ -4,10 +4,22 @@ import { Badge } from "@/components/ui/badge";
 export const getRoleBadge = (role: string) => {
   switch(role) {
     case 'admin':
-      return <Badge className="bg-purple-600">Администратор</Badge>;
+      return { 
+        variant: "default", 
+        className: "bg-purple-600", 
+        children: "Администратор" 
+      };
     case 'partner':
-      return <Badge className="bg-blue-600">Партнер</Badge>;
+      return { 
+        variant: "default", 
+        className: "bg-blue-600", 
+        children: "Партнер" 
+      };
     default:
-      return <Badge className="bg-gray-600">Пользователь</Badge>;
+      return { 
+        variant: "default", 
+        className: "bg-gray-600", 
+        children: "Пользователь" 
+      };
   }
 };

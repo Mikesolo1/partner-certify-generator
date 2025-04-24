@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Partner } from '@/types';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { getRoleBadge } from '@/utils/roleUtils';
 
 interface PartnersListProps {
   partners: Partner[];
@@ -41,21 +41,10 @@ export const PartnersList: React.FC<PartnersListProps> = ({
   getPartnerClients,
   getTotalEarnings,
 }) => {
-  const getRoleBadge = (role: string) => {
-    switch(role) {
-      case 'admin':
-        return <Badge className="bg-purple-600">Администратор</Badge>;
-      case 'partner':
-        return <Badge className="bg-blue-600">Партнер</Badge>;
-      default:
-        return <Badge className="bg-gray-600">Пользователь</Badge>;
-    }
-  };
-
   const getTestStatusBadge = (passed: boolean) => {
     return passed 
-      ? <Badge className="bg-green-600">Пройден</Badge>
-      : <Badge className="bg-yellow-600">Не пройден</Badge>;
+      ? { variant: "default", className: "bg-green-600", children: "Пройден" }
+      : { variant: "default", className: "bg-yellow-600", children: "Не пройден" };
   };
 
   return (
@@ -82,7 +71,9 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                 <TableCell>{p.contactPerson || p.contact_person}</TableCell>
                 <TableCell>{p.email}</TableCell>
                 <TableCell>{getTestStatusBadge(p.testPassed || p.test_passed || false)}</TableCell>
-                <TableCell>{getRoleBadge(p.role || 'user')}</TableCell>
+                <TableCell>
+                  <Badge {...getRoleBadge(p.role || 'user')} />
+                </TableCell>
                 <TableCell>{p.partnerLevel || p.partner_level}</TableCell>
                 <TableCell>{p.id ? getPartnerClients(p.id).length : 0}</TableCell>
                 <TableCell>{p.id ? getTotalEarnings(p.id).toLocaleString('ru-RU') : 0} ₽</TableCell>
