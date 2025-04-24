@@ -29,6 +29,7 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
           throw error;
         }
         
+        console.log('Fetched notifications:', data);
         setNotifications(data || []);
       } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -46,22 +47,34 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
     
     // Setup subscription to notifications table updates
     const channel = supabase
-      .channel('public:notifications')
+      .channel('notifications-channel')
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
         table: 'notifications' 
       }, (payload) => {
+        console.log('New notification received:', payload);
+        const newNotification = payload.new as Notification;
+        
         // Add new notification to the beginning of the list
-        setNotifications(prev => [payload.new as Notification, ...prev]);
+        setNotifications(prev => {
+          // Remove the last notification if we already have 5
+          const updatedList = [newNotification, ...prev];
+          if (updatedList.length > 5) {
+            return updatedList.slice(0, 5);
+          }
+          return updatedList;
+        });
         
         // Show toast when new notification arrives
         toast({
           title: "Новое уведомление",
-          description: (payload.new as Notification).title,
+          description: newNotification.title,
         });
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
       
     return () => {
       supabase.removeChannel(channel);
