@@ -66,7 +66,9 @@ export const useClientsList = () => {
 
   const handleUpdateClient = async (updatedClient: Client) => {
     try {
-      await updateClient(updatedClient);
+      // Fix here: Pass updatedClient.id as the first argument and updatedClient as the second argument
+      await updateClient(updatedClient.id, updatedClient);
+      
       setClients(prev => 
         prev.map(client => client.id === updatedClient.id ? updatedClient : client)
       );
