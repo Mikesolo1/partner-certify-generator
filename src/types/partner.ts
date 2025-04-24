@@ -1,4 +1,3 @@
-
 export interface Partner {
   id?: string;
   companyName?: string;
@@ -26,9 +25,9 @@ export interface Client {
   phone: string;
   registrationDate?: string;
   registration_date?: string;
+  date?: string;
   partner_id?: string;
   payments?: Payment[];
-  date?: string;
 }
 
 export interface Payment {
