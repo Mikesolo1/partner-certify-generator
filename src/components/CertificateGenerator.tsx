@@ -82,7 +82,10 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
     <div className="space-y-6">
       <div className="overflow-hidden border border-gray-200 shadow-lg rounded-lg">
         <div className="bg-white p-4">
-          <CertificateTemplate ref={certificateRef} partner={partner} />
+          {/* Wrap certificate in a container with scaling */}
+          <div style={{ transform: 'scale(0.5)', transformOrigin: 'top center' }} className="flex justify-center">
+            <CertificateTemplate ref={certificateRef} partner={partner} />
+          </div>
         </div>
       </div>
       
