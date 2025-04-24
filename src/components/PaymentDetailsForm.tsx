@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 const paymentDetailsSchema = z.object({
   payment_type: z.enum(['bank_account', 'sbp', 'card']),
@@ -34,9 +35,10 @@ type PaymentDetailsFormValues = z.infer<typeof paymentDetailsSchema>;
 interface PaymentDetailsFormProps {
   onSubmit: (data: PaymentDetailsFormValues) => void;
   defaultValues?: PaymentDetailsFormValues;
+  isLoading?: boolean; // Add isLoading prop to interface
 }
 
-const PaymentDetailsForm = ({ onSubmit, defaultValues }: PaymentDetailsFormProps) => {
+const PaymentDetailsForm = ({ onSubmit, defaultValues, isLoading = false }: PaymentDetailsFormProps) => {
   const form = useForm<PaymentDetailsFormValues>({
     resolver: zodResolver(paymentDetailsSchema),
     defaultValues: defaultValues || {
@@ -102,7 +104,16 @@ const PaymentDetailsForm = ({ onSubmit, defaultValues }: PaymentDetailsFormProps
           )}
         />
 
-        <Button type="submit">Сохранить реквизиты</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Сохранение...
+            </>
+          ) : (
+            'Сохранить реквизиты'
+          )}
+        </Button>
       </form>
     </Form>
   );
