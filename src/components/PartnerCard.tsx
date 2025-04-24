@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Award, FileText } from 'lucide-react';

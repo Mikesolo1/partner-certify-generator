@@ -1,6 +1,6 @@
 
 import React, { forwardRef } from 'react';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PARTNER_LEVELS } from '@/types/partner';
+import { PARTNER_LEVELS } from '@/types';
 import { Award, Badge, Medal, Diamond, Star } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';

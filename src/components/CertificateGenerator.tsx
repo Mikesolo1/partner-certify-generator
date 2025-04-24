@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import CertificateTemplate from './CertificateTemplate';
 import { Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

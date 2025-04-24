@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Notification } from '@/types/partner';
+import { Notification } from '@/types';
 import { CalendarClock } from 'lucide-react';
 
 interface NotificationsPanelProps {

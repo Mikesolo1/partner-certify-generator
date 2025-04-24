@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Partner, Client, Payment, TestQuestion } from '@/types/partner';
+import { Partner, Client, Payment, TestQuestion } from '@/types';
 import * as api from '@/api/partnersApi';
 import { supabase } from '@/integrations/supabase/client';
 import { calculatePartnerLevel } from '@/api/partnersApi';

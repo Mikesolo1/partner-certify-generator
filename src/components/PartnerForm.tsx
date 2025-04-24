@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import { useToast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({

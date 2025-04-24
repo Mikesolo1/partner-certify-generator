@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 import CertificateGenerator from '@/components/CertificateGenerator';
 import Header from '@/components/Header';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 
 const CertificatePage = () => {
   const { id } = useParams<{ id: string }>();

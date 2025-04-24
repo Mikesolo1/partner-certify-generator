@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Search } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
-import { Client, Payment } from '@/types/partner';
+import { Client, Payment } from '@/types';
 import ClientCard from '@/components/ClientCard';
 import ClientForm from '@/components/ClientForm';
 import { Navigate } from 'react-router-dom';

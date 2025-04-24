@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/components/ui/use-toast';
 import { usePartners } from '@/contexts/PartnersContext';
 import PartnerForm from '@/components/PartnerForm';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import Header from '@/components/Header';
 
 const EditPartnerPage = () => {

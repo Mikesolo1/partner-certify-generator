@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Award, FileText, Users, Star, Trophy, CircleCheck } from 'lucide-react';
 import PartnerLevelProgress from '@/components/PartnerLevelProgress';
-import { PARTNER_LEVELS, Client } from '@/types/partner';
+import { PARTNER_LEVELS, Client } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import { supabase } from '@/integrations/supabase/client';

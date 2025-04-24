@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { usePartners } from '@/contexts/PartnersContext';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({

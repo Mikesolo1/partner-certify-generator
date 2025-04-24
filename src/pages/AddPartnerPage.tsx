@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePartners } from '@/contexts/PartnersContext';
 import PartnerForm from '@/components/PartnerForm';
-import { Partner } from '@/types/partner';
+import { Partner } from '@/types';
 import Header from '@/components/Header';
 
 const AddPartnerPage = () => {
