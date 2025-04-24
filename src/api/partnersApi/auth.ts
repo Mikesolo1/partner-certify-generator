@@ -52,6 +52,17 @@ export const loginPartnerWithCredentials = async (email: string, password: strin
     const partnerData = data[0];
     console.log("Login successful, partner data found:", partnerData.id);
     
+    // После успешного входа устанавливаем JWT сессию
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: password
+    });
+    
+    if (authError) {
+      console.warn("Warning: Could not establish auth session:", authError);
+      // Продолжаем даже если сессия не установлена, это нормально для текущей архитектуры
+    }
+    
     return {
       id: partnerData.id,
       companyName: partnerData.company_name,

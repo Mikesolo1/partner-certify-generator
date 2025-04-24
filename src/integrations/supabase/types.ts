@@ -321,6 +321,10 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       user_role: "admin" | "partner"

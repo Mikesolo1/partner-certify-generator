@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -24,11 +25,11 @@ const formSchema = z.object({
   }),
   phone: z.string().min(6, {
     message: "Номер телефона должен содержать не менее 6 символов.",
-  }),
+  }).optional(),
 });
 
 interface ClientFormProps {
-  onSubmit: (data: Client) => void;
+  onSubmit: (data: Omit<Client, "id" | "partner_id" | "registrationDate" | "payments">) => void;
   defaultValues?: Partial<Client>;
   isEditing?: boolean;
 }
@@ -47,28 +48,16 @@ const ClientForm = ({ onSubmit, defaultValues, isEditing = false }: ClientFormPr
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     try {
-      // Создание нового клиента или обновление существующего
-      const client: Client = {
-        id: defaultValues?.id || `${Date.now()}`,
+      // Передаем только необходимые данные в колбэк
+      onSubmit({
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        registrationDate: defaultValues?.registrationDate || new Date().toISOString().split('T')[0],
-        payments: defaultValues?.payments || []
-      };
-      
-      onSubmit(client);
+        phone: data.phone || '',
+      });
       
       if (!isEditing) {
         form.reset();
       }
-      
-      toast({
-        title: isEditing ? "Клиент обновлен" : "Клиент добавлен",
-        description: isEditing 
-          ? "Информация о клиенте успешно обновлена." 
-          : "Новый клиент успешно добавлен в вашу базу.",
-      });
     } catch (error) {
       console.error("Error submitting client form:", error);
       toast({
