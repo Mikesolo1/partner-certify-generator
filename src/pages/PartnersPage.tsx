@@ -13,15 +13,18 @@ const PartnersPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredPartners = partners.filter(partner => {
-    const searchString = searchTerm.toLowerCase();
-    return (
-      partner.companyName.toLowerCase().includes(searchString) ||
-      partner.contactPerson.toLowerCase().includes(searchString) ||
-      partner.email.toLowerCase().includes(searchString) ||
-      partner.partnerLevel.toLowerCase().includes(searchString)
-    );
-  });
+  // Filter partners who have passed the test first, then apply search filter
+  const filteredPartners = partners
+    .filter(partner => partner.testPassed || partner.test_passed)
+    .filter(partner => {
+      const searchString = searchTerm.toLowerCase();
+      return (
+        partner.companyName.toLowerCase().includes(searchString) ||
+        partner.contactPerson.toLowerCase().includes(searchString) ||
+        partner.email.toLowerCase().includes(searchString) ||
+        partner.partnerLevel.toLowerCase().includes(searchString)
+      );
+    });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,7 +34,7 @@ const PartnersPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold mb-2">Партнеры</h1>
-            <p className="text-gray-600">Управление зарегистрированными партнерами и их сертификатами.</p>
+            <p className="text-gray-600">Просмотр сертифицированных партнеров.</p>
           </div>
           
           <Button 
@@ -65,12 +68,12 @@ const PartnersPage = () => {
           </div>
         ) : (
           <div className="text-center py-16 border rounded-lg bg-white">
-            <h3 className="text-xl font-medium mb-2">Партнеров не найдено</h3>
+            <h3 className="text-xl font-medium mb-2">Сертифицированных партнеров не найдено</h3>
             {searchTerm ? (
               <p className="text-gray-500">Попробуйте изменить параметры поиска.</p>
             ) : (
               <div className="mt-4">
-                <p className="text-gray-500 mb-4">Начните с регистрации первого партнера.</p>
+                <p className="text-gray-500 mb-4">Станьте первым сертифицированным партнером.</p>
                 <Button 
                   onClick={() => navigate('/register')}
                   className="bg-certificate-blue text-white"
