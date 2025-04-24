@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Payment } from "@/types";
 import { safeRPC } from "@/api/utils/queryHelpers";
@@ -7,13 +8,21 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
     console.log("Creating payment:", payment);
     
     if (!payment.client_id || !payment.amount || !payment.status) {
-      throw new Error("Missing required payment fields");
+      const missingFields = [
+        !payment.client_id && 'client_id',
+        !payment.amount && 'amount',
+        !payment.status && 'status'
+      ].filter(Boolean);
+      
+      throw new Error(`Missing required payment fields: ${missingFields.join(', ')}`);
     }
     
     const finalPayment = {
       ...payment,
       commission_amount: payment.commission_amount || 0
     };
+    
+    console.log("Sending payment to RPC with data:", finalPayment);
     
     const { data, error } = await safeRPC('add_payment_with_details', {
       p_client_id: finalPayment.client_id,
@@ -27,12 +36,11 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
     });
     
     if (error) {
-      console.error("Error creating payment:", error);
+      console.error("RPC Error in createPayment:", error);
       throw error;
     }
     
     console.log("Payment created successfully:", data);
-    
     return data;
   } catch (error) {
     console.error("Error in createPayment:", error);
@@ -42,36 +50,68 @@ export const createPayment = async (payment: Omit<Payment, "id">) => {
 
 export const getClientPayments = async (clientId: string) => {
   try {
+    console.log("Fetching payments for client:", clientId);
+    
+    if (!clientId) {
+      console.error("getClientPayments called without clientId");
+      return [];
+    }
+
     const { data, error } = await safeRPC('get_client_payments', {
       p_client_id: clientId
     });
     
     if (error) {
       console.error("Error fetching client payments:", error);
+      console.error("Client ID:", clientId);
+      console.error("Full error details:", {
+        message: error.message,
+        hint: error.hint,
+        details: error.details,
+        code: error.code
+      });
       return [];
     }
     
+    console.log(`Retrieved ${data?.length || 0} payments for client ${clientId}`);
     return data || [];
   } catch (error) {
-    console.error("Error in getClientPayments:", error);
+    console.error("Exception in getClientPayments:", error);
+    console.error("Failed for client ID:", clientId);
     return [];
   }
 };
 
 export const getPartnerPayments = async (partnerId: string) => {
   try {
+    console.log("Fetching payments for partner:", partnerId);
+    
+    if (!partnerId) {
+      console.error("getPartnerPayments called without partnerId");
+      return [];
+    }
+
     const { data, error } = await safeRPC('get_partner_payments', {
       p_partner_id: partnerId
     });
     
     if (error) {
       console.error("Error fetching partner payments:", error);
+      console.error("Partner ID:", partnerId);
+      console.error("Full error details:", {
+        message: error.message,
+        hint: error.hint,
+        details: error.details,
+        code: error.code
+      });
       return [];
     }
     
+    console.log(`Retrieved ${data?.length || 0} payments for partner ${partnerId}`);
     return data || [];
   } catch (error) {
-    console.error("Error in getPartnerPayments:", error);
+    console.error("Exception in getPartnerPayments:", error);
+    console.error("Failed for partner ID:", partnerId);
     return [];
   }
 };
