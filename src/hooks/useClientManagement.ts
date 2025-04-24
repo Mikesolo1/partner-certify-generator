@@ -6,14 +6,10 @@ import { useToast } from '@/hooks/use-toast';
 export const useClientManagement = () => {
   const { toast } = useToast();
 
-  const addClient = async (partnerId: string, client: Omit<Client, "id" | "partner_id" | "registrationDate" | "payments">) => {
+  const addClient = async (client: Omit<Client, "id" | "registrationDate" | "payments">) => {
     try {
-      const clientData = {
-        ...client,
-        partner_id: partnerId,
-      };
-      
-      const newClient = await api.createClient(clientData);
+      // We now handle the partner_id in the API layer with security definer functions
+      const newClient = await api.createClient(client);
       
       toast({
         title: "Клиент добавлен",

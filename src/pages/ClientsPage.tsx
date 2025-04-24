@@ -59,7 +59,8 @@ const ClientsPage = () => {
     if (!currentPartner?.id) return;
     
     try {
-      const newClient = await addClient(currentPartner.id, client as Client);
+      // Updated to match new function signature that expects only one parameter
+      const newClient = await addClient(client as Client);
       setClients(prev => [...prev, newClient]);
       setIsAddClientDialogOpen(false);
       toast({
@@ -80,7 +81,8 @@ const ClientsPage = () => {
     if (!currentPartner?.id) return;
     
     try {
-      await updateClient(currentPartner.id, updatedClient);
+      // Updated to match new function signature that expects only one parameter
+      await updateClient(updatedClient);
       setClients(prev => 
         prev.map(client => client.id === updatedClient.id ? updatedClient : client)
       );
@@ -102,7 +104,7 @@ const ClientsPage = () => {
     if (!currentPartner?.id) return;
     
     try {
-      await removeClient(currentPartner.id, clientId);
+      await removeClient(clientId);
       setClients(prev => prev.filter(client => client.id !== clientId));
       toast({
         title: 'Клиент удален',
