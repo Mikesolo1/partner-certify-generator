@@ -1,4 +1,6 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 // Calculate partner level based on number of clients with payments
 export const calculatePartnerLevel = (clientsWithPayments: number): { 
   level: string; 
