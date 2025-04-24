@@ -25,13 +25,35 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
         description: "Пожалуйста, подождите, пока мы генерируем ваш сертификат.",
       });
 
-      const canvas = await html2canvas(certificateRef.current, {
+      // Create a hidden container for rendering the certificate at full size
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      document.body.appendChild(container);
+
+      // Create a temporary div to render the certificate at full size
+      const tempDiv = document.createElement('div');
+      container.appendChild(tempDiv);
+
+      // Clone the certificate content without scaling
+      const certificateClone = certificateRef.current.cloneNode(true) as HTMLElement;
+      tempDiv.appendChild(certificateClone);
+
+      // Wait for images to load in the cloned element
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Create canvas from the full-size certificate
+      const canvas = await html2canvas(certificateClone, {
         scale: 4, // Higher scale for better quality
         logging: false,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
       });
+
+      // Remove temporary elements
+      document.body.removeChild(container);
 
       // A4 dimensions in mm (landscape)
       const imgWidth = 297;
@@ -82,8 +104,12 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
     <div className="space-y-6">
       <div className="overflow-hidden border border-gray-200 shadow-lg rounded-lg">
         <div className="bg-white p-4">
-          {/* Wrap certificate in a container with scaling */}
-          <div style={{ transform: 'scale(0.5)', transformOrigin: 'top center' }} className="flex justify-center">
+          {/* Создаем контейнер с адаптивным масштабированием */}
+          <div className="flex justify-center" style={{ 
+            transform: 'scale(0.5)', 
+            transformOrigin: 'top center',
+            margin: '-25% 0' // Компенсируем пустое пространство из-за уменьшения
+          }}>
             <CertificateTemplate ref={certificateRef} partner={partner} />
           </div>
         </div>
