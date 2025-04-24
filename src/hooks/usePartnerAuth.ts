@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Partner } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { loginPartnerWithCredentials } from '@/api/partnersApi/auth';
 
 export const usePartnerAuth = () => {
   const [currentPartner, setCurrentPartner] = useState<Partner | null>(() => {
@@ -42,45 +42,16 @@ export const usePartnerAuth = () => {
     try {
       console.log("Attempting to login with email:", email);
       
-      // Use direct query with case-insensitive and trimmed email
-      const { data, error } = await supabase
-        .from("partners")
-        .select("*")
-        .eq("email", email.trim().toLowerCase())
-        .eq("password", password)
-        .maybeSingle();
+      // Use our new secure login function
+      const partner = await loginPartnerWithCredentials(email, password);
       
-      if (error) {
-        console.error('Login failed:', error);
-        return null;
+      if (partner) {
+        console.log("Login successful, setting partner data");
+        setCurrentPartner(partner);
+        return partner;
       }
       
-      if (!data) {
-        console.log('No partner found with these credentials');
-        return null;
-      }
-      
-      console.log("Login successful, partner data:", {
-        ...data,
-        password: '[REDACTED]'
-      });
-      
-      const partner: Partner = {
-        id: data.id,
-        companyName: data.company_name,
-        contactPerson: data.contact_person,
-        email: data.email,
-        partnerLevel: data.partner_level,
-        joinDate: data.join_date,
-        certificateId: data.certificate_id,
-        password: data.password,
-        testPassed: data.test_passed,
-        commission: data.commission,
-        role: data.role
-      };
-      
-      setCurrentPartner(partner);
-      return partner;
+      return null;
     } catch (error) {
       console.error('Error during login:', error);
       return null;
