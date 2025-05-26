@@ -2,9 +2,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Notification } from "@/types";
 
-export const createNotification = async (title: string, content: string): Promise<Notification> => {
+export const createNotification = async (title: string, content: string, images: string[] = []): Promise<Notification> => {
   try {
-    console.log("Creating notification using RPC:", { title, content });
+    console.log("Creating notification using RPC:", { title, content, images });
     
     const { data, error } = await supabase
       .rpc('create_notification', {
@@ -18,9 +18,30 @@ export const createNotification = async (title: string, content: string): Promis
       throw error;
     }
     
-    console.log("Notification created successfully:", data);
+    let finalData = data;
+    
+    // If images are provided, update the notification with images
+    if (images.length > 0) {
+      const { data: updatedData, error: updateError } = await supabase
+        .rpc('update_notification', {
+          p_id: data.id,
+          p_title: title,
+          p_content: content,
+          p_images: JSON.stringify(images)
+        })
+        .single();
+      
+      if (updateError) {
+        console.error("Error updating notification with images:", updateError);
+        throw updateError;
+      }
+      
+      finalData = updatedData;
+    }
+    
+    console.log("Notification created successfully:", finalData);
 
-    const typedData = data as Record<string, any>;
+    const typedData = finalData as Record<string, any>;
     
     const notification: Notification = {
       id: typedData.id,

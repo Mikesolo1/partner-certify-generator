@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { X, Upload, Plus } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface NotificationEditorProps {
   notification?: {
@@ -32,6 +33,23 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
   const [images, setImages] = useState<string[]>(notification?.images || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const modules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['link'],
+      ['clean']
+    ],
+  }), []);
+
+  const formats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'color', 'background', 'align', 'link'
+  ];
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -102,18 +120,12 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
     setIsSubmitting(true);
     
     try {
-      const notificationData = {
-        title: title.trim(),
-        content: content.trim(),
-        images: JSON.stringify(images)
-      };
-
       if (isEditing && notification?.id) {
         const { data, error } = await supabase.rpc('update_notification', {
           p_id: notification.id,
-          p_title: notificationData.title,
-          p_content: notificationData.content,
-          p_images: notificationData.images
+          p_title: title.trim(),
+          p_content: content.trim(),
+          p_images: JSON.stringify(images)
         });
 
         if (error) throw error;
@@ -125,27 +137,28 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
         });
       } else {
         const { data, error } = await supabase.rpc('create_notification', {
-          p_title: notificationData.title,
-          p_content: notificationData.content
+          p_title: title.trim(),
+          p_content: content.trim()
         });
 
         if (error) throw error;
+
+        let finalData = data;
 
         // Update with images if any
         if (images.length > 0) {
           const { data: updatedData, error: updateError } = await supabase.rpc('update_notification', {
             p_id: data.id,
-            p_title: notificationData.title,
-            p_content: notificationData.content,
-            p_images: notificationData.images
+            p_title: title.trim(),
+            p_content: content.trim(),
+            p_images: JSON.stringify(images)
           });
 
           if (updateError) throw updateError;
-          onSave(updatedData[0]);
-        } else {
-          onSave(data);
+          finalData = updatedData[0];
         }
 
+        onSave(finalData);
         toast({
           title: "Успешно",
           description: "Уведомление создано",
@@ -196,13 +209,14 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
             <label htmlFor="content" className="text-sm font-medium">
               Содержание уведомления *
             </label>
-            <Textarea
-              id="content"
+            <ReactQuill
+              theme="snow"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={setContent}
+              modules={modules}
+              formats={formats}
               placeholder="Введите текст уведомления..."
-              className="min-h-[120px]"
-              required
+              style={{ minHeight: '200px' }}
             />
           </div>
 

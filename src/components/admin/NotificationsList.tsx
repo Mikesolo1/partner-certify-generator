@@ -25,7 +25,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
     setEditingNotification(notification);
   };
 
-  const handleSave = (updatedNotification: Notification) => {
+  const handleSave = () => {
     setEditingNotification(null);
     onNotificationUpdate();
   };
@@ -132,7 +132,10 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-line mb-4">{notification.content}</p>
+                  <div 
+                    className="prose prose-sm max-w-none mb-4"
+                    dangerouslySetInnerHTML={{ __html: notification.content }}
+                  />
                   
                   {images.length > 0 && (
                     <div className="space-y-3">

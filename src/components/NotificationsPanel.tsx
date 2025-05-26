@@ -161,7 +161,10 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
                       <span className="ml-2">(обновлено: {formatDate(notification.updated_at)})</span>
                     )}
                   </p>
-                  <p className="text-gray-700 whitespace-pre-line mb-3">{notification.content}</p>
+                  <div 
+                    className="prose prose-sm max-w-none text-gray-700 mb-3"
+                    dangerouslySetInnerHTML={{ __html: notification.content }}
+                  />
                   
                   {images.length > 0 && (
                     <div className="space-y-2">
