@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Notification } from '@/types';
-import { CalendarClock } from 'lucide-react';
+import { CalendarClock, ChevronDown, ChevronUp } from 'lucide-react';
 import { safeRPC } from '@/api/utils/queryHelpers';
+import { Button } from '@/components/ui/button';
 
 interface NotificationsPanelProps {
   className?: string;
@@ -14,6 +15,7 @@ interface NotificationsPanelProps {
 const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedNotifications, setExpandedNotifications] = useState<{ [key: string]: boolean }>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -21,7 +23,6 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
       try {
         setLoading(true);
         
-        // Используем RPC функцию вместо прямого запроса
         const { data, error } = await safeRPC('get_all_notifications');
         
         if (error) {
@@ -55,9 +56,7 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
         console.log('New notification received:', payload);
         const newNotification = payload.new as Notification;
         
-        // Add new notification to the beginning of the list
         setNotifications(prev => {
-          // Remove the last notification if we already have 5
           const updatedList = [newNotification, ...prev];
           if (updatedList.length > 5) {
             return updatedList.slice(0, 5);
@@ -65,11 +64,36 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
           return updatedList;
         });
         
-        // Show toast when new notification arrives
         toast({
           title: "Новое уведомление",
           description: newNotification.title,
         });
+      })
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'notifications' 
+      }, (payload) => {
+        console.log('Notification updated:', payload);
+        const updatedNotification = payload.new as Notification;
+        
+        setNotifications(prev => 
+          prev.map(notification => 
+            notification.id === updatedNotification.id ? updatedNotification : notification
+          )
+        );
+      })
+      .on('postgres_changes', { 
+        event: 'DELETE', 
+        schema: 'public', 
+        table: 'notifications' 
+      }, (payload) => {
+        console.log('Notification deleted:', payload);
+        const deletedNotification = payload.old as Notification;
+        
+        setNotifications(prev => 
+          prev.filter(notification => notification.id !== deletedNotification.id)
+        );
       })
       .subscribe((status) => {
         console.log('Subscription status:', status);
@@ -89,6 +113,26 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
     });
   };
 
+  const parseImages = (images: any): string[] => {
+    if (!images) return [];
+    if (typeof images === 'string') {
+      try {
+        return JSON.parse(images);
+      } catch {
+        return [];
+      }
+    }
+    if (Array.isArray(images)) return images;
+    return [];
+  };
+
+  const toggleExpanded = (notificationId: string) => {
+    setExpandedNotifications(prev => ({
+      ...prev,
+      [notificationId]: !prev[notificationId]
+    }));
+  };
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -104,15 +148,60 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
           </div>
         ) : notifications.length > 0 ? (
           <div className="space-y-4">
-            {notifications.map((notification) => (
-              <div key={notification.id} className="border-b pb-4 last:border-b-0">
-                <h3 className="font-semibold text-lg">{notification.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">
-                  {formatDate(notification.created_at!)}
-                </p>
-                <p className="text-gray-700 whitespace-pre-line">{notification.content}</p>
-              </div>
-            ))}
+            {notifications.map((notification) => {
+              const images = parseImages(notification.images);
+              const isExpanded = expandedNotifications[notification.id || ''];
+              
+              return (
+                <div key={notification.id} className="border-b pb-4 last:border-b-0">
+                  <h3 className="font-semibold text-lg">{notification.title}</h3>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {formatDate(notification.created_at!)}
+                    {notification.updated_at && notification.updated_at !== notification.created_at && (
+                      <span className="ml-2">(обновлено: {formatDate(notification.updated_at)})</span>
+                    )}
+                  </p>
+                  <p className="text-gray-700 whitespace-pre-line mb-3">{notification.content}</p>
+                  
+                  {images.length > 0 && (
+                    <div className="space-y-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleExpanded(notification.id || '')}
+                        className="p-1 h-auto text-sm"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="h-4 w-4 mr-1" />
+                            Скрыть изображения ({images.length})
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-4 w-4 mr-1" />
+                            Показать изображения ({images.length})
+                          </>
+                        )}
+                      </Button>
+                      
+                      {isExpanded && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {images.map((image, index) => (
+                            <img
+                              key={index}
+                              src={image}
+                              alt={`Изображение ${index + 1}`}
+                              className="w-full h-24 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => window.open(image, '_blank')}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex justify-center py-8">

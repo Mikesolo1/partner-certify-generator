@@ -54,6 +54,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     return payments.filter(payment => payment.client_id === clientId);
   };
 
+  const handleNotificationUpdate = () => {
+    onRefresh(); // This will reload all data including notifications
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -101,11 +105,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </TabsContent>
 
             <TabsContent value="notifications">
-              <div className="mb-6 space-y-4">
-                <NotificationForm onCreateNotification={(title, content) => {
-                  setNotifications([{ title, content, created_at: new Date().toISOString() }, ...notifications])
-                }} />
-                <NotificationsList notifications={notifications} />
+              <div className="space-y-6">
+                <NotificationForm onCreateNotification={() => handleNotificationUpdate()} />
+                <NotificationsList 
+                  notifications={notifications} 
+                  onNotificationUpdate={handleNotificationUpdate}
+                />
               </div>
             </TabsContent>
 
@@ -145,4 +150,3 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     </Card>
   );
 };
-
