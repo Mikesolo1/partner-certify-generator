@@ -8,6 +8,7 @@ import { PartnerHeader } from '@/components/admin/PartnerHeader';
 import { PartnerInfo } from '@/components/admin/PartnerInfo';
 import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails';
 import { PartnerCommissionDetails } from '@/components/admin/partner-details/PartnerCommissionDetails';
+import { PartnerReferralsSection } from '@/components/admin/partner-details/PartnerReferralsSection';
 import Header from '@/components/Header';
 
 interface PartnerDetailsContentProps {
@@ -48,6 +49,7 @@ export const PartnerDetailsContent = ({
           <PartnerInfo partner={partner} />
           <PartnerCommissionDetails partnerId={partnerId} />
           <PartnerPaymentDetails partnerId={partnerId} />
+          <PartnerReferralsSection partnerId={partnerId} />
           <Card>
             <CardHeader>
               <CardTitle>Клиенты партнера</CardTitle>
