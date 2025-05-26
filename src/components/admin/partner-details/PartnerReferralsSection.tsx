@@ -2,10 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, TrendingUp, DollarSign, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, TrendingUp, DollarSign, UserPlus, RefreshCw } from 'lucide-react';
 import { Partner } from '@/types';
 import { ReferralCommission } from '@/types/ReferralCommission';
 import { getPartnerReferrals, getPartnerReferralCommissions } from '@/api/partnersApi/referrals';
+import { useToast } from '@/hooks/use-toast';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 interface PartnerReferralsSectionProps {
   partnerId: string;
@@ -16,6 +19,8 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
   const [commissions, setCommissions] = useState<ReferralCommission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [payingCommissions, setPayingCommissions] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchReferralsData();
@@ -45,9 +50,55 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
     }
   };
 
+  const handlePayReferralCommissions = async () => {
+    try {
+      setPayingCommissions(true);
+      
+      const { data, error } = await safeRPC('mark_referral_commissions_paid', {
+        p_referrer_id: partnerId
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (data && data.length > 0) {
+        const result = data[0];
+        
+        if (result.updated_count > 0) {
+          toast({
+            title: "Реферальные комиссии выплачены",
+            description: `Выплачено ${result.total_amount.toLocaleString('ru-RU')} ₽ за ${result.updated_count} комиссий`,
+          });
+          
+          // Обновляем данные после выплаты
+          await fetchReferralsData();
+        } else {
+          toast({
+            title: "Нет комиссий для выплаты",
+            description: "Все реферальные комиссии уже выплачены",
+            variant: "default",
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error("Error paying referral commissions:", error);
+      toast({
+        title: "Ошибка выплаты",
+        description: error.message || "Не удалось выплатить комиссии",
+        variant: "destructive",
+      });
+    } finally {
+      setPayingCommissions(false);
+    }
+  };
+
   const totalCommissions = commissions.reduce((sum, comm) => sum + comm.commission_amount, 0);
   const paidCommissions = commissions
     .filter(comm => comm.paid_at)
+    .reduce((sum, comm) => sum + comm.commission_amount, 0);
+  const unpaidCommissions = commissions
+    .filter(comm => !comm.paid_at)
     .reduce((sum, comm) => sum + comm.commission_amount, 0);
 
   if (loading) {
@@ -91,14 +142,34 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
     <div className="space-y-6">
       {/* Статистика рефералов */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             Реферальная статистика
           </CardTitle>
+          {unpaidCommissions > 0 && (
+            <Button 
+              onClick={handlePayReferralCommissions}
+              disabled={payingCommissions}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {payingCommissions ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Выплачиваем...
+                </>
+              ) : (
+                <>
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Выплатить комиссии ({unpaidCommissions.toLocaleString('ru-RU')} ₽)
+                </>
+              )}
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
               <Users className="h-8 w-8 text-blue-600" />
               <div>
@@ -120,6 +191,14 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
               <div>
                 <p className="text-sm text-gray-600">Выплачено</p>
                 <p className="text-2xl font-bold text-purple-700">{paidCommissions.toLocaleString('ru-RU')} ₽</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg">
+              <DollarSign className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="text-sm text-gray-600">К выплате</p>
+                <p className="text-2xl font-bold text-orange-700">{unpaidCommissions.toLocaleString('ru-RU')} ₽</p>
               </div>
             </div>
           </div>

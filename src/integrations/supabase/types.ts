@@ -772,6 +772,13 @@ export type Database = {
           total_amount: number
         }[]
       }
+      mark_referral_commissions_paid: {
+        Args: { p_referrer_id: string }
+        Returns: {
+          updated_count: number
+          total_amount: number
+        }[]
+      }
       save_partner_payment_details: {
         Args: {
           p_partner_id: string
