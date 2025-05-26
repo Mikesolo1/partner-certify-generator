@@ -31,7 +31,8 @@ export const PartnerDetailsContent = ({
   console.log("PartnerDetailsContent rendering with:", {
     partnerName: partner.companyName,
     clientCount: partnerClients.length,
-    partnerId
+    partnerId,
+    hasReferralCode: !!partner.referralCode
   });
 
   return (
@@ -49,7 +50,12 @@ export const PartnerDetailsContent = ({
           <PartnerInfo partner={partner} />
           <PartnerCommissionDetails partnerId={partnerId} />
           <PartnerPaymentDetails partnerId={partnerId} />
-          <PartnerReferralsSection partnerId={partnerId} />
+          
+          {/* Добавляем секцию рефералов только для партнеров, прошедших тест */}
+          {partner.testPassed && (
+            <PartnerReferralsSection partnerId={partnerId} />
+          )}
+          
           <Card>
             <CardHeader>
               <CardTitle>Клиенты партнера</CardTitle>

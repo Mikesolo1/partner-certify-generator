@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Partner } from '@/types';
 
 interface PartnerInfoProps {
@@ -30,6 +31,24 @@ export const PartnerInfo = ({ partner }: PartnerInfoProps) => {
             <p className="text-sm text-gray-500 mb-1">ID сертификата</p>
             <p className="font-medium">{partner.certificateId || 'Не выдан'}</p>
           </div>
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Статус теста</p>
+            <Badge variant={partner.testPassed ? "default" : "secondary"}>
+              {partner.testPassed ? "Тест пройден" : "Тест не пройден"}
+            </Badge>
+          </div>
+          {partner.referralCode && (
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Реферальный код</p>
+              <p className="font-medium font-mono">{partner.referralCode}</p>
+            </div>
+          )}
+          {partner.referrerId && (
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Статус</p>
+              <Badge variant="outline">Реферал</Badge>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

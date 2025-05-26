@@ -49,7 +49,6 @@ const AdminPartnerDetailsPage = () => {
         return;
       }
 
-      // Add additional debug logging
       console.log("Partner data response:", data);
       
       if (!data || data.length === 0) {
@@ -83,7 +82,9 @@ const AdminPartnerDetailsPage = () => {
         testPassed: partnerData.test_passed,
         commission: partnerData.commission,
         role: partnerData.role,
-        phone: partnerData.phone || ''
+        phone: partnerData.phone || '',
+        referrerId: partnerData.referrer_id,
+        referralCode: partnerData.referral_code
       });
       
       setError(null);
@@ -109,9 +110,10 @@ const AdminPartnerDetailsPage = () => {
 
   useEffect(() => {
     console.log("AdminPartnerDetailsPage mounted with partnerId:", partnerId);
-    fetchPartnerDetails();
-    // Fetch admin data on mount to ensure we have clients and payments
-    fetchData();
+    if (partnerId) {
+      fetchPartnerDetails();
+      fetchData();
+    }
   }, [partnerId]);
 
   const handleRefresh = async () => {
@@ -127,7 +129,7 @@ const AdminPartnerDetailsPage = () => {
   
   if (!partnerId) {
     console.error("No partnerId provided in URL");
-    return <Navigate to="/admin" />;
+    return <Navigate to="/admin" replace />;
   }
 
   if (loading || adminDataLoading) {
@@ -147,7 +149,6 @@ const AdminPartnerDetailsPage = () => {
     );
   }
 
-  // Add additional logging before rendering content
   console.log("Rendering partner details content for:", partner.companyName);
   console.log("Available clients:", clients.length);
   

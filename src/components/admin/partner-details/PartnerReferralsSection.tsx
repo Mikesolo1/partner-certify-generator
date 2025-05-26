@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, TrendingUp, DollarSign } from 'lucide-react';
+import { Users, TrendingUp, DollarSign, UserPlus } from 'lucide-react';
 import { Partner } from '@/types';
 import { ReferralCommission } from '@/types/ReferralCommission';
 import { getPartnerReferrals, getPartnerReferralCommissions } from '@/api/partnersApi/referrals';
@@ -15,6 +15,7 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
   const [referrals, setReferrals] = useState<Partner[]>([]);
   const [commissions, setCommissions] = useState<ReferralCommission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchReferralsData();
@@ -22,16 +23,23 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
 
   const fetchReferralsData = async () => {
     setLoading(true);
+    setError(null);
     try {
+      console.log("Fetching referrals data for partner:", partnerId);
+      
       const [referralsData, commissionsData] = await Promise.all([
         getPartnerReferrals(partnerId),
         getPartnerReferralCommissions(partnerId)
       ]);
       
+      console.log("Referrals data:", referralsData);
+      console.log("Commissions data:", commissionsData);
+      
       setReferrals(referralsData);
       setCommissions(commissionsData);
     } catch (error) {
       console.error("Error fetching referrals data:", error);
+      setError("Не удалось загрузить данные рефералов");
     } finally {
       setLoading(false);
     }
@@ -46,10 +54,34 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Рефералы партнера</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Рефералы партнера
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500">Загрузка...</p>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-500">Загрузка...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Рефералы партнера
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p className="text-red-500">{error}</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -60,31 +92,34 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
       {/* Статистика рефералов */}
       <Card>
         <CardHeader>
-          <CardTitle>Реферальная статистика</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Реферальная статистика
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
               <Users className="h-8 w-8 text-blue-600" />
               <div>
                 <p className="text-sm text-gray-600">Всего рефералов</p>
-                <p className="text-2xl font-bold">{referrals.length}</p>
+                <p className="text-2xl font-bold text-blue-700">{referrals.length}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
               <TrendingUp className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm text-gray-600">Общая комиссия</p>
-                <p className="text-2xl font-bold">{totalCommissions.toLocaleString('ru-RU')} ₽</p>
+                <p className="text-2xl font-bold text-green-700">{totalCommissions.toLocaleString('ru-RU')} ₽</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
               <DollarSign className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-sm text-gray-600">Выплачено</p>
-                <p className="text-2xl font-bold">{paidCommissions.toLocaleString('ru-RU')} ₽</p>
+                <p className="text-2xl font-bold text-purple-700">{paidCommissions.toLocaleString('ru-RU')} ₽</p>
               </div>
             </div>
           </div>
@@ -92,10 +127,10 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
       </Card>
 
       {/* Список рефералов */}
-      {referrals.length > 0 && (
+      {referrals.length > 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>Список рефералов</CardTitle>
+            <CardTitle>Список рефералов ({referrals.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -108,21 +143,21 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
                 );
 
                 return (
-                  <div key={referral.id} className="border rounded-lg p-4">
+                  <div key={referral.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold">{referral.companyName}</h3>
-                        <p className="text-sm text-gray-600">{referral.contactPerson}</p>
-                        <p className="text-sm text-gray-500">{referral.email}</p>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{referral.companyName}</h3>
+                        <p className="text-gray-600">{referral.contactPerson}</p>
+                        <p className="text-gray-500 text-sm">{referral.email}</p>
                         {referral.phone && (
-                          <p className="text-sm text-gray-500">{referral.phone}</p>
+                          <p className="text-gray-500 text-sm">{referral.phone}</p>
                         )}
                       </div>
                       <div className="text-right">
-                        <Badge variant={referral.testPassed ? "default" : "secondary"}>
+                        <Badge variant={referral.testPassed ? "default" : "secondary"} className="mb-2">
                           {referral.testPassed ? "Тест пройден" : "Тест не пройден"}
                         </Badge>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500">
                           Уровень: {referral.partnerLevel}
                         </p>
                       </div>
@@ -134,7 +169,7 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-600">Комиссия с рефералов</p>
-                        <p className="font-semibold text-green-600">
+                        <p className="font-semibold text-green-600 text-lg">
                           {referralTotal.toLocaleString('ru-RU')} ₽
                         </p>
                       </div>
@@ -145,18 +180,30 @@ export const PartnerReferralsSection = ({ partnerId }: PartnerReferralsSectionPr
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Список рефералов</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-500">У этого партнера пока нет рефералов</p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* История реферальных комиссий */}
       {commissions.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>История реферальных комиссий</CardTitle>
+            <CardTitle>История реферальных комиссий ({commissions.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-96 overflow-y-auto">
               {commissions.map((commission) => (
-                <div key={commission.id} className="border rounded-lg p-3">
+                <div key={commission.id} className="border rounded-lg p-3 bg-gray-50">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium">{commission.referee_company}</p>
