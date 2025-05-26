@@ -2,6 +2,15 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Notification } from "@/types";
 
+interface NotificationData {
+  id: string;
+  title: string;
+  content: string;
+  images?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
 export const createNotification = async (title: string, content: string, images: string[] = []): Promise<Notification> => {
   try {
     console.log("Creating notification using RPC:", { title, content, images });
@@ -18,11 +27,13 @@ export const createNotification = async (title: string, content: string, images:
       throw error;
     }
     
+    const notificationData = data as NotificationData;
+    
     // If images are provided, update the notification with images
     if (images.length > 0) {
       const { data: updatedData, error: updateError } = await supabase
         .rpc('update_notification', {
-          p_id: data.id,
+          p_id: notificationData.id,
           p_title: title,
           p_content: content,
           p_images: JSON.stringify(images)
@@ -34,24 +45,26 @@ export const createNotification = async (title: string, content: string, images:
         throw updateError;
       }
       
+      const updatedNotificationData = updatedData as NotificationData;
+      
       return {
-        id: updatedData.id,
-        title: updatedData.title,
-        content: updatedData.content,
-        images: typeof updatedData.images === 'string' ? JSON.parse(updatedData.images) : updatedData.images,
-        created_at: updatedData.created_at,
-        updated_at: updatedData.updated_at
+        id: updatedNotificationData.id,
+        title: updatedNotificationData.title,
+        content: updatedNotificationData.content,
+        images: typeof updatedNotificationData.images === 'string' ? JSON.parse(updatedNotificationData.images) : updatedNotificationData.images || [],
+        created_at: updatedNotificationData.created_at,
+        updated_at: updatedNotificationData.updated_at
       };
     }
     
     console.log("Notification created successfully:", data);
 
     const notification: Notification = {
-      id: data.id,
-      title: data.title,
-      content: data.content,
+      id: notificationData.id,
+      title: notificationData.title,
+      content: notificationData.content,
       images: [],
-      created_at: data.created_at
+      created_at: notificationData.created_at
     };
     
     return notification;
@@ -79,15 +92,17 @@ export const updateNotification = async (id: string, title: string, content: str
       throw error;
     }
     
+    const notificationData = data as NotificationData;
+    
     console.log("Notification updated successfully:", data);
     
     return {
-      id: data.id,
-      title: data.title,
-      content: data.content,
-      images: typeof data.images === 'string' ? JSON.parse(data.images) : data.images,
-      created_at: data.created_at,
-      updated_at: data.updated_at
+      id: notificationData.id,
+      title: notificationData.title,
+      content: notificationData.content,
+      images: typeof notificationData.images === 'string' ? JSON.parse(notificationData.images) : notificationData.images || [],
+      created_at: notificationData.created_at,
+      updated_at: notificationData.updated_at
     };
   } catch (error) {
     console.error("Error in updateNotification:", error);
