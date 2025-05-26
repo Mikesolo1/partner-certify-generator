@@ -30,7 +30,22 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
   const { toast } = useToast();
   const [title, setTitle] = useState(notification?.title || '');
   const [content, setContent] = useState(notification?.content || '');
-  const [images, setImages] = useState<string[]>(notification?.images || []);
+  
+  // Properly handle images initialization to ensure it's always an array
+  const [images, setImages] = useState<string[]>(() => {
+    if (!notification?.images) return [];
+    if (Array.isArray(notification.images)) return notification.images;
+    if (typeof notification.images === 'string') {
+      try {
+        const parsed = JSON.parse(notification.images);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -83,7 +98,7 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
         .from('notification-images')
         .getPublicUrl(filePath);
 
-      setImages([...images, publicUrlData.publicUrl]);
+      setImages(prevImages => [...prevImages, publicUrlData.publicUrl]);
       
       toast({
         title: "Успешно",
@@ -102,7 +117,7 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
   };
 
   const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,7 +145,7 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
 
         if (error) throw error;
         
-        onSave(data[0]);
+        onSave(data);
         toast({
           title: "Успешно",
           description: "Уведомление обновлено",
@@ -155,7 +170,7 @@ export const NotificationEditor: React.FC<NotificationEditorProps> = ({
           });
 
           if (updateError) throw updateError;
-          finalData = updatedData[0];
+          finalData = updatedData;
         }
 
         onSave(finalData);
