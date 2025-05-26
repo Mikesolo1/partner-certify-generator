@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Partner, Client, Payment, TestQuestion, Notification } from '@/types';
+import { Partner, Client, Payment, TestQuestion } from '@/types';
 import { fetchPartners } from '@/api/partnersApi';
 import { safeRPC } from '@/api/utils/queryHelpers';
 
@@ -11,7 +11,7 @@ export const useAdminData = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [testQuestions, setTestQuestions] = useState<TestQuestion[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -21,6 +21,7 @@ export const useAdminData = () => {
       setLoading(true);
       setFetchError(null);
       
+      // Загружаем все данные параллельно для лучшей производительности, используя безопасные RPC функции
       const [partnersResult, clientsResult, paymentsResult, questionsResult, notificationsResult] = 
         await Promise.all([
           fetchAllPartners(),
@@ -30,20 +31,24 @@ export const useAdminData = () => {
           safeRPC('get_all_notifications')
         ]);
 
+      // Обрабатываем данные партнеров
       if (partnersResult) {
         setPartners(partnersResult);
       }
 
+      // Обрабатываем данные клиентов
       if (clientsResult.data) {
         console.log("Loaded clients:", clientsResult.data.length);
         setClients(clientsResult.data);
       }
 
+      // Обрабатываем данные платежей
       if (paymentsResult.data) {
         console.log("Loaded payments:", paymentsResult.data.length);
         setPayments(paymentsResult.data);
       }
 
+      // Обрабатываем данные вопросов теста с правильным преобразованием
       if (questionsResult.data) {
         const formattedQuestions: TestQuestion[] = questionsResult.data.map((q: any) => ({
           id: q.id,
@@ -54,16 +59,9 @@ export const useAdminData = () => {
         setTestQuestions(formattedQuestions);
       }
 
+      // Обрабатываем данные уведомлений
       if (notificationsResult.data) {
-        const formattedNotifications: Notification[] = notificationsResult.data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          content: item.content,
-          images: item.images ? (typeof item.images === 'string' ? JSON.parse(item.images) : item.images) : [],
-          created_at: item.created_at,
-          updated_at: item.updated_at
-        }));
-        setNotifications(formattedNotifications);
+        setNotifications(notificationsResult.data);
       }
 
       setFetchError(null);

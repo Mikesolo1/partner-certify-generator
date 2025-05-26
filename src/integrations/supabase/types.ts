@@ -87,25 +87,19 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
-          images: Json | null
           title: string
-          updated_at: string | null
         }
         Insert: {
           content: string
           created_at?: string | null
           id?: string
-          images?: Json | null
           title: string
-          updated_at?: string | null
         }
         Update: {
           content?: string
           created_at?: string | null
           id?: string
-          images?: Json | null
           title?: string
-          updated_at?: string | null
         }
         Relationships: []
       }
@@ -473,17 +467,11 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
-          images: Json | null
           title: string
-          updated_at: string | null
         }[]
       }
       delete_client: {
         Args: { p_client_id: string }
-        Returns: boolean
-      }
-      delete_notification: {
-        Args: { p_id: string }
         Returns: boolean
       }
       generate_referral_code: {
@@ -509,9 +497,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
-          images: Json | null
           title: string
-          updated_at: string | null
         }[]
       }
       get_all_partners: {
@@ -807,22 +793,6 @@ export type Database = {
           is_primary: boolean | null
           partner_id: string
           payment_type: string
-          updated_at: string | null
-        }[]
-      }
-      update_notification: {
-        Args: {
-          p_id: string
-          p_title: string
-          p_content: string
-          p_images?: Json
-        }
-        Returns: {
-          content: string
-          created_at: string | null
-          id: string
-          images: Json | null
-          title: string
           updated_at: string | null
         }[]
       }
