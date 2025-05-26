@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { registerFormSchema, RegisterFormValues } from '@/validations/authSchemas';
 import { useRegistration } from '@/hooks/useRegistration';
 import { toast } from '@/hooks/use-toast';
+import { validateReferralCode } from '@/api/utils/referralValidation';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -26,6 +27,13 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [searchParams] = useSearchParams();
   const { registerPartner, isLoading } = useRegistration();
   const [referralCode, setReferralCode] = useState<string>('');
+  const [isValidatingReferral, setIsValidatingReferral] = useState(false);
+  const [referralValidation, setReferralValidation] = useState<{
+    isValid: boolean;
+    referrerName?: string;
+    referrerCompany?: string;
+    error?: string;
+  } | null>(null);
   
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -36,6 +44,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       email: '',
       password: '',
       confirmPassword: '',
+      referralCode: '',
     },
   });
 
@@ -43,12 +52,60 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     const refCode = searchParams.get('ref');
     if (refCode) {
       setReferralCode(refCode);
+      form.setValue('referralCode', refCode);
+      validateReferral(refCode);
       toast({
         title: "Реферальный код применен",
         description: `Вы регистрируетесь по реферальному коду: ${refCode}`,
       });
     }
-  }, [searchParams]);
+  }, [searchParams, form]);
+
+  const validateReferral = async (code: string) => {
+    if (!code || code.trim() === '') {
+      setReferralValidation(null);
+      return;
+    }
+
+    setIsValidatingReferral(true);
+    try {
+      const result = await validateReferralCode(code);
+      setReferralValidation(result);
+      
+      if (result.isValid) {
+        toast({
+          title: "Реферальный код действителен",
+          description: `Реферер: ${result.referrerName} (${result.referrerCompany})`,
+        });
+      } else {
+        toast({
+          title: "Ошибка реферального кода",
+          description: result.error,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error validating referral code:', error);
+      setReferralValidation({
+        isValid: false,
+        error: 'Произошла ошибка при проверке кода'
+      });
+    } finally {
+      setIsValidatingReferral(false);
+    }
+  };
+
+  const handleReferralCodeChange = (value: string) => {
+    setReferralCode(value);
+    form.setValue('referralCode', value);
+    
+    // Валидируем код с задержкой
+    const timeoutId = setTimeout(() => {
+      validateReferral(value);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  };
 
   const handleSubmit = async (data: RegisterFormValues) => {
     try {
@@ -56,16 +113,28 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         ...data, 
         password: '[REDACTED]',
         confirmPassword: '[REDACTED]',
-        referralCode 
+        referralCode: data.referralCode 
       });
+
+      // Проверяем реферальный код перед регистрацией
+      if (data.referralCode && data.referralCode.trim() !== '') {
+        if (!referralValidation || !referralValidation.isValid) {
+          toast({
+            title: "Ошибка регистрации",
+            description: "Указанный реферальный код недействителен",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
       
-      const result = await registerPartner({ ...data, referralCode });
+      const result = await registerPartner({ ...data, referralCode: data.referralCode });
       
       if (result?.success) {
         console.log("Registration successful, redirecting to dashboard");
         toast({
           title: "Регистрация успешна",
-          description: referralCode 
+          description: data.referralCode 
             ? "Добро пожаловать в партнерскую программу S3! Вы зарегистрированы по реферальной ссылке."
             : "Добро пожаловать в партнерскую программу S3!",
         });
@@ -108,13 +177,21 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        {referralCode && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-800">
+        {referralCode && referralValidation?.isValid && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <p className="text-sm text-green-800">
               <strong>Реферальный код:</strong> {referralCode}
             </p>
-            <p className="text-xs text-blue-600 mt-1">
-              Вы регистрируетесь по реферальной ссылке партнера
+            <p className="text-xs text-green-600 mt-1">
+              Реферер: {referralValidation.referrerName} ({referralValidation.referrerCompany})
+            </p>
+          </div>
+        )}
+
+        {referralCode && referralValidation && !referralValidation.isValid && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-sm text-red-800">
+              <strong>Ошибка реферального кода:</strong> {referralValidation.error}
             </p>
           </div>
         )}
@@ -177,6 +254,31 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
         <FormField
           control={form.control}
+          name="referralCode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Реферальный код (необязательно)</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Введите реферальный код" 
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleReferralCodeChange(e.target.value);
+                  }}
+                  disabled={isValidatingReferral}
+                />
+              </FormControl>
+              {isValidatingReferral && (
+                <p className="text-xs text-gray-500">Проверка реферального кода...</p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
@@ -206,7 +308,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         <Button 
           type="submit" 
           className="w-full bg-gradient-to-r from-certificate-blue to-certificate-darkBlue hover:from-certificate-darkBlue hover:to-certificate-blue transition-all duration-300"
-          disabled={isLoading}
+          disabled={isLoading || isValidatingReferral || (referralCode && referralValidation && !referralValidation.isValid)}
         >
           {isLoading ? "Регистрация..." : "Зарегистрироваться"}
         </Button>

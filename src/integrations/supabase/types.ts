@@ -793,6 +793,15 @@ export type Database = {
         Args: { p_partner_id: string }
         Returns: string
       }
+      validate_referral_code: {
+        Args: { p_referral_code: string }
+        Returns: {
+          is_valid: boolean
+          referrer_id: string
+          referrer_name: string
+          referrer_company: string
+        }[]
+      }
     }
     Enums: {
       user_role: "admin" | "partner"
