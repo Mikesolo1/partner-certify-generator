@@ -48,9 +48,15 @@ export const useAdminData = () => {
         setPayments(paymentsResult.data);
       }
 
-      // Обрабатываем данные вопросов теста
+      // Обрабатываем данные вопросов теста с правильным преобразованием
       if (questionsResult.data) {
-        setTestQuestions(questionsResult.data);
+        const formattedQuestions: TestQuestion[] = questionsResult.data.map((q: any) => ({
+          id: q.id,
+          question: q.question,
+          options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+          correctAnswer: q.correct_answer
+        }));
+        setTestQuestions(formattedQuestions);
       }
 
       // Обрабатываем данные уведомлений

@@ -33,6 +33,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Edit, Trash } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { createTestQuestion, updateTestQuestion, deleteTestQuestion } from '@/api/partnersApi/testQuestions';
 
 interface TestQuestionsManagerProps {
   questions: TestQuestion[];
@@ -47,8 +49,11 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
   onCreateQuestion,
   onDeleteQuestion,
 }) => {
+  const { toast } = useToast();
   const [selectedQuestion, setSelectedQuestion] = useState<TestQuestion | null>(null);
   const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+  const [isEditingQuestion, setIsEditingQuestion] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<Omit<TestQuestion, 'id'>>({
     question: '',
     options: ['', '', '', ''],
@@ -62,15 +67,38 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
       options: [...question.options],
       correctAnswer: question.correctAnswer
     });
+    setIsEditingQuestion(true);
   };
 
-  const handleUpdateQuestion = () => {
-    if (selectedQuestion) {
-      onUpdateQuestion({
-        ...formData,
-        id: selectedQuestion.id
-      });
+  const handleUpdateQuestion = async () => {
+    if (!selectedQuestion) return;
+    
+    setIsSubmitting(true);
+    try {
+      const updatedQuestion = await updateTestQuestion(
+        selectedQuestion.id,
+        formData.question,
+        formData.options,
+        formData.correctAnswer
+      );
+      
+      onUpdateQuestion(updatedQuestion);
       setSelectedQuestion(null);
+      setIsEditingQuestion(false);
+      
+      toast({
+        title: "Вопрос обновлен",
+        description: "Вопрос теста успешно обновлен",
+      });
+    } catch (error) {
+      console.error("Error updating question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить вопрос",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,10 +120,52 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
     });
   };
 
-  const handleCreateQuestion = () => {
-    onCreateQuestion(formData);
-    resetForm();
-    setIsCreatingQuestion(false);
+  const handleCreateQuestion = async () => {
+    setIsSubmitting(true);
+    try {
+      const newQuestion = await createTestQuestion(
+        formData.question,
+        formData.options,
+        formData.correctAnswer
+      );
+      
+      onCreateQuestion(formData);
+      resetForm();
+      setIsCreatingQuestion(false);
+      
+      toast({
+        title: "Вопрос создан",
+        description: "Новый вопрос теста успешно создан",
+      });
+    } catch (error) {
+      console.error("Error creating question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать вопрос",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    try {
+      await deleteTestQuestion(questionId);
+      onDeleteQuestion(questionId);
+      
+      toast({
+        title: "Вопрос удален",
+        description: "Вопрос теста успешно удален",
+      });
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить вопрос",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -155,8 +225,11 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
             </div>
             <DialogFooter>
               <Button onClick={() => setIsCreatingQuestion(false)} variant="outline">Отмена</Button>
-              <Button onClick={handleCreateQuestion} disabled={!formData.question || formData.options.some(o => !o)}>
-                Создать
+              <Button 
+                onClick={handleCreateQuestion} 
+                disabled={!formData.question || formData.options.some(o => !o) || isSubmitting}
+              >
+                {isSubmitting ? "Создание..." : "Создать"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -190,7 +263,7 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
                 </ul>
               </CardContent>
               <CardFooter className="flex justify-end gap-2 border-t pt-4">
-                <Dialog>
+                <Dialog open={isEditingQuestion && selectedQuestion?.id === question.id} onOpenChange={setIsEditingQuestion}>
                   <DialogTrigger asChild>
                     <Button 
                       size="sm" 
@@ -242,12 +315,12 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button onClick={() => setSelectedQuestion(null)} variant="outline">Отмена</Button>
+                      <Button onClick={() => setIsEditingQuestion(false)} variant="outline">Отмена</Button>
                       <Button 
                         onClick={handleUpdateQuestion}
-                        disabled={!formData.question || formData.options.some(o => !o)}
+                        disabled={!formData.question || formData.options.some(o => !o) || isSubmitting}
                       >
-                        Сохранить
+                        {isSubmitting ? "Сохранение..." : "Сохранить"}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -268,7 +341,7 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Отмена</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => onDeleteQuestion(question.id)}>
+                      <AlertDialogAction onClick={() => handleDeleteQuestion(question.id)}>
                         Удалить
                       </AlertDialogAction>
                     </AlertDialogFooter>

@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Notification } from '@/types';
 import { CalendarClock } from 'lucide-react';
+import { safeRPC } from '@/api/utils/queryHelpers';
 
 interface NotificationsPanelProps {
   className?: string;
@@ -19,12 +20,10 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
     const fetchNotifications = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
-          
+        
+        // Используем RPC функцию вместо прямого запроса
+        const { data, error } = await safeRPC('get_all_notifications');
+        
         if (error) {
           throw error;
         }
