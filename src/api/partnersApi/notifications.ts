@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Notification } from "@/types";
 
@@ -17,7 +18,7 @@ export const createNotification = async (title: string, content: string, images:
       throw error;
     }
     
-    let finalData = data;
+    let finalData = data as any;
     
     // If images are provided, update the notification with images
     if (images.length > 0) {
@@ -35,7 +36,7 @@ export const createNotification = async (title: string, content: string, images:
         throw updateError;
       }
       
-      finalData = updatedData;
+      finalData = updatedData as any;
     }
     
     console.log("Notification created successfully:", finalData);
@@ -76,13 +77,15 @@ export const updateNotification = async (id: string, title: string, content: str
     
     console.log("Notification updated successfully:", data);
     
+    const typedData = data as any;
+    
     const notification: Notification = {
-      id: data.id,
-      title: data.title,
-      content: data.content,
-      images: data.images ? (typeof data.images === 'string' ? JSON.parse(data.images) : data.images) : [],
-      created_at: data.created_at,
-      updated_at: data.updated_at
+      id: typedData.id,
+      title: typedData.title,
+      content: typedData.content,
+      images: typedData.images ? (typeof typedData.images === 'string' ? JSON.parse(typedData.images) : typedData.images) : [],
+      created_at: typedData.created_at,
+      updated_at: typedData.updated_at
     };
     
     return notification;
