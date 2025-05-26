@@ -19,8 +19,15 @@ const AdminPartnerDetailsPage = () => {
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  console.log("AdminPartnerDetailsPage component mounted");
+  console.log("URL partnerId from useParams:", partnerId);
+  console.log("Current window location:", window.location.href);
+
   const fetchPartnerDetails = async () => {
-    if (!partnerId) return;
+    if (!partnerId) {
+      console.error("No partnerId provided");
+      return;
+    }
     
     try {
       setLoading(true);
@@ -109,10 +116,12 @@ const AdminPartnerDetailsPage = () => {
   };
 
   useEffect(() => {
-    console.log("AdminPartnerDetailsPage mounted with partnerId:", partnerId);
+    console.log("useEffect triggered with partnerId:", partnerId);
     if (partnerId) {
       fetchPartnerDetails();
       fetchData();
+    } else {
+      console.error("partnerId is undefined in useEffect");
     }
   }, [partnerId]);
 
@@ -128,16 +137,17 @@ const AdminPartnerDetailsPage = () => {
   };
   
   if (!partnerId) {
-    console.error("No partnerId provided in URL");
+    console.error("No partnerId provided in URL params");
     return <Navigate to="/admin" replace />;
   }
 
   if (loading || adminDataLoading) {
+    console.log("Showing loading state");
     return <PartnerDetailsLoading partnerId={partnerId} />;
   }
 
   if (error || !partner) {
-    console.error("Error or no partner data:", error, partner);
+    console.error("Showing error state:", { error, hasPartner: !!partner });
     return (
       <PartnerDetailsError 
         error={error} 

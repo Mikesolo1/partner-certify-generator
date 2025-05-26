@@ -20,7 +20,7 @@ interface PartnersListProps {
   selectedPartnerId: string | null;
   getPartnerClients: (partnerId: string) => any[];
   getTotalEarnings: (partnerId: string) => number;
-  onUpdateRole?: (partnerId: string, newRole: string) => void; // Made optional as it's no longer used
+  onUpdateRole?: (partnerId: string, newRole: string) => void;
 }
 
 export const PartnersList: React.FC<PartnersListProps> = ({
@@ -35,6 +35,8 @@ export const PartnersList: React.FC<PartnersListProps> = ({
       ? { variant: "default" as const, className: "bg-green-600", children: "Пройден" }
       : { variant: "default" as const, className: "bg-yellow-600", children: "Не пройден" };
   };
+
+  console.log("PartnersList rendering with partners:", partners.map(p => ({ id: p.id, name: p.companyName || p.company_name })));
 
   return (
     <div className="rounded-md border">
@@ -54,43 +56,57 @@ export const PartnersList: React.FC<PartnersListProps> = ({
         </TableHeader>
         <TableBody>
           {partners.length > 0 ? (
-            partners.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.companyName || p.company_name}</TableCell>
-                <TableCell>{p.contactPerson || p.contact_person}</TableCell>
-                <TableCell>{p.email}</TableCell>
-                <TableCell>
-                  <Badge {...getTestStatusBadge(p.testPassed || p.test_passed || false)} />
-                </TableCell>
-                <TableCell>
-                  <Badge {...getRoleBadge(p.role || 'user')} />
-                </TableCell>
-                <TableCell>{p.partnerLevel || p.partner_level}</TableCell>
-                <TableCell>{p.id ? getPartnerClients(p.id).length : 0}</TableCell>
-                <TableCell>{p.id ? getTotalEarnings(p.id).toLocaleString('ru-RU') : 0} ₽</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => onSelectPartner(p.id === selectedPartnerId ? null : p.id)}
-                    >
-                      {p.id === selectedPartnerId ? "Скрыть" : "Детали"}
-                    </Button>
+            partners.map((p) => {
+              console.log("Rendering partner row:", { id: p.id, companyName: p.companyName || p.company_name });
+              
+              // Убеждаемся, что у партнера есть валидный ID
+              if (!p.id) {
+                console.error("Partner missing ID:", p);
+                return null;
+              }
 
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      asChild
-                    >
-                      <Link to={`/admin/partners/${p.id}`} data-testid={`view-partner-${p.id}`}>
-                        Подробнее
-                      </Link>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
+              return (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.companyName || p.company_name}</TableCell>
+                  <TableCell>{p.contactPerson || p.contact_person}</TableCell>
+                  <TableCell>{p.email}</TableCell>
+                  <TableCell>
+                    <Badge {...getTestStatusBadge(p.testPassed || p.test_passed || false)} />
+                  </TableCell>
+                  <TableCell>
+                    <Badge {...getRoleBadge(p.role || 'user')} />
+                  </TableCell>
+                  <TableCell>{p.partnerLevel || p.partner_level}</TableCell>
+                  <TableCell>{getPartnerClients(p.id).length}</TableCell>
+                  <TableCell>{getTotalEarnings(p.id).toLocaleString('ru-RU')} ₽</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => onSelectPartner(p.id === selectedPartnerId ? null : p.id)}
+                      >
+                        {p.id === selectedPartnerId ? "Скрыть" : "Детали"}
+                      </Button>
+
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        asChild
+                        onClick={() => console.log("Navigating to partner details:", p.id)}
+                      >
+                        <Link 
+                          to={`/admin/partners/${p.id}`} 
+                          data-testid={`view-partner-${p.id}`}
+                        >
+                          Подробнее
+                        </Link>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={9} className="text-center py-4">Нет данных</TableCell>
