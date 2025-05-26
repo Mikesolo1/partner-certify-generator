@@ -162,7 +162,7 @@ const NotificationsPanel = ({ className }: NotificationsPanelProps) => {
                     )}
                   </p>
                   <div 
-                    className="prose prose-sm max-w-none text-gray-700 mb-3"
+                    className="prose prose-sm max-w-none text-gray-700 mb-3 [&_a]:text-blue-600 [&_a]:underline [&_a:hover]:text-blue-800"
                     dangerouslySetInnerHTML={{ __html: notification.content }}
                   />
                   
