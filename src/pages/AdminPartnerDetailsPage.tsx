@@ -10,71 +10,45 @@ import { PartnerDetailsError } from '@/components/admin/partner-details/PartnerD
 import { PartnerDetailsContent } from '@/components/admin/partner-details/PartnerDetailsContent';
 
 const AdminPartnerDetailsPage = () => {
-  const { partnerId } = useParams();
+  const { id } = useParams(); // Используем 'id' вместо 'partnerId'
   const { clients, payments, loading: adminDataLoading, fetchData } = useAdminData();
   const { toast } = useToast();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  console.log("AdminPartnerDetailsPage component mounted");
-  console.log("URL partnerId from useParams:", partnerId);
-  console.log("Current window location:", window.location.href);
+  console.log("AdminPartnerDetailsPage component mounted with id:", id);
 
-  const fetchPartnerDetails = async () => {
-    if (!partnerId) {
-      console.error("No partnerId provided");
-      setError("ID партнера не предоставлен");
-      setLoading(false);
-      return;
-    }
-    
+  const fetchPartnerDetails = async (partnerId: string) => {
     try {
       setLoading(true);
+      setError(null);
       console.log("Fetching partner details for ID:", partnerId);
 
-      // Исправляем вызов RPC функции - используем правильное имя параметра
+      // Используем правильное имя параметра для RPC функции
       const { data, error: rpcError } = await safeRPC(
         'get_partner_by_id', 
         { p_id: partnerId },
-        { retries: 3, delay: 1500 }
+        { retries: 2, delay: 1000 }
       );
 
-      console.log("RPC call result:", { data, error: rpcError });
+      console.log("Partner data response:", { data, error: rpcError });
 
       if (rpcError) {
-        console.error("RPC Error fetching partner:", rpcError);
-        setError(`Ошибка загрузки: ${rpcError.message || rpcError.toString()}`);
-        setDebugInfo({
-          method: 'RPC get_partner_by_id',
-          error: rpcError,
-          partnerId,
-          errorCode: rpcError.code,
-          errorDetails: rpcError.details
-        });
-        
+        console.error("RPC Error:", rpcError);
+        setError(`Ошибка загрузки: ${rpcError.message}`);
         toast({
           title: "Ошибка",
-          description: `Не удалось загрузить данные партнера: ${rpcError.message || 'Неизвестная ошибка'}`,
+          description: `Не удалось загрузить данные партнера: ${rpcError.message}`,
           variant: "destructive"
         });
         return;
       }
 
-      console.log("Partner data response:", data);
-      
       if (!data || data.length === 0) {
-        console.error("No partner data returned for ID:", partnerId);
-        setError("Партнер не найден в базе данных");
-        setDebugInfo({
-          method: 'Data validation',
-          error: 'No data returned',
-          partnerId,
-          responseData: data
-        });
-        
+        console.error("No partner data returned");
+        setError("Партнер не найден");
         toast({
           title: "Ошибка",
           description: "Партнер не найден в базе данных",
@@ -84,20 +58,7 @@ const AdminPartnerDetailsPage = () => {
       }
 
       const partnerData = data[0];
-      console.log("Partner data found:", partnerData);
-      
-      // Проверяем наличие обязательных полей
-      if (!partnerData.id || !partnerData.company_name) {
-        console.error("Invalid partner data structure:", partnerData);
-        setError("Некорректные данные партнера");
-        setDebugInfo({
-          method: 'Data structure validation',
-          error: 'Missing required fields',
-          partnerId,
-          partnerData
-        });
-        return;
-      }
+      console.log("Setting partner data:", partnerData);
       
       setPartner({
         id: partnerData.id,
@@ -115,23 +76,12 @@ const AdminPartnerDetailsPage = () => {
         referralCode: partnerData.referral_code
       });
       
-      setError(null);
-      setDebugInfo(null);
-      console.log("Partner successfully loaded:", partnerData.company_name);
     } catch (err: any) {
       console.error("Exception in fetchPartnerDetails:", err);
-      setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
-      setDebugInfo({
-        method: 'Exception handler',
-        error: err,
-        partnerId,
-        stack: err.stack,
-        name: err.name
-      });
-      
+      setError(`Критическая ошибка: ${err.message}`);
       toast({
         title: "Критическая ошибка",
-        description: err.message || "Произошла неизвестная ошибка",
+        description: err.message,
         variant: "destructive"
       });
     } finally {
@@ -140,29 +90,33 @@ const AdminPartnerDetailsPage = () => {
   };
 
   useEffect(() => {
-    console.log("useEffect triggered with partnerId:", partnerId);
-    if (partnerId) {
-      // Проверяем валидность UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(partnerId)) {
-        console.error("Invalid UUID format:", partnerId);
-        setError("Некорректный формат ID партнера");
-        setLoading(false);
-        return;
-      }
-      
-      fetchPartnerDetails();
-      fetchData();
-    } else {
-      console.error("partnerId is undefined in useEffect");
+    console.log("useEffect triggered with id:", id);
+    
+    if (!id) {
+      console.error("No id parameter in URL");
       setError("ID партнера не предоставлен");
       setLoading(false);
+      return;
     }
-  }, [partnerId]);
+
+    // Проверяем валидность UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      console.error("Invalid UUID format:", id);
+      setError("Некорректный формат ID партнера");
+      setLoading(false);
+      return;
+    }
+    
+    fetchPartnerDetails(id);
+    fetchData();
+  }, [id]);
 
   const handleRefresh = async () => {
+    if (!id) return;
+    
     setRefreshing(true);
-    await Promise.all([fetchPartnerDetails(), fetchData()]);
+    await Promise.all([fetchPartnerDetails(id), fetchData()]);
     setRefreshing(false);
     
     toast({
@@ -171,14 +125,14 @@ const AdminPartnerDetailsPage = () => {
     });
   };
   
-  if (!partnerId) {
-    console.error("No partnerId provided in URL params");
+  if (!id) {
+    console.error("No id provided in URL params");
     return <Navigate to="/admin" replace />;
   }
 
   if (loading || adminDataLoading) {
     console.log("Showing loading state");
-    return <PartnerDetailsLoading partnerId={partnerId} />;
+    return <PartnerDetailsLoading partnerId={id} />;
   }
 
   if (error || !partner) {
@@ -186,8 +140,8 @@ const AdminPartnerDetailsPage = () => {
     return (
       <PartnerDetailsError 
         error={error} 
-        partnerId={partnerId}
-        debugInfo={debugInfo}
+        partnerId={id}
+        debugInfo={null}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
@@ -195,10 +149,9 @@ const AdminPartnerDetailsPage = () => {
   }
 
   console.log("Rendering partner details content for:", partner.companyName);
-  console.log("Available clients:", clients.length);
   
-  const partnerClients = clients.filter(client => client.partner_id === partnerId);
-  console.log("Filtered partner clients:", partnerClients.length);
+  const partnerClients = clients.filter(client => client.partner_id === id);
+  console.log("Partner clients found:", partnerClients.length);
   
   const getClientPayments = (clientId: string) => {
     return payments.filter(payment => payment.client_id === clientId);
@@ -208,7 +161,7 @@ const AdminPartnerDetailsPage = () => {
     <PartnerDetailsContent 
       partner={partner}
       partnerClients={partnerClients}
-      partnerId={partnerId}
+      partnerId={id}
       refreshing={refreshing}
       onRefresh={handleRefresh}
       getClientPayments={getClientPayments}
