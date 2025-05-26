@@ -14,10 +14,11 @@ interface CertificateGeneratorProps {
 
 const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) => {
   const certificateRef = useRef<HTMLDivElement>(null);
+  const hiddenCertificateRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const downloadCertificate = async () => {
-    if (!certificateRef.current) return;
+    if (!hiddenCertificateRef.current) return;
 
     try {
       toast({
@@ -25,8 +26,8 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
         description: "Пожалуйста, подождите, пока мы генерируем ваш сертификат.",
       });
 
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 4, // Higher scale for better quality
+      const canvas = await html2canvas(hiddenCertificateRef.current, {
+        scale: 4,
         logging: false,
         useCORS: true,
         allowTaint: true,
@@ -62,7 +63,7 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
       
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
-      pdf.save(`S3-${partner.companyName}-Сертификат.pdf`);
+      pdf.save(`S3-${partner.companyName || partner.company_name}-Сертификат.pdf`);
 
       toast({
         title: "Сертификат скачан",
@@ -80,9 +81,27 @@ const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ partner }) 
 
   return (
     <div className="space-y-6">
-      <div className="overflow-hidden border border-gray-200 shadow-lg rounded-lg">
-        <div className="bg-white p-4">
-          <CertificateTemplate ref={certificateRef} partner={partner} />
+      {/* Адаптивное превью сертификата */}
+      <div className="w-full max-w-none overflow-hidden border border-gray-200 shadow-lg rounded-lg bg-white">
+        <div className="w-full aspect-[297/210] relative">
+          <div 
+            ref={certificateRef}
+            className="absolute inset-0 w-full h-full scale-[0.3] sm:scale-[0.4] md:scale-[0.5] lg:scale-[0.6] xl:scale-[0.7] origin-top-left"
+            style={{
+              transformOrigin: 'top left',
+            }}
+          >
+            <div className="w-[297mm] h-[210mm]">
+              <CertificateTemplate partner={partner} />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Скрытая версия для генерации PDF в полном размере */}
+      <div className="fixed -top-[9999px] -left-[9999px] opacity-0 pointer-events-none">
+        <div ref={hiddenCertificateRef} className="w-[297mm] h-[210mm]">
+          <CertificateTemplate partner={partner} />
         </div>
       </div>
       
