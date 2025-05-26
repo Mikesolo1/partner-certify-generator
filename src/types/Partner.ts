@@ -18,4 +18,8 @@ export interface Partner {
   commission?: number;
   role?: string;
   phone: string;
+  referrerId?: string;
+  referrer_id?: string; // Added for compatibility
+  referralCode?: string;
+  referral_code?: string; // Added for compatibility
 }

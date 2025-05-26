@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { registerFormSchema, RegisterFormValues } from '@/validations/authSchemas';
 import { useRegistration } from '@/hooks/useRegistration';
 import { toast } from '@/hooks/use-toast';
@@ -23,7 +23,9 @@ interface RegisterFormProps {
 
 const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { registerPartner, isLoading } = useRegistration();
+  const [referralCode, setReferralCode] = useState<string>('');
   
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -37,21 +39,35 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     },
   });
 
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      toast({
+        title: "Реферальный код применен",
+        description: `Вы регистрируетесь по реферальному коду: ${refCode}`,
+      });
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (data: RegisterFormValues) => {
     try {
       console.log("Form submitted with data:", { 
         ...data, 
         password: '[REDACTED]',
-        confirmPassword: '[REDACTED]' 
+        confirmPassword: '[REDACTED]',
+        referralCode 
       });
       
-      const result = await registerPartner(data);
+      const result = await registerPartner({ ...data, referralCode });
       
       if (result?.success) {
         console.log("Registration successful, redirecting to dashboard");
         toast({
           title: "Регистрация успешна",
-          description: "Добро пожаловать в партнерскую программу S3!",
+          description: referralCode 
+            ? "Добро пожаловать в партнерскую программу S3! Вы зарегистрированы по реферальной ссылке."
+            : "Добро пожаловать в партнерскую программу S3!",
         });
         if (onSuccess) {
           onSuccess();
@@ -92,6 +108,17 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        {referralCode && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm text-blue-800">
+              <strong>Реферальный код:</strong> {referralCode}
+            </p>
+            <p className="text-xs text-blue-600 mt-1">
+              Вы регистрируетесь по реферальной ссылке партнера
+            </p>
+          </div>
+        )}
+
         <FormField
           control={form.control}
           name="companyName"

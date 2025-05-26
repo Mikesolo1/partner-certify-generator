@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { FileText, Users, Award, Star } from 'lucide-react';
+import { FileText, Users, Award, Star, UserPlus } from 'lucide-react';
 
 interface QuickActionsProps {
   testPassed: boolean;
@@ -22,7 +22,7 @@ const QuickActions = ({ testPassed, showLevelUpHint }: QuickActionsProps) => {
         )}
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {testPassed ? (
           <>
             <Link to="/dashboard/certificate">
@@ -47,6 +47,19 @@ const QuickActions = ({ testPassed, showLevelUpHint }: QuickActionsProps) => {
                 <div>
                   <p className="font-medium">Мои клиенты</p>
                   <p className="text-xs text-gray-500">Управление клиентами</p>
+                </div>
+              </Button>
+            </Link>
+
+            <Link to="/dashboard/referrals">
+              <Button
+                variant="outline"
+                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+              >
+                <UserPlus className="h-8 w-8 mb-2 text-brand" />
+                <div>
+                  <p className="font-medium">Рефералы</p>
+                  <p className="text-xs text-gray-500">Реферальная программа</p>
                 </div>
               </Button>
             </Link>

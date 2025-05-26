@@ -23,7 +23,9 @@ export const updatePartner = async (id: string, partner: any) => {
       testPassed: data.test_passed,
       commission: data.commission,
       role: data.role,
-      phone: data.phone || '' // Include phone in returned data
+      phone: data.phone || '',
+      referrerId: data.referrer_id,
+      referralCode: data.referral_code
     };
   } catch (error) {
     console.error("Error updating partner:", error);
@@ -46,6 +48,22 @@ export const completeTest = async (partnerId: string) => {
     
     const updatedPartner = data[0];
     
+    // После прохождения теста генерируем реферальный код
+    let referralCode = updatedPartner.referral_code;
+    if (!referralCode) {
+      try {
+        const { data: codeData, error: codeError } = await supabase.rpc("update_partner_referral_code", {
+          p_partner_id: partnerId
+        });
+        
+        if (!codeError && codeData) {
+          referralCode = codeData;
+        }
+      } catch (codeErr) {
+        console.warn("Failed to generate referral code:", codeErr);
+      }
+    }
+    
     return {
       id: updatedPartner.id,
       companyName: updatedPartner.company_name,
@@ -57,7 +75,9 @@ export const completeTest = async (partnerId: string) => {
       testPassed: updatedPartner.test_passed,
       commission: updatedPartner.commission,
       role: updatedPartner.role,
-      phone: updatedPartner.phone || '' // Include phone in returned data
+      phone: updatedPartner.phone || '',
+      referrerId: updatedPartner.referrer_id,
+      referralCode: referralCode
     };
   } catch (error) {
     console.error("Error completing test:", error);

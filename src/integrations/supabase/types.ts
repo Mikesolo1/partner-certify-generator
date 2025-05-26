@@ -116,6 +116,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -132,6 +134,8 @@ export type Database = {
           partner_level: string
           password: string
           phone?: string
+          referral_code?: string | null
+          referrer_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           test_passed?: boolean | null
           updated_at?: string | null
@@ -148,11 +152,21 @@ export type Database = {
           partner_level?: string
           password?: string
           phone?: string
+          referral_code?: string | null
+          referrer_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           test_passed?: boolean | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_details: {
         Row: {
@@ -255,6 +269,61 @@ export type Database = {
           },
         ]
       }
+      referral_commissions: {
+        Row: {
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          payment_id: string
+          referee_id: string
+          referrer_id: string
+        }
+        Insert: {
+          commission_amount: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id: string
+          referee_id: string
+          referrer_id: string
+        }
+        Update: {
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id?: string
+          referee_id?: string
+          referrer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_commissions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_commissions_referee_id_fkey"
+            columns: ["referee_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_commissions_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_questions: {
         Row: {
           correct_answer: number
@@ -338,6 +407,10 @@ export type Database = {
           updated_at: string | null
         }
       }
+      calculate_referral_commission: {
+        Args: { p_payment_id: string }
+        Returns: undefined
+      }
       check_client_exists: {
         Args: { p_email: string; p_phone?: string }
         Returns: {
@@ -363,6 +436,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -398,6 +473,10 @@ export type Database = {
       delete_client: {
         Args: { p_client_id: string }
         Returns: boolean
+      }
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_all_clients: {
         Args: Record<PropertyKey, never>
@@ -435,6 +514,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -517,6 +598,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -536,6 +619,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -588,6 +673,41 @@ export type Database = {
           commission_paid: boolean
         }[]
       }
+      get_partner_referral_commissions: {
+        Args: { p_partner_id: string }
+        Returns: {
+          id: string
+          referee_name: string
+          referee_company: string
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          paid_at: string
+          payment_date: string
+          client_name: string
+        }[]
+      }
+      get_partner_referrals: {
+        Args: { p_partner_id: string }
+        Returns: {
+          certificate_id: string | null
+          commission: number | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          partner_level: string
+          password: string
+          phone: string
+          referral_code: string | null
+          referrer_id: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
+      }
       insert_partner_direct: {
         Args:
           | {
@@ -608,6 +728,16 @@ export type Database = {
               p_commission?: number
               p_phone?: string
             }
+          | {
+              p_company_name: string
+              p_contact_person: string
+              p_email: string
+              p_password: string
+              p_partner_level?: string
+              p_commission?: number
+              p_phone?: string
+              p_referral_code?: string
+            }
         Returns: {
           certificate_id: string | null
           commission: number | null
@@ -620,6 +750,8 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_code: string | null
+          referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           test_passed: boolean | null
           updated_at: string | null
@@ -656,6 +788,10 @@ export type Database = {
           payment_type: string
           updated_at: string | null
         }[]
+      }
+      update_partner_referral_code: {
+        Args: { p_partner_id: string }
+        Returns: string
       }
     }
     Enums: {

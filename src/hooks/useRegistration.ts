@@ -10,7 +10,7 @@ export const useRegistration = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const registerPartner = async (formData: RegisterFormValues) => {
+  const registerPartner = async (formData: RegisterFormValues & { referralCode?: string }) => {
     try {
       setIsLoading(true);
       
@@ -28,7 +28,9 @@ export const useRegistration = () => {
         testPassed: false,
         role: 'partner',  // Explicitly set to 'partner'
         commission: 20,
-        phone: formData.phone || '' // Include phone with default empty string
+        phone: formData.phone || '', // Include phone with default empty string
+        // Добавляем реферальный код если он есть
+        ...(formData.referralCode && { referralCode: formData.referralCode })
       };
       
       try {
@@ -49,7 +51,9 @@ export const useRegistration = () => {
           console.log("Login successful for new partner");
           toast({
             title: "Регистрация успешна",
-            description: "Добро пожаловать в партнерскую программу S3!",
+            description: formData.referralCode 
+              ? "Добро пожаловать в партнерскую программу S3! Вы зарегистрированы по реферальной ссылке."
+              : "Добро пожаловать в партнерскую программу S3!",
           });
           
           return {

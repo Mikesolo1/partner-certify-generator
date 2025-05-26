@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Users, Award, FileText, Download, LogOut } from 'lucide-react';
+import { Users, Award, FileText, Download, LogOut, UserPlus } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -73,6 +73,12 @@ const DashboardNav = () => {
               icon={Users}
               label="Мои клиенты"
               isActive={isActive('/dashboard/clients')}
+            />
+            <NavItem
+              href="/dashboard/referrals"
+              icon={UserPlus}
+              label="Рефералы"
+              isActive={isActive('/dashboard/referrals')}
             />
           </>
         ) : (
