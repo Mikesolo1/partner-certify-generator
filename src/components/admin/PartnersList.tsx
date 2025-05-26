@@ -36,7 +36,11 @@ export const PartnersList: React.FC<PartnersListProps> = ({
       : { variant: "default" as const, className: "bg-yellow-600", children: "Не пройден" };
   };
 
-  console.log("PartnersList rendering with partners:", partners.map(p => ({ id: p.id, name: p.companyName || p.company_name })));
+  console.log("PartnersList rendering with partners:", partners.map(p => ({ 
+    id: p.id, 
+    name: p.companyName || p.company_name,
+    hasValidId: !!p.id 
+  })));
 
   return (
     <div className="rounded-md border">
@@ -57,13 +61,29 @@ export const PartnersList: React.FC<PartnersListProps> = ({
         <TableBody>
           {partners.length > 0 ? (
             partners.map((p) => {
-              console.log("Rendering partner row:", { id: p.id, companyName: p.companyName || p.company_name });
+              console.log("Rendering partner row:", { 
+                id: p.id, 
+                companyName: p.companyName || p.company_name,
+                hasValidId: !!p.id,
+                idType: typeof p.id
+              });
               
               // Убеждаемся, что у партнера есть валидный ID
               if (!p.id) {
                 console.error("Partner missing ID:", p);
                 return null;
               }
+
+              // Проверяем валидность UUID
+              const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+              if (!uuidRegex.test(p.id)) {
+                console.error("Invalid UUID format for partner:", p.id);
+                return null;
+              }
+
+              const handleDetailsClick = () => {
+                console.log("Details button clicked for partner:", p.id);
+              };
 
               return (
                 <TableRow key={p.id}>
@@ -93,11 +113,11 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                         size="sm" 
                         variant="outline"
                         asChild
-                        onClick={() => console.log("Navigating to partner details:", p.id)}
                       >
                         <Link 
                           to={`/admin/partners/${p.id}`} 
                           data-testid={`view-partner-${p.id}`}
+                          onClick={handleDetailsClick}
                         >
                           Подробнее
                         </Link>

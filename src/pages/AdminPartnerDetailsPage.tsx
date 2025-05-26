@@ -26,6 +26,8 @@ const AdminPartnerDetailsPage = () => {
   const fetchPartnerDetails = async () => {
     if (!partnerId) {
       console.error("No partnerId provided");
+      setError("ID партнера не предоставлен");
+      setLoading(false);
       return;
     }
     
@@ -33,24 +35,29 @@ const AdminPartnerDetailsPage = () => {
       setLoading(true);
       console.log("Fetching partner details for ID:", partnerId);
 
+      // Исправляем вызов RPC функции - используем правильное имя параметра
       const { data, error: rpcError } = await safeRPC(
         'get_partner_by_id', 
         { p_id: partnerId },
         { retries: 3, delay: 1500 }
       );
 
+      console.log("RPC call result:", { data, error: rpcError });
+
       if (rpcError) {
         console.error("RPC Error fetching partner:", rpcError);
-        setError(`Ошибка загрузки: ${rpcError.message}`);
+        setError(`Ошибка загрузки: ${rpcError.message || rpcError.toString()}`);
         setDebugInfo({
           method: 'RPC get_partner_by_id',
           error: rpcError,
-          partnerId
+          partnerId,
+          errorCode: rpcError.code,
+          errorDetails: rpcError.details
         });
         
         toast({
           title: "Ошибка",
-          description: `Не удалось загрузить данные партнера: ${rpcError.message}`,
+          description: `Не удалось загрузить данные партнера: ${rpcError.message || 'Неизвестная ошибка'}`,
           variant: "destructive"
         });
         return;
@@ -62,9 +69,10 @@ const AdminPartnerDetailsPage = () => {
         console.error("No partner data returned for ID:", partnerId);
         setError("Партнер не найден в базе данных");
         setDebugInfo({
-          method: 'Data check',
+          method: 'Data validation',
           error: 'No data returned',
-          partnerId
+          partnerId,
+          responseData: data
         });
         
         toast({
@@ -77,6 +85,19 @@ const AdminPartnerDetailsPage = () => {
 
       const partnerData = data[0];
       console.log("Partner data found:", partnerData);
+      
+      // Проверяем наличие обязательных полей
+      if (!partnerData.id || !partnerData.company_name) {
+        console.error("Invalid partner data structure:", partnerData);
+        setError("Некорректные данные партнера");
+        setDebugInfo({
+          method: 'Data structure validation',
+          error: 'Missing required fields',
+          partnerId,
+          partnerData
+        });
+        return;
+      }
       
       setPartner({
         id: partnerData.id,
@@ -96,13 +117,16 @@ const AdminPartnerDetailsPage = () => {
       
       setError(null);
       setDebugInfo(null);
+      console.log("Partner successfully loaded:", partnerData.company_name);
     } catch (err: any) {
       console.error("Exception in fetchPartnerDetails:", err);
       setError(`Критическая ошибка: ${err.message || "Неизвестная ошибка"}`);
       setDebugInfo({
-        method: 'Exception',
+        method: 'Exception handler',
         error: err,
-        partnerId
+        partnerId,
+        stack: err.stack,
+        name: err.name
       });
       
       toast({
@@ -118,10 +142,21 @@ const AdminPartnerDetailsPage = () => {
   useEffect(() => {
     console.log("useEffect triggered with partnerId:", partnerId);
     if (partnerId) {
+      // Проверяем валидность UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(partnerId)) {
+        console.error("Invalid UUID format:", partnerId);
+        setError("Некорректный формат ID партнера");
+        setLoading(false);
+        return;
+      }
+      
       fetchPartnerDetails();
       fetchData();
     } else {
       console.error("partnerId is undefined in useEffect");
+      setError("ID партнера не предоставлен");
+      setLoading(false);
     }
   }, [partnerId]);
 

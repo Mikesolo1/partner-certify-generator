@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 interface SafeRPCOptions {
@@ -19,7 +18,7 @@ export const safeRPC = async (
   options: SafeRPCOptions = { retries: 2, delay: 1000 }
 ) => {
   let lastError;
-  const { retries = 2, delay = 1000, timeoutMs = 10000 } = options;
+  const { retries = 2, delay = 1000, timeoutMs = 15000 } = options;
   
   // Create a timeout promise
   const timeoutPromise = timeoutMs 
@@ -27,16 +26,19 @@ export const safeRPC = async (
     : null;
 
   console.log(`Calling RPC function ${functionName} with params:`, params);
+  console.log(`Retry settings: retries=${retries}, delay=${delay}ms, timeout=${timeoutMs}ms`);
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     if (attempt > 0) {
-      console.log(`RPC retry ${attempt}/${retries} for ${functionName} after ${delay}ms`);
+      console.log(`RPC retry ${attempt}/${retries} for ${functionName} after ${delay * attempt}ms`);
       if (delay > 0) {
         await sleep(delay * attempt); // Exponential backoff
       }
     }
     
     try {
+      console.log(`Attempt ${attempt + 1}/${retries + 1} for ${functionName}`);
+      
       // If timeout is set, race between the RPC call and the timeout
       const rpcPromise = supabase.rpc(functionName, params);
       const result = timeoutPromise 
@@ -45,27 +47,58 @@ export const safeRPC = async (
         
       const { data, error } = result;
       
-      console.log(`RPC ${functionName} result:`, { data, error });
+      console.log(`RPC ${functionName} result:`, { 
+        data: data ? `${Array.isArray(data) ? data.length : 1} records` : 'null', 
+        error: error ? error.message : 'none',
+        attempt: attempt + 1
+      });
 
       if (error) {
-        console.error(`RPC error on attempt ${attempt + 1}/${retries + 1}:`, error);
+        console.error(`RPC error on attempt ${attempt + 1}/${retries + 1}:`, {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
         lastError = error;
         
-        // Don't retry if it's a function not found error
+        // Don't retry for certain types of errors
         if (error.message?.includes('function') && error.message?.includes('not found')) {
           console.error('Function not found error, no retrying:', error);
           return { data: null, error };
         }
+        
+        if (error.code === 'PGRST116' || error.message?.includes('JWT')) {
+          console.error('Authentication error, no retrying:', error);
+          return { data: null, error };
+        }
+        
+        if (error.code === '42883') {
+          console.error('Function does not exist, no retrying:', error);
+          return { data: null, error };
+        }
       } else {
         // Success
+        console.log(`RPC ${functionName} succeeded on attempt ${attempt + 1}`);
         return { data, error: null };
       }
     } catch (err: any) {
-      console.error(`Exception on attempt ${attempt + 1}/${retries + 1}:`, err);
+      console.error(`Exception on attempt ${attempt + 1}/${retries + 1}:`, {
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      });
       lastError = err;
+      
+      // Don't retry on timeout
+      if (err.message === 'RPC timeout exceeded') {
+        console.error('Timeout error, no more retries');
+        break;
+      }
     }
   }
 
+  console.error(`All attempts failed for ${functionName}:`, lastError);
   return { data: null, error: lastError };
 };
 
