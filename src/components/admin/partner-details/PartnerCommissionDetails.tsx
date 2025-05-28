@@ -4,12 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { safeRPC } from '@/api/utils/queryHelpers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Partner } from '@/types';
 
-interface PartnerCommissionDetails {
+interface PartnerCommissionDetailsProps {
+  partner: Partner;
+  partnerClients: any[];
   partnerId: string;
+  getClientPayments: (clientId: string) => any[];
 }
 
-export const PartnerCommissionDetails = ({ partnerId }: PartnerCommissionDetails) => {
+export const PartnerCommissionDetails = ({ 
+  partner, 
+  partnerClients, 
+  partnerId, 
+  getClientPayments 
+}: PartnerCommissionDetailsProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [commissionData, setCommissionData] = useState<any>(null);
