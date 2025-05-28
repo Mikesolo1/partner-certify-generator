@@ -15,7 +15,7 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header />
       
-      <main>
+      <main className="overflow-hidden">
         <HeroSection />
         <WabaInfoSection />
         <CommissionSection />
