@@ -29,7 +29,7 @@ export const usePartnersData = () => {
         testPassed: p.test_passed,
         commission: p.commission,
         role: p.role,
-        phone: p.phone || '', // Include phone with fallback
+        phone: p.phone || '',
         referralAccessEnabled: p.referral_access_enabled || false,
         referrerId: p.referrer_id,
         referralCode: p.referral_code
