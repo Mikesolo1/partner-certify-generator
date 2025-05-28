@@ -58,7 +58,7 @@ const Footer = () => {
               © 2024 S3 WABA. Все права защищены.
             </div>
             <div className="text-center md:text-right">
-              <p className="mb-1">ИП Самохин Сергей Сергеевич</p>
+              <p className="mb-1">ИП Киреев Никита Андреевич</p>
               <p>ИНН: 580903594790 • ОГРНИП: 324580000058570</p>
             </div>
           </div>
