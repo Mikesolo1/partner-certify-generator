@@ -7,8 +7,9 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Max-Age": "86400",
 };
 
 interface PasswordResetRequest {
@@ -16,14 +17,22 @@ interface PasswordResetRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Request method:", req.method);
+  console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    console.log("Handling CORS preflight request");
+    return new Response(null, { 
+      status: 200,
+      headers: corsHeaders 
+    });
   }
 
   try {
+    console.log("Processing password reset request");
+    
     const { email }: PasswordResetRequest = await req.json();
-
     console.log("Password reset requested for email:", email);
 
     // Инициализируем Supabase клиент
@@ -42,6 +51,8 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Ошибка проверки партнера");
     }
 
+    console.log("Partner exists check result:", partnerExists);
+
     if (!partnerExists) {
       console.log("Partner not found for email:", email);
       // Возвращаем успех даже если партнер не найден (безопасность)
@@ -54,12 +65,8 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Генерируем токен для сброса пароля
-    const resetToken = crypto.randomUUID();
-    const resetTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 часа
-
-    // Здесь бы нужно было сохранить токен в базе данных
-    // Но поскольку у нас нет таблицы для токенов сброса, используем Supabase Auth
+    // Используем Supabase Auth для сброса пароля
+    console.log("Calling Supabase auth resetPasswordForEmail");
     const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${req.headers.get('origin')}/reset-password`,
     });
@@ -69,6 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Ошибка отправки письма восстановления");
     }
 
+    console.log("Sending email via Resend");
     const emailResponse = await resend.emails.send({
       from: "S3 Partners <noreply@resend.dev>",
       to: [email],
@@ -130,7 +138,10 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ error: "Произошла ошибка при отправке письма" }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { 
+          "Content-Type": "application/json", 
+          ...corsHeaders 
+        },
       }
     );
   }
