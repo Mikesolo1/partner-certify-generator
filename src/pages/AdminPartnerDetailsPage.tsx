@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -64,11 +63,9 @@ const AdminPartnerDetailsPage = () => {
         companyName: partnerData.company_name,
         contactPerson: partnerData.contact_person,
         email: partnerData.email,
-        partnerLevel: partnerData.partner_level,
         joinDate: partnerData.join_date,
         certificateId: partnerData.certificate_id,
         testPassed: partnerData.test_passed,
-        commission: partnerData.commission,
         role: partnerData.role,
         phone: partnerData.phone || '',
         referrerId: partnerData.referrer_id,
