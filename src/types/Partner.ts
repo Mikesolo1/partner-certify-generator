@@ -6,8 +6,6 @@ export interface Partner {
   contactPerson: string;
   contact_person?: string; // Added for compatibility
   email: string;
-  partnerLevel: string;
-  partner_level?: string; // Added for compatibility
   joinDate: string;
   join_date?: string; // Added for compatibility
   certificateId?: string;
@@ -15,7 +13,6 @@ export interface Partner {
   password?: string;
   testPassed?: boolean;
   test_passed?: boolean; // Added for compatibility
-  commission?: number;
   role?: string;
   phone: string;
   referrerId?: string;
