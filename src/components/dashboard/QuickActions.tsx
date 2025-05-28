@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { FileText, Users, Award, Star, UserPlus } from 'lucide-react';
+import { FileText, Users, Award, Star, UserPlus, BookOpen } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 
 interface QuickActionsProps {
@@ -72,20 +72,48 @@ const QuickActions = ({ testPassed, showLevelUpHint }: QuickActionsProps) => {
                 </Button>
               </Link>
             )}
+
+            <Link to="/dashboard/waba-training">
+              <Button
+                variant="outline"
+                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+              >
+                <BookOpen className="h-8 w-8 mb-2 text-brand" />
+                <div>
+                  <p className="font-medium">Обучение WABA</p>
+                  <p className="text-xs text-gray-500">WhatsApp Business API</p>
+                </div>
+              </Button>
+            </Link>
           </>
         ) : (
-          <Link to="/dashboard/test">
-            <Button
-              variant="outline"
-              className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-            >
-              <Award className="h-8 w-8 mb-2 text-brand" />
-              <div>
-                <p className="font-medium">Пройти тест</p>
-                <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
-              </div>
-            </Button>
-          </Link>
+          <>
+            <Link to="/dashboard/test">
+              <Button
+                variant="outline"
+                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+              >
+                <Award className="h-8 w-8 mb-2 text-brand" />
+                <div>
+                  <p className="font-medium">Пройти тест</p>
+                  <p className="text-xs text-gray-500">Получить доступ к сертификату</p>
+                </div>
+              </Button>
+            </Link>
+
+            <Link to="/dashboard/waba-training">
+              <Button
+                variant="outline"
+                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+              >
+                <BookOpen className="h-8 w-8 mb-2 text-brand" />
+                <div>
+                  <p className="font-medium">Обучение WABA</p>
+                  <p className="text-xs text-gray-500">WhatsApp Business API</p>
+                </div>
+              </Button>
+            </Link>
+          </>
         )}
         
         <Link to="/partners">

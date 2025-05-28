@@ -9,7 +9,8 @@ import {
   HelpCircle, 
   UserPlus,
   BarChart3,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
 
@@ -26,6 +27,7 @@ const DashboardNav = () => {
     { path: '/dashboard/certificate', icon: Award, label: 'Сертификат' },
     { path: '/dashboard/test', icon: HelpCircle, label: 'Тест' },
     { path: '/dashboard/referrals', icon: UserPlus, label: 'Рефералы' },
+    { path: '/dashboard/waba-training', icon: BookOpen, label: 'Обучение WABA' },
   ];
 
   return (
