@@ -1,12 +1,29 @@
 
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { usePartners } from '@/contexts/PartnersContext';
 import LoginForm from '@/components/LoginForm';
 import DashboardHeader from '@/components/DashboardHeader';
-import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
+  const { currentPartner, loading } = usePartners();
+
+  // Если идет загрузка, показываем загрузку
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Загрузка...</p>
+      </div>
+    );
+  }
+
+  // Если пользователь уже авторизован, перенаправляем на дашборд
+  if (currentPartner) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
