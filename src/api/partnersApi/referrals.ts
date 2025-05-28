@@ -62,3 +62,16 @@ export const getPartnerReferralCommissions = async (partnerId: string): Promise<
     throw error;
   }
 };
+
+export const markReferralCommissionsPaid = async (partnerId: string): Promise<void> => {
+  try {
+    const { error } = await supabase.rpc('mark_referral_commissions_paid', {
+      p_partner_id: partnerId
+    });
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error marking referral commissions as paid:", error);
+    throw error;
+  }
+};
