@@ -55,8 +55,7 @@ export const usePartnersData = () => {
   const addPartner = async (partner: Partner) => {
     try {
       const newPartner = await api.createPartner(partner);
-      // The API response should already be in the correct format
-      // But we ensure all required fields are present with fallbacks
+      // The API response may not include referralAccessEnabled, so we provide a fallback
       const completePartner: Partner = {
         id: newPartner.id,
         companyName: newPartner.companyName,
@@ -69,7 +68,7 @@ export const usePartnersData = () => {
         commission: newPartner.commission,
         role: newPartner.role,
         phone: newPartner.phone || '',
-        referralAccessEnabled: newPartner.referralAccessEnabled || false,
+        referralAccessEnabled: (newPartner as any).referralAccessEnabled || false,
         referrerId: newPartner.referrerId,
         referralCode: newPartner.referralCode
       };
@@ -84,8 +83,7 @@ export const usePartnersData = () => {
   const updatePartner = async (id: string, updatedPartner: Partner) => {
     try {
       const updated = await api.updatePartner(id, updatedPartner);
-      // The API response should already be in the correct format
-      // But we ensure all required fields are present with fallbacks
+      // The API response may not include referralAccessEnabled, so we provide a fallback
       const completePartner: Partner = {
         id: updated.id,
         companyName: updated.companyName,
@@ -98,7 +96,7 @@ export const usePartnersData = () => {
         commission: updated.commission,
         role: updated.role,
         phone: updated.phone || '',
-        referralAccessEnabled: updated.referralAccessEnabled || false,
+        referralAccessEnabled: (updated as any).referralAccessEnabled || false,
         referrerId: updated.referrerId,
         referralCode: updated.referralCode
       };
