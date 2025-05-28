@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +36,7 @@ const CertificatePage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header variant="light" />
         <div className="container mx-auto px-4 py-12 text-center">
           <p>Loading...</p>
         </div>
@@ -46,7 +47,7 @@ const CertificatePage = () => {
   if (!partner) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header variant="light" />
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Partner Not Found</h1>
           <p className="text-gray-600 mb-6">The partner you're looking for doesn't exist or has been removed.</p>
@@ -63,7 +64,7 @@ const CertificatePage = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header variant="light" />
       
       <div className="container mx-auto px-4 py-12">
         <Button
