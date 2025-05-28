@@ -78,6 +78,7 @@ export const PartnersProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value = {
     partners,
     currentPartner,
+    setCurrentPartner,
     testQuestions,
     addPartner,
     updatePartner,

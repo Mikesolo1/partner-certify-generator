@@ -5,6 +5,7 @@ import { useClientManagement } from '@/hooks/useClientManagement';
 export interface PartnersContextType {
   partners: Partner[];
   currentPartner: Partner | null;
+  setCurrentPartner: (partner: Partner | null) => void;
   testQuestions: TestQuestion[];
   addPartner: (partner: Partner) => Promise<Partner>;
   updatePartner: (id: string, updatedPartner: Partial<Partner>) => Promise<Partner>;
