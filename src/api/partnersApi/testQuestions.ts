@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { TestQuestion } from "@/types";
 import { safeRPC } from "@/api/utils/queryHelpers";
@@ -11,15 +10,12 @@ export const createTestQuestion = async (
   try {
     console.log("Creating test question:", { question, options, correctAnswer });
     
-    const { data, error } = await supabase
-      .from('test_questions')
-      .insert({
-        question,
-        options: JSON.stringify(options),
-        correct_answer: correctAnswer
-      })
-      .select()
-      .single();
+    // Используем RPC функцию для безопасного создания
+    const { data, error } = await safeRPC('create_test_question', {
+      p_question: question,
+      p_options: JSON.stringify(options),
+      p_correct_answer: correctAnswer
+    });
     
     if (error) {
       console.error("Error creating test question:", error);
@@ -30,10 +26,10 @@ export const createTestQuestion = async (
     
     // Приводим данные к формату TestQuestion
     const testQuestion: TestQuestion = {
-      id: data.id,
-      question: data.question,
-      options: typeof data.options === 'string' ? JSON.parse(data.options) : data.options,
-      correctAnswer: data.correct_answer
+      id: data[0].id,
+      question: data[0].question,
+      options: typeof data[0].options === 'string' ? JSON.parse(data[0].options) : data[0].options,
+      correctAnswer: data[0].correct_answer
     };
     
     return testQuestion;
@@ -52,17 +48,13 @@ export const updateTestQuestion = async (
   try {
     console.log("Updating test question:", { id, question, options, correctAnswer });
     
-    const { data, error } = await supabase
-      .from('test_questions')
-      .update({
-        question,
-        options: JSON.stringify(options),
-        correct_answer: correctAnswer,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    // Используем RPC функцию для безопасного обновления
+    const { data, error } = await safeRPC('update_test_question', {
+      p_id: id,
+      p_question: question,
+      p_options: JSON.stringify(options),
+      p_correct_answer: correctAnswer
+    });
     
     if (error) {
       console.error("Error updating test question:", error);
@@ -73,10 +65,10 @@ export const updateTestQuestion = async (
     
     // Приводим данные к формату TestQuestion
     const testQuestion: TestQuestion = {
-      id: data.id,
-      question: data.question,
-      options: typeof data.options === 'string' ? JSON.parse(data.options) : data.options,
-      correctAnswer: data.correct_answer
+      id: data[0].id,
+      question: data[0].question,
+      options: typeof data[0].options === 'string' ? JSON.parse(data[0].options) : data[0].options,
+      correctAnswer: data[0].correct_answer
     };
     
     return testQuestion;

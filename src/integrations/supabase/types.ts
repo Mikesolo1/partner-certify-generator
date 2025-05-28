@@ -503,6 +503,10 @@ export type Database = {
         Args: { p_id: string }
         Returns: boolean
       }
+      delete_test_question: {
+        Args: { question_id: string }
+        Returns: undefined
+      }
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
