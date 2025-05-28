@@ -5,7 +5,6 @@ import { safeRPC } from "@/api/utils/queryHelpers";
 
 export const fetchPartners = async () => {
   try {
-    // Используем безопасную RPC функцию вместо прямого доступа к таблице
     const { data, error } = await safeRPC('get_all_partners');
     
     if (error) {
@@ -22,7 +21,6 @@ export const fetchPartners = async () => {
 
 export const fetchPartnerById = async (id: string) => {
   try {
-    // Используем безопасную RPC функцию вместо прямого доступа к таблице
     const { data, error } = await safeRPC('get_partner_by_id', { p_id: id });
     
     if (error) {
@@ -47,7 +45,10 @@ export const fetchPartnerById = async (id: string) => {
       testPassed: partnerData.test_passed,
       commission: partnerData.commission,
       role: partnerData.role,
-      phone: partnerData.phone || '' // Include phone with fallback
+      phone: partnerData.phone || '',
+      referrerId: partnerData.referrer_id,
+      referralCode: partnerData.referral_code,
+      referralAccessEnabled: partnerData.referral_access_enabled
     };
     
     return partner;

@@ -63,13 +63,6 @@ export const getClientPayments = async (clientId: string) => {
     
     if (error) {
       console.error("Error fetching client payments:", error);
-      console.error("Client ID:", clientId);
-      console.error("Full error details:", {
-        message: error.message,
-        hint: error.hint,
-        details: error.details,
-        code: error.code
-      });
       return [];
     }
     
@@ -77,7 +70,6 @@ export const getClientPayments = async (clientId: string) => {
     return data || [];
   } catch (error) {
     console.error("Exception in getClientPayments:", error);
-    console.error("Failed for client ID:", clientId);
     return [];
   }
 };
@@ -91,19 +83,12 @@ export const getPartnerPayments = async (partnerId: string) => {
       return [];
     }
 
-    const { data, error } = await safeRPC('get_partner_payments', {
+    const { data, error } = await safeRPC('get_partner_payments_with_commission', {
       p_partner_id: partnerId
     });
     
     if (error) {
       console.error("Error fetching partner payments:", error);
-      console.error("Partner ID:", partnerId);
-      console.error("Full error details:", {
-        message: error.message,
-        hint: error.hint,
-        details: error.details,
-        code: error.code
-      });
       return [];
     }
     
@@ -111,7 +96,6 @@ export const getPartnerPayments = async (partnerId: string) => {
     return data || [];
   } catch (error) {
     console.error("Exception in getPartnerPayments:", error);
-    console.error("Failed for partner ID:", partnerId);
     return [];
   }
 };
@@ -132,13 +116,6 @@ export const markPartnerCommissionsPaid = async (partnerId: string, adminId: str
     
     if (error) {
       console.error("Error marking commissions as paid:", error);
-      console.error("Parameters:", { partnerId, adminId });
-      console.error("Full error details:", {
-        message: error.message,
-        hint: error.hint,
-        details: error.details,
-        code: error.code
-      });
       throw error;
     }
     

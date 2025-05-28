@@ -4,8 +4,13 @@ import { Partner } from '@/types';
 import Header from '@/components/Header';
 import { PartnerHeader } from '@/components/admin/PartnerHeader';
 import { PartnerCommissionDetails } from './PartnerCommissionDetails';
+import { PartnerInfo } from '@/components/admin/PartnerInfo';
+import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails';
+import { ClientsList } from '@/components/admin/ClientsList';
+import { PartnerReferralsSection } from './PartnerReferralsSection';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PartnerDetailsContentProps {
   partner: Partner;
@@ -37,12 +42,43 @@ export const PartnerDetailsContent = ({
           </Button>
         </div>
         
-        <PartnerCommissionDetails
-          partner={partner}
-          partnerClients={partnerClients}
-          partnerId={partnerId}
-          getClientPayments={getClientPayments}
-        />
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Обзор</TabsTrigger>
+            <TabsTrigger value="clients">Клиенты</TabsTrigger>
+            <TabsTrigger value="payments">Выплаты</TabsTrigger>
+            <TabsTrigger value="referrals">Рефералы</TabsTrigger>
+            <TabsTrigger value="info">Информация</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            <PartnerCommissionDetails
+              partner={partner}
+              partnerClients={partnerClients}
+              partnerId={partnerId}
+              getClientPayments={getClientPayments}
+            />
+          </TabsContent>
+          
+          <TabsContent value="clients" className="mt-6">
+            <ClientsList
+              clients={partnerClients}
+              getClientPayments={getClientPayments}
+            />
+          </TabsContent>
+          
+          <TabsContent value="payments" className="mt-6">
+            <PartnerPaymentDetails partnerId={partnerId} />
+          </TabsContent>
+          
+          <TabsContent value="referrals" className="mt-6">
+            <PartnerReferralsSection partnerId={partnerId} />
+          </TabsContent>
+          
+          <TabsContent value="info" className="mt-6">
+            <PartnerInfo partner={partner} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
