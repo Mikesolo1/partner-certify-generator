@@ -55,13 +55,22 @@ export const usePartnersData = () => {
   const addPartner = async (partner: Partner) => {
     try {
       const newPartner = await api.createPartner(partner);
-      // Ensure newPartner has all required fields including phone
+      // Convert the API response from snake_case to camelCase
       const completePartner: Partner = {
-        ...newPartner,
+        id: newPartner.id,
+        companyName: newPartner.company_name || newPartner.companyName,
+        contactPerson: newPartner.contact_person || newPartner.contactPerson,
+        email: newPartner.email,
+        partnerLevel: newPartner.partner_level || newPartner.partnerLevel,
+        joinDate: newPartner.join_date || newPartner.joinDate,
+        certificateId: newPartner.certificate_id || newPartner.certificateId,
+        testPassed: newPartner.test_passed || newPartner.testPassed,
+        commission: newPartner.commission,
+        role: newPartner.role,
         phone: newPartner.phone || '',
-        referralAccessEnabled: newPartner.referral_access_enabled || false,
-        referrerId: newPartner.referrer_id,
-        referralCode: newPartner.referral_code
+        referralAccessEnabled: newPartner.referral_access_enabled || newPartner.referralAccessEnabled || false,
+        referrerId: newPartner.referrer_id || newPartner.referrerId,
+        referralCode: newPartner.referral_code || newPartner.referralCode
       };
       setPartners((prev) => [...prev, completePartner]);
       return completePartner;
@@ -74,13 +83,22 @@ export const usePartnersData = () => {
   const updatePartner = async (id: string, updatedPartner: Partner) => {
     try {
       const updated = await api.updatePartner(id, updatedPartner);
-      // Ensure updated partner has all required fields including phone
+      // Convert the API response from snake_case to camelCase
       const completePartner: Partner = {
-        ...updated,
+        id: updated.id,
+        companyName: updated.company_name || updated.companyName,
+        contactPerson: updated.contact_person || updated.contactPerson,
+        email: updated.email,
+        partnerLevel: updated.partner_level || updated.partnerLevel,
+        joinDate: updated.join_date || updated.joinDate,
+        certificateId: updated.certificate_id || updated.certificateId,
+        testPassed: updated.test_passed || updated.testPassed,
+        commission: updated.commission,
+        role: updated.role,
         phone: updated.phone || '',
-        referralAccessEnabled: updated.referral_access_enabled || false,
-        referrerId: updated.referrer_id,
-        referralCode: updated.referral_code
+        referralAccessEnabled: updated.referral_access_enabled || updated.referralAccessEnabled || false,
+        referrerId: updated.referrer_id || updated.referrerId,
+        referralCode: updated.referral_code || updated.referralCode
       };
       setPartners(prev => prev.map(partner => partner.id === id ? completePartner : partner));
       return completePartner;
