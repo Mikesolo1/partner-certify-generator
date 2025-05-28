@@ -29,15 +29,25 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-300">
                 <Phone className="h-5 w-5 text-brand" />
-                <span>+7 (999) 123-45-67</span>
+                <span>+7 (969) 777-62-52</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300">
                 <Mail className="h-5 w-5 text-brand" />
-                <span>partners@s3.com</span>
+                <span>sales1@s-3.tech</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300">
                 <MapPin className="h-5 w-5 text-brand" />
                 <span>Москва, Россия</span>
+              </div>
+            </div>
+            
+            {/* Юридическая информация */}
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              <h4 className="text-sm font-semibold text-gray-400 mb-2">Юридическая информация</h4>
+              <div className="text-xs text-gray-400 space-y-1">
+                <p>ИНН: 580903594790</p>
+                <p>ОГРНИП: 324580000058570</p>
+                <p>ИП Киреев Никита Андреевич</p>
               </div>
             </div>
           </div>
@@ -69,7 +79,7 @@ const Footer = () => {
                 <Clock className="h-5 w-5 text-brand" />
                 <span>24/7 поддержка</span>
               </div>
-              <a href="mailto:support@s3.com" className="block text-gray-300 hover:text-brand transition-colors">
+              <a href="mailto:sales1@s-3.tech" className="block text-gray-300 hover:text-brand transition-colors">
                 Техподдержка
               </a>
               <a href="#faq" className="block text-gray-300 hover:text-brand transition-colors">
