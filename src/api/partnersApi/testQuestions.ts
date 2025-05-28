@@ -90,10 +90,8 @@ export const deleteTestQuestion = async (id: string): Promise<void> => {
   try {
     console.log("Deleting test question:", id);
     
-    const { error } = await supabase
-      .from('test_questions')
-      .delete()
-      .eq('id', id);
+    // Используем RPC функцию для безопасного удаления
+    const { error } = await safeRPC('delete_test_question', { question_id: id });
     
     if (error) {
       console.error("Error deleting test question:", error);
