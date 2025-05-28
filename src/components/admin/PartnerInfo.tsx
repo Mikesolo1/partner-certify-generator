@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Partner } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +34,7 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpda
       
       setReferralAccess(enabled);
       
-      // Обновляем currentPartner в контексте, если это тот же партнер
+      // Если обновляемый партнер - это текущий авторизованный пользователь, обновляем его данные
       if (currentPartner && currentPartner.id === partner.id) {
         const updatedCurrentPartner = {
           ...currentPartner,

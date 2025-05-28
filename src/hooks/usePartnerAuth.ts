@@ -17,8 +17,9 @@ export const usePartnerAuth = () => {
   });
   const { toast } = useToast();
 
-  // Обновляем функцию setCurrentPartner, чтобы она также обновляла localStorage
+  // Функция для обновления данных партнера с сохранением в localStorage
   const updateCurrentPartner = (partner: Partner | null) => {
+    console.log("Updating currentPartner:", partner?.id, partner?.referralAccessEnabled);
     setCurrentPartner(partner);
     if (partner) {
       try {
