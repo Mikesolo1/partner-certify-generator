@@ -3,7 +3,7 @@ import React, { ReactNode, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import DashboardNav from './DashboardNav';
 import { usePartners } from '@/contexts/PartnersContext';
-import Header from '@/components/Header';
+import DashboardHeader from '@/components/DashboardHeader';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -31,9 +31,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
+      <DashboardHeader />
       
-      <div className="flex flex-1">
+      <div className="flex flex-1 pt-16">
         {/* Mobile sidebar */}
         {isMobile && sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)}>
