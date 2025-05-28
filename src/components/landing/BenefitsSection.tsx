@@ -8,7 +8,7 @@ const BenefitsSection = () => {
     <div className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
-          🔥 Почему клиенты выбирают S3
+          Почему клиенты выбирают S3
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <Card className="border-brand/20 bg-white shadow-lg hover:shadow-xl transition-all duration-300">

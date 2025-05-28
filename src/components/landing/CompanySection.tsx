@@ -51,7 +51,7 @@ const CompanySection = () => {
               Делать бизнес-коммуникации через WhatsApp простыми, надежными и эффективными. 
               Мы помогаем компаниям налаживать прямой контакт с клиентами через самый популярный мессенджер в мире.
             </p>
-            <h4 className="text-xl font-bold text-gray-900 mb-4">💼 Наши услуги</h4>
+            <h4 className="text-xl font-bold text-gray-900 mb-4">Наши услуги</h4>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <CheckCircle className="h-5 w-5 text-brand mt-1 flex-shrink-0" />

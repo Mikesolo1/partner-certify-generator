@@ -10,7 +10,7 @@ const CommissionSection = () => {
         <div className="text-center mb-16">
           <DollarSign className="h-16 w-16 text-brand mx-auto mb-6" />
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            💰 Зарабатывайте с каждого клиента WABA
+            Зарабатывайте с каждого клиента WABA
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
             Приведите клиента с аккаунтом WhatsApp Business API и получайте долгосрочный доход
@@ -51,7 +51,7 @@ const CommissionSection = () => {
 
         <div className="bg-gray-50 rounded-xl p-8 border border-brand/20">
           <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            💡 Пример дохода с одного клиента
+            Пример дохода с одного клиента
           </h3>
           <div className="bg-white rounded-lg p-6 mb-6 border border-brand/10">
             <p className="text-gray-700 text-lg mb-4 text-center">
@@ -74,7 +74,7 @@ const CommissionSection = () => {
           </div>
           <div className="text-center mt-8">
             <p className="text-2xl font-bold text-brand">
-              🎯 Итого: <span className="text-3xl">302 400 ₽</span> с одного клиента за 3 года
+              Итого: <span className="text-3xl">302 400 ₽</span> с одного клиента за 3 года
             </p>
           </div>
         </div>
