@@ -83,7 +83,7 @@ const CertificatePage = () => {
                 Certificate for {partner.companyName || partner.company_name}
               </CardTitle>
               <CardDescription>
-                {partner.partnerLevel || partner.partner_level} Partner - Certificate ID: {partner.certificateId || partner.certificate_id}
+                Сертифицированный партнер - Certificate ID: {partner.certificateId || partner.certificate_id}
               </CardDescription>
             </CardHeader>
             <CardContent>

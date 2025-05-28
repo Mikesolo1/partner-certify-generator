@@ -22,12 +22,10 @@ export const useRegistration = () => {
         contactPerson: formData.contactPerson,
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        partnerLevel: 'Бронзовый',
         joinDate: new Date().toISOString(),
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         testPassed: false,
         role: 'partner',  // Explicitly set to 'partner'
-        commission: 20,
         phone: formData.phone || '', // Include phone with default empty string
         // Добавляем реферальный код если он есть
         ...(formData.referralCode && { referralCode: formData.referralCode })

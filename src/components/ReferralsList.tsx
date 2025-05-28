@@ -152,9 +152,6 @@ const ReferralsList = () => {
                         <Badge variant={referral.testPassed ? "default" : "secondary"}>
                           {referral.testPassed ? "Тест пройден" : "Тест не пройден"}
                         </Badge>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Уровень: {referral.partnerLevel}
-                        </p>
                       </div>
                     </div>
                     

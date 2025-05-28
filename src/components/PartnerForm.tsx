@@ -26,11 +26,9 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  partnerLevel: z.string().min(1, {
-    message: "Please select a partner level.",
-  }),
   joinDate: z.string(),
   certificateId: z.string().optional(),
+  phone: z.string().optional(),
 });
 
 interface PartnerFormProps {
@@ -46,9 +44,9 @@ const PartnerForm = ({ onSubmit, defaultValues }: PartnerFormProps) => {
       companyName: defaultValues?.companyName || '',
       contactPerson: defaultValues?.contactPerson || '',
       email: defaultValues?.email || '',
-      partnerLevel: defaultValues?.partnerLevel || 'Gold',
       joinDate: defaultValues?.joinDate || new Date().toISOString().split('T')[0],
       certificateId: defaultValues?.certificateId || `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+      phone: defaultValues?.phone || '',
     },
   });
 
@@ -123,20 +121,12 @@ const PartnerForm = ({ onSubmit, defaultValues }: PartnerFormProps) => {
 
         <FormField
           control={form.control}
-          name="partnerLevel"
+          name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Partner Level</FormLabel>
+              <FormLabel>Phone</FormLabel>
               <FormControl>
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...field}
-                >
-                  <option value="Gold">Gold</option>
-                  <option value="Silver">Silver</option>
-                  <option value="Bronze">Bronze</option>
-                  <option value="Platinum">Platinum</option>
-                </select>
+                <Input placeholder="+7 (999) 123-45-67" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

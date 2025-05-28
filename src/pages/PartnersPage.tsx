@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import { Input } from '@/components/ui/input';
@@ -20,8 +21,7 @@ const PartnersPage = () => {
       return (
         partner.companyName.toLowerCase().includes(searchString) ||
         partner.contactPerson.toLowerCase().includes(searchString) ||
-        partner.email.toLowerCase().includes(searchString) ||
-        partner.partnerLevel.toLowerCase().includes(searchString)
+        partner.email.toLowerCase().includes(searchString)
       );
     });
 

@@ -48,7 +48,6 @@ export const PartnersList: React.FC<PartnersListProps> = ({
             <TableHead>Email</TableHead>
             <TableHead>Статус теста</TableHead>
             <TableHead>Роль</TableHead>
-            <TableHead>Уровень</TableHead>
             <TableHead>Клиентов</TableHead>
             <TableHead>Заработано</TableHead>
             <TableHead>Действия</TableHead>
@@ -84,7 +83,6 @@ export const PartnersList: React.FC<PartnersListProps> = ({
                   <TableCell>
                     <Badge {...getRoleBadge(p.role || 'user')} />
                   </TableCell>
-                  <TableCell>{p.partnerLevel || p.partner_level}</TableCell>
                   <TableCell>{getPartnerClients(p.id).length}</TableCell>
                   <TableCell>{getTotalEarnings(p.id).toLocaleString('ru-RU')} ₽</TableCell>
                   <TableCell>
@@ -116,7 +114,7 @@ export const PartnersList: React.FC<PartnersListProps> = ({
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-4">Нет данных</TableCell>
+              <TableCell colSpan={8} className="text-center py-4">Нет данных</TableCell>
             </TableRow>
           )}
         </TableBody>
