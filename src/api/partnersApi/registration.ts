@@ -41,7 +41,7 @@ export const createPartner = async (partner: Partner) => {
       password: '[REDACTED]'
     });
     
-    // Use the updated RPC function without partner_level and commission
+    // Use the updated RPC function with correct parameters
     const { data, error } = await supabase.rpc('insert_partner_direct', {
       p_company_name: partner.companyName,
       p_contact_person: partner.contactPerson,
@@ -76,7 +76,8 @@ export const createPartner = async (partner: Partner) => {
       role: createdPartner.role,
       phone: createdPartner.phone || '',
       referrerId: createdPartner.referrer_id,
-      referralCode: createdPartner.referral_code
+      referralCode: createdPartner.referral_code,
+      referralAccessEnabled: createdPartner.referral_access_enabled
     };
   } catch (error) {
     console.error("Error in createPartner:", error);
