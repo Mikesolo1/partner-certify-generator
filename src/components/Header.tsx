@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Mail } from 'lucide-react';
 
 interface HeaderProps {
@@ -10,6 +10,7 @@ interface HeaderProps {
 
 const Header = ({ variant = 'dark' }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const isDark = variant === 'dark';
   const bgClass = isDark ? 'bg-gray-900/95 backdrop-blur-lg border-gray-800' : 'bg-white border-gray-200';
@@ -19,11 +20,22 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
   const menuBorderClass = isDark ? 'border-gray-800' : 'border-gray-200';
   const phoneTextClass = isDark ? 'text-gray-400' : 'text-gray-500';
 
+  const isHomePage = location.pathname === '/';
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
       setIsMenuOpen(false);
+    }
+  };
+
+  const handleMenuClick = (sectionId: string) => {
+    if (isHomePage) {
+      scrollToSection(sectionId);
+    } else {
+      // Перейти на главную страницу с хэшем
+      window.location.href = `/#${sectionId}`;
     }
   };
 
@@ -41,9 +53,9 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium`}>О компании</button>
-            <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium`}>Услуги</button>
-            <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium`}>Преимущества</button>
+            <button onClick={() => handleMenuClick('about')} className={`${linkTextClass} transition-colors font-medium`}>О компании</button>
+            <button onClick={() => handleMenuClick('services')} className={`${linkTextClass} transition-colors font-medium`}>Услуги</button>
+            <button onClick={() => handleMenuClick('benefits')} className={`${linkTextClass} transition-colors font-medium`}>Преимущества</button>
             <a href="tel:+79697776252" className={`flex items-center space-x-2 text-sm ${phoneTextClass} hover:text-brand transition-colors`}>
               <Phone className="h-4 w-4" />
               <span>+7 (969) 777-62-52</span>
@@ -77,9 +89,9 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
         {isMenuOpen && (
           <div className={`lg:hidden py-4 border-t ${menuBorderClass}`}>
             <nav className="flex flex-col space-y-4">
-              <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>О компании</button>
-              <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Услуги</button>
-              <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Преимущества</button>
+              <button onClick={() => handleMenuClick('about')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>О компании</button>
+              <button onClick={() => handleMenuClick('services')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Услуги</button>
+              <button onClick={() => handleMenuClick('benefits')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Преимущества</button>
               <a href="tel:+79697776252" className={`flex items-center space-x-2 text-sm ${phoneTextClass} px-2 hover:text-brand transition-colors`}>
                 <Phone className="h-4 w-4" />
                 <span>+7 (969) 777-62-52</span>
