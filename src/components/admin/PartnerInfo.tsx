@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Partner } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { updatePartnerReferralAccess } from '@/api/partnersApi/referrals';
+import { usePartners } from '@/contexts/PartnersContext';
 
 interface PartnerInfoProps {
   partner: Partner;
@@ -15,6 +15,7 @@ interface PartnerInfoProps {
 
 export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpdate }) => {
   const { toast } = useToast();
+  const { currentPartner, setCurrentPartner } = usePartners();
   const [referralAccess, setReferralAccess] = useState(
     partner.referralAccessEnabled || partner.referral_access_enabled || false
   );
@@ -28,6 +29,17 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpda
       const updatedPartner = await updatePartnerReferralAccess(partner.id, enabled);
       
       setReferralAccess(enabled);
+      
+      // Обновляем currentPartner в контексте, если это тот же партнер
+      if (currentPartner && currentPartner.id === partner.id) {
+        const updatedCurrentPartner = {
+          ...currentPartner,
+          referralAccessEnabled: enabled,
+          referral_access_enabled: enabled
+        };
+        setCurrentPartner(updatedCurrentPartner);
+        console.log("Updated currentPartner referral access:", enabled);
+      }
       
       // Уведомляем родительский компонент об обновлении
       if (onPartnerUpdate) {
