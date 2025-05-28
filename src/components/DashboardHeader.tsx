@@ -69,7 +69,6 @@ const DashboardHeader = () => {
             <div className="space-y-4">
               <div className="px-2 text-sm">
                 <p className="font-medium text-gray-900">{currentPartner?.companyName}</p>
-                <p className="text-gray-500">Уровень: {currentPartner?.partnerLevel || '-'}</p>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-500 px-2">
                 <Phone className="h-4 w-4" />
