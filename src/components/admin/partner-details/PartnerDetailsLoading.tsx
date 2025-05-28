@@ -1,10 +1,14 @@
 
-import Header from '@/components/Header';
-
 export const PartnerDetailsLoading = ({ partnerId }: { partnerId: string }) => {
   return (
-    <div className="min-h-screen bg-brand-light">
-      <Header />
+    <div className="min-h-screen bg-gray-50">
+      {/* White header like in admin dashboard */}
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold text-gray-900">Загрузка данных партнера...</h1>
+        </div>
+      </header>
+      
       <div className="container mx-auto px-4 py-12">
         <div className="flex justify-center items-center py-20">
           <div className="text-center">

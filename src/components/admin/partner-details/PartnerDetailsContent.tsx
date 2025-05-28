@@ -9,7 +9,6 @@ import { PartnerInfo } from '@/components/admin/PartnerInfo';
 import { PartnerPaymentDetails } from '@/components/admin/PartnerPaymentDetails';
 import { PartnerCommissionDetails } from '@/components/admin/partner-details/PartnerCommissionDetails';
 import { PartnerReferralsSection } from '@/components/admin/partner-details/PartnerReferralsSection';
-import Header from '@/components/Header';
 
 interface PartnerDetailsContentProps {
   partner: Partner;
@@ -36,16 +35,21 @@ export const PartnerDetailsContent = ({
   });
 
   return (
-    <div className="min-h-screen bg-brand-light">
-      <Header />
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-6">
-          <PartnerHeader partner={partner} />
-          <Button onClick={onRefresh} disabled={refreshing} variant="outline">
-            <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Обновить
-          </Button>
+    <div className="min-h-screen bg-gray-50">
+      {/* White header like in admin dashboard */}
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-between items-center">
+            <PartnerHeader partner={partner} />
+            <Button onClick={onRefresh} disabled={refreshing} variant="outline">
+              <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Обновить
+            </Button>
+          </div>
         </div>
+      </header>
+      
+      <div className="container mx-auto px-4 py-6">
         <div className="grid gap-6">
           <PartnerInfo partner={partner} />
           <PartnerCommissionDetails partnerId={partnerId} />

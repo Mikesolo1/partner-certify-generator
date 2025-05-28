@@ -1,5 +1,4 @@
 
-import Header from '@/components/Header';
 import { ErrorDisplay } from '@/components/admin/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -20,8 +19,14 @@ export const PartnerDetailsError = ({
   onRefresh
 }: PartnerDetailsErrorProps) => {
   return (
-    <div className="min-h-screen bg-brand-light">
-      <Header />
+    <div className="min-h-screen bg-gray-50">
+      {/* White header like in admin dashboard */}
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold text-gray-900">Ошибка загрузки данных партнера</h1>
+        </div>
+      </header>
+      
       <div className="container mx-auto px-4 py-12">
         <ErrorDisplay 
           error={error || "Партнер не найден"} 
