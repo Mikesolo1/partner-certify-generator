@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Building2, Award, TrendingUp, Star, CheckCircle, Rocket, Users } from 'lucide-react';
+import { Building2, Award, TrendingUp, Star, CheckCircle, Rocket, Users, Shield } from 'lucide-react';
 
 const CompanySection = () => {
   return (
