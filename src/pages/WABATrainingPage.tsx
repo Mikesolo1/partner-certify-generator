@@ -40,31 +40,34 @@ const WABATrainingPage = () => {
     "Каталог товаров в WhatsApp"
   ];
 
-  const pricing = [
+  const pricingTypes = [
     {
-      tier: "Бесплатно",
-      limit: "1000 сообщений/месяц",
-      price: "0₽",
-      description: "Для начинающих бизнесов"
+      tier: "Маркетинговые сообщения",
+      description: "Промо-акции, новости, анонсы",
+      price: "0.0802$",
+      details: "За каждое сообщение свыше лимита 1000/месяц"
     },
     {
-      tier: "Маркетинговые",
-      limit: "Свыше 1000 сообщений",
-      price: "от 0.4₽ за сообщение",
-      description: "Промо-акции, новости"
-    },
-    {
-      tier: "Утилитарные",
-      limit: "Подтверждения, уведомления",
-      price: "от 0.2₽ за сообщение",
-      description: "Статусы заказов, напоминания"
+      tier: "Утилитарные сообщения",
+      description: "Подтверждения заказов, уведомления о доставке",
+      price: "0.0400$",
+      details: "Статусы заказов, напоминания о встречах"
     },
     {
       tier: "Аутентификация",
-      limit: "Коды подтверждения",
-      price: "от 0.3₽ за сообщение",
-      description: "OTP коды, верификация"
+      description: "Коды подтверждения, верификация",
+      price: "0.0429$",
+      details: "OTP коды, двухфакторная аутентификация"
     }
+  ];
+
+  const popularCountries = [
+    { country: "Россия", marketing: "0.0802$", utility: "0.0400$", auth: "0.0429$" },
+    { country: "Германия", marketing: "0.1365$", utility: "0.0550$", auth: "0.0768$" },
+    { country: "Франция", marketing: "0.1432$", utility: "0.0300$", auth: "0.0691$" },
+    { country: "Италия", marketing: "0.0691$", utility: "0.0300$", auth: "0.0378$" },
+    { country: "Испания", marketing: "0.0615$", utility: "0.0200$", auth: "0.0342$" },
+    { country: "Великобритания", marketing: "0.0529$", utility: "0.0220$", auth: "0.0358$" }
   ];
 
   return (
@@ -141,7 +144,7 @@ const WABATrainingPage = () => {
           </CardContent>
         </Card>
 
-        {/* Стоимость */}
+        {/* Стоимость по типам сообщений */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -149,19 +152,49 @@ const WABATrainingPage = () => {
               Тарификация WhatsApp Business API
             </CardTitle>
             <CardDescription>
-              Цены указаны для России и могут отличаться в зависимости от провайдера
+              Стоимость для России. Первые 1000 сообщений в месяц - бесплатно
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {pricing.map((tier, index) => (
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
+              {pricingTypes.map((type, index) => (
                 <div key={index} className="border rounded-lg p-4 hover:border-brand transition-colors">
-                  <h3 className="font-semibold text-lg">{tier.tier}</h3>
-                  <p className="text-2xl font-bold text-brand mt-2">{tier.price}</p>
-                  <p className="text-sm text-gray-600 mt-1">{tier.limit}</p>
-                  <p className="text-xs text-gray-500 mt-2">{tier.description}</p>
+                  <h3 className="font-semibold text-lg mb-2">{type.tier}</h3>
+                  <p className="text-2xl font-bold text-brand mb-2">{type.price}</p>
+                  <p className="text-sm text-gray-600 mb-3">{type.description}</p>
+                  <p className="text-xs text-gray-500">{type.details}</p>
                 </div>
               ))}
+            </div>
+            
+            {/* Таблица по странам */}
+            <div className="mt-6">
+              <h4 className="font-semibold mb-4">Стоимость в популярных странах (USD)</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-200 text-sm">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="border border-gray-200 p-3 text-left font-semibold">Страна</th>
+                      <th className="border border-gray-200 p-3 text-center font-semibold">Маркетинговые</th>
+                      <th className="border border-gray-200 p-3 text-center font-semibold">Утилитарные</th>
+                      <th className="border border-gray-200 p-3 text-center font-semibold">Аутентификация</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {popularCountries.map((country, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 p-3 font-medium">{country.country}</td>
+                        <td className="border border-gray-200 p-3 text-center">{country.marketing}</td>
+                        <td className="border border-gray-200 p-3 text-center">{country.utility}</td>
+                        <td className="border border-gray-200 p-3 text-center">{country.auth}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                * Цены указаны в долларах США за одно сообщение. Актуальные тарифы для других стран уточняйте у менеджера.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -169,7 +202,7 @@ const WABATrainingPage = () => {
         {/* Этапы подключения */}
         <Card>
           <CardHeader>
-            <CardTitle>Этапы подключения WABA</CardTitle>
+            <CardTitle>Этапы подключения WABA через S3 Partners</CardTitle>
             <CardDescription>
               Пошаговый процесс подключения WhatsApp Business API
             </CardDescription>
@@ -179,8 +212,8 @@ const WABATrainingPage = () => {
               <div className="flex items-start gap-4">
                 <div className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</div>
                 <div>
-                  <h3 className="font-semibold">Выбор провайдера BSP</h3>
-                  <p className="text-gray-600 text-sm">Выберите официального партнера Meta для подключения API</p>
+                  <h3 className="font-semibold">Обращение к S3 Partners</h3>
+                  <p className="text-gray-600 text-sm">Свяжитесь с нашим менеджером для начала процесса подключения</p>
                 </div>
               </div>
               
@@ -188,7 +221,7 @@ const WABATrainingPage = () => {
                 <div className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</div>
                 <div>
                   <h3 className="font-semibold">Верификация бизнеса</h3>
-                  <p className="text-gray-600 text-sm">Подтвердите свой бизнес в Meta Business Manager</p>
+                  <p className="text-gray-600 text-sm">Мы поможем подтвердить ваш бизнес в Meta Business Manager</p>
                 </div>
               </div>
               
@@ -196,7 +229,7 @@ const WABATrainingPage = () => {
                 <div className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</div>
                 <div>
                   <h3 className="font-semibold">Создание WhatsApp Business аккаунта</h3>
-                  <p className="text-gray-600 text-sm">Настройте профиль компании с номером телефона</p>
+                  <p className="text-gray-600 text-sm">Настроим профиль компании с вашим номером телефона</p>
                 </div>
               </div>
               
@@ -204,7 +237,7 @@ const WABATrainingPage = () => {
                 <div className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</div>
                 <div>
                   <h3 className="font-semibold">Интеграция с системами</h3>
-                  <p className="text-gray-600 text-sm">Подключите API к вашим CRM, чат-ботам или другим системам</p>
+                  <p className="text-gray-600 text-sm">Подключим API к вашим CRM, чат-ботам или другим системам</p>
                 </div>
               </div>
               
@@ -212,7 +245,7 @@ const WABATrainingPage = () => {
                 <div className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">5</div>
                 <div>
                   <h3 className="font-semibold">Тестирование и запуск</h3>
-                  <p className="text-gray-600 text-sm">Протестируйте функционал и начните отправку сообщений</p>
+                  <p className="text-gray-600 text-sm">Протестируем функционал и запустим отправку сообщений</p>
                 </div>
               </div>
             </div>
@@ -232,7 +265,7 @@ const WABATrainingPage = () => {
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <h4 className="font-semibold text-amber-800">Лимиты сообщений</h4>
                 <p className="text-amber-700 text-sm mt-1">
-                  Новые аккаунты начинают с лимита 250 сообщений в день, который постепенно увеличивается
+                  Новые аккаунты начинают с лимита 250 сообщений в день, который постепенно увеличивается до 100 000
                 </p>
               </div>
               
@@ -247,6 +280,13 @@ const WABATrainingPage = () => {
                 <h4 className="font-semibold text-green-800">Шаблоны сообщений</h4>
                 <p className="text-green-700 text-sm mt-1">
                   Для рассылок нужно использовать предварительно одобренные шаблоны Meta
+                </p>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <h4 className="font-semibold text-purple-800">Бесплатные сообщения</h4>
+                <p className="text-purple-700 text-sm mt-1">
+                  Каждый месяц первые 1000 сообщений любого типа отправляются бесплатно
                 </p>
               </div>
             </div>
