@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { usePartners } from "@/contexts/PartnersContext";
-import DashboardHeader from "@/components/DashboardHeader";
+import Header from "@/components/Header";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useAdminData } from "@/hooks/useAdminData";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -44,9 +45,9 @@ const AdminPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
+      <Header variant="light" />
       
-      <div className="container mx-auto px-4 py-6 pt-20">
+      <div className="container mx-auto px-4 py-6 pt-28">
         {adminData.fetchError && (
           <Alert variant="destructive" className="mb-6">
             <AlertTitle>Ошибка при загрузке данных</AlertTitle>

@@ -21,13 +21,13 @@ export const PartnerDetailsError = ({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* White header like in admin dashboard */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900">Ошибка загрузки данных партнера</h1>
         </div>
       </header>
       
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 pt-28">
         <ErrorDisplay 
           error={error || "Партнер не найден"} 
           partnerId={partnerId}
