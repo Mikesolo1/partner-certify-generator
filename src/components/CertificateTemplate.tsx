@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Partner } from '@/types';
 import QRCode from 'qrcode';
@@ -110,13 +109,6 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
               <p className="text-sm text-gray-600 mb-1">ID партнера</p>
               <p className="font-semibold text-gray-900">
                 {partner.certificateId || partner.certificate_id}
-              </p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-sm text-gray-600 mb-1">Уровень партнерства</p>
-              <p className="font-semibold text-brand">
-                {partner.partnerLevel || partner.partner_level}
               </p>
             </div>
           </div>
