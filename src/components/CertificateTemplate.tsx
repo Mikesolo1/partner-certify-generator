@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Partner } from '@/types';
+import QRCode from 'qrcode';
 
 interface CertificateTemplateProps {
   partner: Partner;
 }
 
 const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) => {
+  const qrCodeRef = useRef<HTMLCanvasElement>(null);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', {
@@ -18,6 +21,29 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
 
   // Base64 подпись Андрея Недорезова
   const signatureBase64 = "/lovable-uploads/be5f6681-c65b-4407-91af-731c3ea9a090.png";
+
+  // Генерация QR кода для верификации сертификата
+  useEffect(() => {
+    const generateQRCode = async () => {
+      if (qrCodeRef.current) {
+        try {
+          const verificationUrl = `${window.location.origin}/certificate/${partner.id}`;
+          await QRCode.toCanvas(qrCodeRef.current, verificationUrl, {
+            width: 96,
+            margin: 1,
+            color: {
+              dark: '#1f2937',
+              light: '#ffffff'
+            }
+          });
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      }
+    };
+
+    generateQRCode();
+  }, [partner.id]);
 
   return (
     <div className="w-full h-full bg-white flex flex-col relative overflow-hidden">
@@ -32,7 +58,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
               <span className="text-2xl font-black text-gray-900">S3</span>
             </div>
             <div className="text-white">
-              <h1 className="text-2xl font-bold">S3 Business Solutions</h1>
+              <h1 className="text-2xl font-bold">S3 Partners</h1>
               <p className="text-cyan-100">Официальный партнерский сертификат</p>
             </div>
           </div>
@@ -66,7 +92,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
               {partner.companyName || partner.company_name}
             </h3>
             <p className="text-lg text-gray-600">
-              является официальным партнером программы S3 Business Solutions
+              является официальным партнером программы S3 Partners
             </p>
           </div>
           
@@ -97,10 +123,11 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
 
           {/* Центральная колонка - QR код */}
           <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300 rounded-lg mx-auto mb-3 flex items-center justify-center shadow-sm">
-              <div className="w-16 h-16 bg-white rounded flex items-center justify-center">
-                <span className="text-xs text-gray-500 font-mono">QR</span>
-              </div>
+            <div className="flex justify-center mb-3">
+              <canvas 
+                ref={qrCodeRef}
+                className="border-2 border-gray-300 rounded-lg shadow-sm"
+              />
             </div>
             <p className="text-xs text-gray-500">Код верификации</p>
           </div>
@@ -117,7 +144,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({ partner }) =>
               </div>
               <div className="border-t border-gray-300 pt-3">
                 <p className="font-semibold text-gray-900">Андрей Недорезов</p>
-                <p className="text-sm text-gray-600">CEO S3 Business Solutions</p>
+                <p className="text-sm text-gray-600">CEO S3 Partners</p>
               </div>
             </div>
           </div>
