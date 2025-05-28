@@ -65,10 +65,11 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Используем Supabase Auth для сброса пароля
+    // Используем Supabase Auth для сброса пароля с корректным redirectTo
     console.log("Calling Supabase auth resetPasswordForEmail");
+    const originUrl = req.headers.get('origin') || 'https://partners.s3-tech.ru';
     const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${req.headers.get('origin')}/reset-password`,
+      redirectTo: `${originUrl}/reset-password`,
     });
 
     if (authError && !authError.message.includes('not found')) {
@@ -76,54 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Ошибка отправки письма восстановления");
     }
 
-    console.log("Sending email via Resend");
-    const emailResponse = await resend.emails.send({
-      from: "S3 Partners <noreply@resend.dev>",
-      to: [email],
-      subject: "Восстановление пароля - S3 Partners",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #1e40af; margin: 0;">S3 Partners</h1>
-          </div>
-          
-          <h2 style="color: #374151; margin-bottom: 20px;">Восстановление пароля</h2>
-          
-          <p style="color: #6b7280; line-height: 1.6; margin-bottom: 20px;">
-            Вы запросили восстановление пароля для вашего аккаунта в S3 Partners.
-          </p>
-          
-          <p style="color: #6b7280; line-height: 1.6; margin-bottom: 30px;">
-            Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
-          </p>
-          
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${req.headers.get('origin')}/reset-password" 
-               style="background: linear-gradient(to right, #1e40af, #0891b2); 
-                      color: white; 
-                      padding: 12px 30px; 
-                      text-decoration: none; 
-                      border-radius: 8px; 
-                      font-weight: 600;
-                      display: inline-block;">
-              Восстановить пароль
-            </a>
-          </div>
-          
-          <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-top: 30px;">
-            Эта ссылка будет действительна в течение 24 часов.
-          </p>
-          
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-          
-          <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-            © 2025 S3 Partners. Все права защищены.
-          </p>
-        </div>
-      `,
-    });
-
-    console.log("Password reset email sent successfully:", emailResponse);
+    console.log("Password reset process completed successfully");
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
