@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
@@ -9,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Компания */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-brand">S3 WABA</h3>
+            <h3 className="text-lg font-semibold mb-4 text-brand">S3</h3>
             <p className="text-gray-300 text-sm mb-4">
               Партнерская программа по продвижению WhatsApp Business API решений
             </p>
@@ -55,7 +54,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
             <div className="mb-4 md:mb-0">
-              © 2024 S3 WABA. Все права защищены.
+              © 2024 S3. Все права защищены.
             </div>
             <div className="text-center md:text-right">
               <p className="mb-1">ИП Киреев Никита Андреевич</p>

@@ -10,7 +10,7 @@ const CommissionSection = () => {
         <div className="text-center mb-12 md:mb-16">
           <DollarSign className="h-12 w-12 md:h-16 md:w-16 text-brand mx-auto mb-4 md:mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6">
-            Зарабатывайте с каждого клиента WABA
+            Зарабатывайте с каждого клиента S3
           </h2>
           <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto">
             Приведите клиента с аккаунтом WhatsApp Business API и получайте долгосрочный доход
