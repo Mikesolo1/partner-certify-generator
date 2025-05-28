@@ -26,6 +26,11 @@ const CommissionCard = ({ totalCommission, paidCommission, pendingCommission }: 
             <p className="font-medium text-green-600">{pendingCommission.toLocaleString('ru-RU')} ₽</p>
           </div>
         </div>
+        <div className="mt-2 pt-2 border-t">
+          <p className="text-xs text-gray-500">
+            Комиссия по клиентам: 50% → 30% → 10%
+          </p>
+        </div>
       </div>
     </BaseStatCard>
   );

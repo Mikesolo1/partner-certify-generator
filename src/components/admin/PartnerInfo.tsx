@@ -65,22 +65,6 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
     return roleConfig[role as keyof typeof roleConfig] || { variant: "default" as const, className: "bg-gray-600", children: role };
   };
 
-  const getYearsOfPartnership = (joinDate: string) => {
-    const now = new Date();
-    const join = new Date(joinDate);
-    const years = now.getFullYear() - join.getFullYear();
-    return Math.max(0, years);
-  };
-
-  const getCommissionRate = (yearsOfPartnership: number) => {
-    if (yearsOfPartnership === 0) return "50%";
-    if (yearsOfPartnership === 1) return "30%";
-    return "10%";
-  };
-
-  const yearsOfPartnership = getYearsOfPartnership(partner.joinDate || partner.join_date || '');
-  const currentCommissionRate = getCommissionRate(yearsOfPartnership);
-
   return (
     <Card>
       <CardHeader>
@@ -111,8 +95,11 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Год партнерства</p>
-            <p className="font-medium">{yearsOfPartnership + 1}-й год</p>
+            <p className="text-sm text-gray-600">Система комиссий</p>
+            <p className="font-medium text-blue-600">По клиентам индивидуально</p>
+            <p className="text-xs text-gray-500">
+              50% в 1-й год / 30% во 2-й год / 10% с 3-го года клиента
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Статус теста</p>
@@ -121,10 +108,6 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
           <div>
             <p className="text-sm text-gray-600">Роль</p>
             <Badge {...getRoleBadge(partner.role || 'partner')} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Текущая комиссия</p>
-            <p className="font-medium text-green-600">{currentCommissionRate}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">ID сертификата</p>

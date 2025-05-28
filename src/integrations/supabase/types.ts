@@ -45,6 +45,7 @@ export type Database = {
         Row: {
           created_at: string | null
           email: string
+          first_payment_date: string | null
           id: string
           name: string
           partner_id: string
@@ -55,6 +56,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           email: string
+          first_payment_date?: string | null
           id?: string
           name: string
           partner_id: string
@@ -65,6 +67,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           email?: string
+          first_payment_date?: string | null
           id?: string
           name?: string
           partner_id?: string
@@ -415,6 +418,10 @@ export type Database = {
           updated_at: string | null
         }
       }
+      calculate_client_partnership_year: {
+        Args: { p_client_id: string; p_payment_date: string }
+        Returns: number
+      }
       calculate_commission_by_year: {
         Args: { p_amount: number; p_partnership_year: number }
         Returns: number
@@ -468,6 +475,7 @@ export type Database = {
         Returns: {
           created_at: string | null
           email: string
+          first_payment_date: string | null
           id: string
           name: string
           partner_id: string
@@ -504,6 +512,7 @@ export type Database = {
         Returns: {
           created_at: string | null
           email: string
+          first_payment_date: string | null
           id: string
           name: string
           partner_id: string
@@ -652,6 +661,7 @@ export type Database = {
         Returns: {
           created_at: string | null
           email: string
+          first_payment_date: string | null
           id: string
           name: string
           partner_id: string

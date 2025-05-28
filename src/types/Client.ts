@@ -11,4 +11,5 @@ export interface Client {
   date?: string;
   partner_id?: string;
   payments?: Payment[];
+  first_payment_date?: string; // Добавляем новое поле
 }

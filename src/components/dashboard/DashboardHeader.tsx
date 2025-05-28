@@ -3,7 +3,6 @@ import React from 'react';
 
 interface DashboardHeaderProps {
   contactPersonName: string;
-  currentPartnerLevel?: string; // Делаем опциональным, так как больше не используем уровни
 }
 
 const DashboardHeader = ({ contactPersonName }: DashboardHeaderProps) => {
@@ -13,7 +12,8 @@ const DashboardHeader = ({ contactPersonName }: DashboardHeaderProps) => {
         Добро пожаловать, {contactPersonName}!
       </h1>
       <p className="text-gray-600">
-        Управляйте своими клиентами и отслеживайте комиссионные выплаты
+        Управляйте своими клиентами и отслеживайте комиссионные выплаты. 
+        Комиссия рассчитывается индивидуально для каждого клиента по годам сотрудничества.
       </p>
     </div>
   );

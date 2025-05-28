@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Client, Payment } from '@/types';
 import {
@@ -48,7 +49,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         payment_destination: paymentDestination,
         tariff_start_date: tariffStartDate,
         tariff_end_date: tariffEndDate || undefined,
-        created_by: currentPartner.id // Add the admin's ID as creator
+        created_by: currentPartner.id
       });
 
       toast({
@@ -73,6 +74,21 @@ export const ClientsList: React.FC<ClientsListProps> = ({
     }
   };
 
+  const getClientYears = (client: Client) => {
+    if (!client.first_payment_date) return null;
+    const firstPaymentDate = new Date(client.first_payment_date);
+    const now = new Date();
+    const yearsDiff = now.getFullYear() - firstPaymentDate.getFullYear();
+    return yearsDiff + 1;
+  };
+
+  const getCommissionRate = (clientYears: number | null) => {
+    if (!clientYears) return "50%";
+    if (clientYears === 1) return "50%";
+    if (clientYears === 2) return "30%";
+    return "10%";
+  };
+
   return (
     <div className="mt-6">
       <h3 className="text-lg font-medium mb-4">Клиенты партнера</h3>
@@ -84,6 +100,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               <TableHead>Email</TableHead>
               <TableHead>Телефон</TableHead>
               <TableHead>Дата регистрации</TableHead>
+              <TableHead>Год клиента</TableHead>
+              <TableHead>Комиссия</TableHead>
               <TableHead>Платежи</TableHead>
               <TableHead>Действия</TableHead>
             </TableRow>
@@ -93,6 +111,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               clients.map(client => {
                 const clientPayments = getClientPayments(client.id);
                 const totalAmount = clientPayments.reduce((sum, payment) => sum + payment.amount, 0);
+                const clientYears = getClientYears(client);
+                const commissionRate = getCommissionRate(clientYears);
                 
                 return (
                   <TableRow key={client.id}>
@@ -101,6 +121,12 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     <TableCell>{client.phone || "—"}</TableCell>
                     <TableCell>
                       {new Date(client.registrationDate || client.registration_date || '').toLocaleDateString('ru-RU')}
+                    </TableCell>
+                    <TableCell>
+                      {clientYears ? `${clientYears}-й год` : 'Без платежей'}
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium text-green-600">{commissionRate}</span>
                     </TableCell>
                     <TableCell>
                       {clientPayments.length} платежей на сумму{" "}
@@ -122,7 +148,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">У партнера нет клиентов</TableCell>
+                <TableCell colSpan={8} className="text-center py-4">У партнера нет клиентов</TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -134,7 +160,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
           <DialogHeader>
             <DialogTitle>Добавить платеж</DialogTitle>
             <DialogDescription>
-              Укажите детали платежа для клиента
+              Укажите детали платежа для клиента. Комиссия будет рассчитана автоматически на основе года клиента.
             </DialogDescription>
           </DialogHeader>
 
