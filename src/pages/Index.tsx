@@ -14,7 +14,7 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header />
       
-      <div className="pt-16">
+      <div>
         <HeroSection />
         <WabaInfoSection />
         <CommissionSection />
