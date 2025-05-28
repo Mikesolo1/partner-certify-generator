@@ -16,11 +16,11 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center">
                 <Mail className="h-4 w-4 mr-2" />
-                partners@s3waba.ru
+                sales1@s-3.tech
               </div>
               <div className="flex items-center">
                 <Phone className="h-4 w-4 mr-2" />
-                +7 (495) 123-45-67
+                +7 (969) 777-62-52
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-2" />
@@ -58,8 +58,8 @@ const Footer = () => {
               © 2024 S3 WABA. Все права защищены.
             </div>
             <div className="text-center md:text-right">
-              <p className="mb-1">ООО "С3 ВАБА"</p>
-              <p>ИНН: 7701234567 • ОГРН: 1234567890123</p>
+              <p className="mb-1">ИП Самохин Сергей Сергеевич</p>
+              <p>ИНН: 580903594790 • ОГРНИП: 324580000058570</p>
             </div>
           </div>
         </div>
