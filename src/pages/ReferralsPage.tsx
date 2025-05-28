@@ -9,15 +9,6 @@ import { Navigate } from 'react-router-dom';
 const ReferralsPage = () => {
   const { currentPartner } = usePartners();
 
-  // Логируем состояние партнера для отладки
-  useEffect(() => {
-    console.log("ReferralsPage - currentPartner:", currentPartner);
-    if (currentPartner) {
-      console.log("referralAccessEnabled:", currentPartner.referralAccessEnabled);
-      console.log("referral_access_enabled:", currentPartner.referral_access_enabled);
-    }
-  }, [currentPartner]);
-
   if (!currentPartner) {
     return <Navigate to="/login" />;
   }
@@ -38,8 +29,6 @@ const ReferralsPage = () => {
   // Проверяем доступ к реферальной программе - используем оба поля для совместимости
   const hasReferralAccess = currentPartner.referralAccessEnabled || currentPartner.referral_access_enabled;
   
-  console.log("ReferralsPage - hasReferralAccess:", hasReferralAccess);
-  
   if (!hasReferralAccess) {
     return (
       <DashboardLayout>
@@ -48,15 +37,6 @@ const ReferralsPage = () => {
           <p className="text-gray-600 mb-8">
             Доступ к реферальной программе управляется администратором. Обратитесь к администратору для получения доступа.
           </p>
-          <p className="text-sm text-gray-500">
-            Текущий статус доступа: {hasReferralAccess ? 'Разрешен' : 'Ограничен'}
-          </p>
-          <div className="mt-4 p-4 bg-gray-100 rounded-lg text-xs">
-            <p>Отладочная информация:</p>
-            <p>referralAccessEnabled: {String(currentPartner.referralAccessEnabled)}</p>
-            <p>referral_access_enabled: {String(currentPartner.referral_access_enabled)}</p>
-            <p>testPassed: {String(currentPartner.testPassed)}</p>
-          </div>
         </div>
       </DashboardLayout>
     );
