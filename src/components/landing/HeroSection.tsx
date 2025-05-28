@@ -6,7 +6,7 @@ import { CheckCircle, Users, TrendingUp, Shield, Target, Star, ArrowRight, Spark
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
+    <section className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-brand/20 to-cyan-300/20 rounded-full blur-3xl animate-pulse"></div>
@@ -17,27 +17,27 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-32 pb-16 lg:pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Main Content */}
-          <div className="space-y-8 lg:space-y-10 text-center lg:text-left">
+          <div className="space-y-6 lg:space-y-8 text-center lg:text-left">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-brand/10 to-cyan-100/50 border border-brand/20 rounded-full text-sm font-semibold text-brand backdrop-blur-sm">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-brand/20 to-cyan-400/20 border border-brand/30 rounded-full text-sm font-semibold text-brand backdrop-blur-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Рынок WABA растет на 40% в год
             </div>
             
             {/* Main Headline */}
             <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight">
-                <span className="text-gray-900">Зарабатывайте на</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight">
+                <span className="text-white">Зарабатывайте на</span>
                 <br />
                 <span className="bg-gradient-to-r from-brand via-cyan-400 to-blue-500 bg-clip-text text-transparent">
                   WhatsApp Business API
                 </span>
               </h1>
               
-              <p className="text-xl sm:text-2xl lg:text-3xl text-gray-600 leading-relaxed font-light">
+              <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed font-light">
                 Получайте до <span className="font-bold text-brand">50% комиссии</span> с каждого клиента.
                 <br className="hidden sm:block" />
-                Стабильный доход от <span className="font-bold text-gray-900">168 000 ₽</span> в год.
+                Стабильный доход от <span className="font-bold text-white">168 000 ₽</span> в год.
               </p>
             </div>
 
@@ -49,9 +49,9 @@ const HeroSection = () => {
                 { icon: Target, text: "Маркетинговые материалы" },
                 { icon: Users, text: "Техподдержка 24/7" }
               ].map((benefit, index) => (
-                <div key={index} className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300">
+                <div key={index} className="flex items-center space-x-3 bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-gray-700 shadow-sm hover:shadow-md hover:border-brand/30 transition-all duration-300">
                   <benefit.icon className="h-5 w-5 text-brand flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">{benefit.text}</span>
+                  <span className="text-gray-300 font-medium">{benefit.text}</span>
                 </div>
               ))}
             </div>
@@ -59,13 +59,13 @@ const HeroSection = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link to="/register" className="flex-1 sm:flex-none">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-500 hover:to-brand text-white text-lg font-bold px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group">
+                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-500 hover:to-brand text-gray-900 text-lg font-bold px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group">
                   Стать партнером бесплатно
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/login" className="flex-1 sm:flex-none">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-brand text-brand hover:bg-brand/5 hover:border-cyan-400 text-lg font-semibold px-8 py-4 backdrop-blur-sm transition-all duration-300">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-brand text-brand hover:bg-brand/10 hover:border-cyan-400 text-lg font-semibold px-8 py-4 backdrop-blur-sm transition-all duration-300">
                   Войти в кабинет
                 </Button>
               </Link>
@@ -75,7 +75,7 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-brand" />
-                <span className="text-gray-600">Уже <span className="font-bold text-gray-900">500+ партнеров</span> зарабатывают с S3</span>
+                <span className="text-gray-400">Уже <span className="font-bold text-white">500+ партнеров</span> зарабатывают с S3</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center space-x-1">
@@ -83,14 +83,14 @@ const HeroSection = () => {
                     <Star key={i} className="h-4 w-4 text-brand fill-current" />
                   ))}
                 </div>
-                <span className="text-gray-600">4.9/5 • 247 отзывов</span>
+                <span className="text-gray-400">4.9/5 • 247 отзывов</span>
               </div>
             </div>
           </div>
 
           {/* Right Column - Stats Card */}
           <div className="lg:pl-8">
-            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border border-gray-200/50 shadow-2xl">
+            <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border border-gray-700 shadow-2xl">
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-brand/5 to-cyan-300/5 rounded-3xl"></div>
               
@@ -98,10 +98,10 @@ const HeroSection = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-brand to-cyan-400 rounded-2xl mb-4">
-                    <Target className="h-8 w-8 text-white" />
+                    <Target className="h-8 w-8 text-gray-900" />
                   </div>
-                  <h3 className="text-2xl lg:text-3xl font-bold mb-2 text-gray-900">Почему выбирают S3</h3>
-                  <p className="text-gray-600">Лидер рынка WABA в России</p>
+                  <h3 className="text-xl lg:text-2xl font-bold mb-2 text-white">Почему выбирают S3</h3>
+                  <p className="text-gray-400">Лидер рынка WABA в России</p>
                 </div>
 
                 {/* Key Features */}
@@ -111,32 +111,32 @@ const HeroSection = () => {
                     { icon: TrendingUp, title: "Растущий доход", desc: "Стабильные выплаты каждый месяц" },
                     { icon: Users, title: "Полная поддержка", desc: "От обучения до сопровождения сделок" }
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50/80 rounded-xl border border-gray-100">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-brand/10 to-cyan-100 rounded-xl flex items-center justify-center">
+                    <div key={index} className="flex items-start space-x-4 p-4 bg-gray-800/50 rounded-xl border border-gray-600">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-brand/20 to-cyan-400/20 rounded-xl flex items-center justify-center">
                         <feature.icon className="h-6 w-6 text-brand" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">{feature.title}</h4>
-                        <p className="text-sm text-gray-600">{feature.desc}</p>
+                        <h4 className="font-semibold text-white mb-1">{feature.title}</h4>
+                        <p className="text-sm text-gray-400">{feature.desc}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {/* Stats */}
-                <div className="bg-gradient-to-r from-brand/10 via-cyan-50 to-brand/5 rounded-2xl p-6 border border-brand/20">
+                <div className="bg-gradient-to-r from-brand/10 via-cyan-400/10 to-brand/5 rounded-2xl p-6 border border-brand/20">
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl lg:text-3xl font-bold text-brand">500+</div>
-                      <div className="text-xs text-gray-600">WABA запущено</div>
+                      <div className="text-xl lg:text-2xl font-bold text-brand">500+</div>
+                      <div className="text-xs text-gray-400">WABA запущено</div>
                     </div>
                     <div>
-                      <div className="text-2xl lg:text-3xl font-bold text-brand">99.9%</div>
-                      <div className="text-xs text-gray-600">uptime</div>
+                      <div className="text-xl lg:text-2xl font-bold text-brand">99.9%</div>
+                      <div className="text-xs text-gray-400">uptime</div>
                     </div>
                     <div>
-                      <div className="text-2xl lg:text-3xl font-bold text-brand">24/7</div>
-                      <div className="text-xs text-gray-600">поддержка</div>
+                      <div className="text-xl lg:text-2xl font-bold text-brand">24/7</div>
+                      <div className="text-xs text-gray-400">поддержка</div>
                     </div>
                   </div>
                 </div>
