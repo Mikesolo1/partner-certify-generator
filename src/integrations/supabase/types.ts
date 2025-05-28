@@ -794,6 +794,14 @@ export type Database = {
               p_password: string
               p_phone?: string
             }
+          | {
+              p_company_name: string
+              p_contact_person: string
+              p_email: string
+              p_password: string
+              p_phone?: string
+              p_referral_code?: string
+            }
         Returns: {
           certificate_id: string | null
           company_name: string
