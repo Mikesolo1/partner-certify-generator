@@ -78,7 +78,7 @@ export const updatePartnerReferralAccess = async (partnerId: string, enabled: bo
   try {
     console.log("Calling update_partner_referral_access RPC with:", { partnerId, enabled });
     
-    // Используем RPC функцию, которая должна вернуть обновленные данные партнера
+    // Используем обновленную RPC функцию, которая возвращает данные партнера
     const { data, error } = await supabase.rpc('update_partner_referral_access', {
       p_partner_id: partnerId,
       p_referral_access_enabled: enabled
@@ -91,22 +91,12 @@ export const updatePartnerReferralAccess = async (partnerId: string, enabled: bo
     
     console.log("RPC Response:", data);
     
-    // Если RPC функция возвращает только boolean, получаем данные партнера отдельно
-    const { data: partnerData, error: fetchError } = await supabase.rpc('get_partner_by_id', {
-      p_id: partnerId
-    });
-    
-    if (fetchError) {
-      console.error("Fetch Error:", fetchError);
-      throw fetchError;
-    }
-    
-    if (!partnerData || partnerData.length === 0) {
+    if (!data || data.length === 0) {
       throw new Error("Partner not found after update");
     }
     
-    const updatedPartner = partnerData[0];
-    console.log("Fetched updated partner:", updatedPartner);
+    const updatedPartner = data[0];
+    console.log("Updated partner data:", updatedPartner);
     
     // Преобразуем данные в нужный формат
     return {

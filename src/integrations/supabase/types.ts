@@ -758,50 +758,14 @@ export type Database = {
         }[]
       }
       insert_partner_direct: {
-        Args:
-          | {
-              p_company_name: string
-              p_contact_person: string
-              p_email: string
-              p_password: string
-              p_partner_level?: string
-              p_certificate_id?: string
-              p_commission?: number
-            }
-          | {
-              p_company_name: string
-              p_contact_person: string
-              p_email: string
-              p_password: string
-              p_partner_level?: string
-              p_commission?: number
-              p_phone?: string
-            }
-          | {
-              p_company_name: string
-              p_contact_person: string
-              p_email: string
-              p_password: string
-              p_partner_level?: string
-              p_commission?: number
-              p_phone?: string
-              p_referral_code?: string
-            }
-          | {
-              p_company_name: string
-              p_contact_person: string
-              p_email: string
-              p_password: string
-              p_phone?: string
-            }
-          | {
-              p_company_name: string
-              p_contact_person: string
-              p_email: string
-              p_password: string
-              p_phone?: string
-              p_referral_code?: string
-            }
+        Args: {
+          p_company_name: string
+          p_contact_person: string
+          p_email: string
+          p_password: string
+          p_phone?: string
+          p_referral_code?: string
+        }
         Returns: {
           certificate_id: string | null
           company_name: string
@@ -877,7 +841,23 @@ export type Database = {
       }
       update_partner_referral_access: {
         Args: { p_partner_id: string; p_referral_access_enabled: boolean }
-        Returns: boolean
+        Returns: {
+          certificate_id: string | null
+          company_name: string
+          contact_person: string
+          created_at: string | null
+          email: string
+          id: string
+          join_date: string | null
+          password: string
+          phone: string
+          referral_access_enabled: boolean | null
+          referral_code: string | null
+          referrer_id: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          test_passed: boolean | null
+          updated_at: string | null
+        }[]
       }
       update_partner_referral_code: {
         Args: { p_partner_id: string }
