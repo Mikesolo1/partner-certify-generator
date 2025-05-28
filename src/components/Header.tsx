@@ -44,9 +44,9 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
             <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium`}>О компании</button>
             <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium`}>Услуги</button>
             <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium`}>Преимущества</button>
-            <a href="tel:+79991234567" className={`flex items-center space-x-2 text-sm ${phoneTextClass} hover:text-brand transition-colors`}>
+            <a href="tel:+79697776252" className={`flex items-center space-x-2 text-sm ${phoneTextClass} hover:text-brand transition-colors`}>
               <Phone className="h-4 w-4" />
-              <span>+7 (999) 123-45-67</span>
+              <span>+7 (969) 777-62-52</span>
             </a>
           </nav>
 
@@ -80,9 +80,9 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
               <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>О компании</button>
               <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Услуги</button>
               <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Преимущества</button>
-              <a href="tel:+79991234567" className={`flex items-center space-x-2 text-sm ${phoneTextClass} px-2 hover:text-brand transition-colors`}>
+              <a href="tel:+79697776252" className={`flex items-center space-x-2 text-sm ${phoneTextClass} px-2 hover:text-brand transition-colors`}>
                 <Phone className="h-4 w-4" />
-                <span>+7 (999) 123-45-67</span>
+                <span>+7 (969) 777-62-52</span>
               </a>
               <div className="flex flex-col space-y-2 pt-4">
                 <Link to="/login">
