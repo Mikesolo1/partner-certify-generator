@@ -3,15 +3,15 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '@/components/LoginForm';
-import Header from '@/components/Header';
+import DashboardHeader from '@/components/DashboardHeader';
 import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <DashboardHeader />
       
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 pt-28">
         <div className="max-w-md mx-auto">
           <Card>
             <CardHeader>
