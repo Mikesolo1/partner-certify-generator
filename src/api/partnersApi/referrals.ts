@@ -75,3 +75,47 @@ export const markReferralCommissionsPaid = async (partnerId: string): Promise<vo
     throw error;
   }
 };
+
+export const updatePartnerReferralAccess = async (partnerId: string, enabled: boolean): Promise<Partner> => {
+  try {
+    const { error } = await supabase.rpc('update_partner_referral_access', {
+      p_partner_id: partnerId,
+      p_referral_access_enabled: enabled
+    });
+    
+    if (error) throw error;
+    
+    // Получаем обновленные данные партнера
+    const { data: partnerData, error: fetchError } = await supabase.rpc('get_partner_by_id', {
+      p_id: partnerId
+    });
+    
+    if (fetchError) throw fetchError;
+    
+    if (!partnerData || partnerData.length === 0) {
+      throw new Error("Partner not found after update");
+    }
+    
+    const updatedPartner = partnerData[0];
+    
+    return {
+      id: updatedPartner.id,
+      companyName: updatedPartner.company_name,
+      contactPerson: updatedPartner.contact_person,
+      email: updatedPartner.email,
+      partnerLevel: updatedPartner.partner_level,
+      joinDate: updatedPartner.join_date,
+      certificateId: updatedPartner.certificate_id,
+      testPassed: updatedPartner.test_passed,
+      commission: updatedPartner.commission,
+      role: updatedPartner.role,
+      phone: updatedPartner.phone || '',
+      referrerId: updatedPartner.referrer_id,
+      referralCode: updatedPartner.referral_code,
+      referralAccessEnabled: updatedPartner.referral_access_enabled
+    };
+  } catch (error) {
+    console.error("Error updating partner referral access:", error);
+    throw error;
+  }
+};

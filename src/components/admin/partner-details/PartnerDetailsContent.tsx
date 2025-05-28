@@ -18,6 +18,7 @@ interface PartnerDetailsContentProps {
   partnerId: string;
   refreshing: boolean;
   onRefresh: () => void;
+  onPartnerUpdate?: (updatedPartner: Partner) => void;
   getClientPayments: (clientId: string) => any[];
 }
 
@@ -27,6 +28,7 @@ export const PartnerDetailsContent = ({
   partnerId,
   refreshing,
   onRefresh,
+  onPartnerUpdate,
   getClientPayments
 }: PartnerDetailsContentProps) => {
   return (
@@ -76,7 +78,10 @@ export const PartnerDetailsContent = ({
           </TabsContent>
           
           <TabsContent value="info" className="mt-6">
-            <PartnerInfo partner={partner} />
+            <PartnerInfo 
+              partner={partner} 
+              onPartnerUpdate={onPartnerUpdate}
+            />
           </TabsContent>
         </Tabs>
       </div>

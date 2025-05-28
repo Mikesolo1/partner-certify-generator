@@ -10,7 +10,7 @@ import { PartnerDetailsError } from '@/components/admin/partner-details/PartnerD
 import { PartnerDetailsContent } from '@/components/admin/partner-details/PartnerDetailsContent';
 
 const AdminPartnerDetailsPage = () => {
-  const { id } = useParams(); // Используем 'id' вместо 'partnerId'
+  const { id } = useParams();
   const { clients, payments, loading: adminDataLoading, fetchData } = useAdminData();
   const { toast } = useToast();
   const [partner, setPartner] = useState<Partner | null>(null);
@@ -26,7 +26,6 @@ const AdminPartnerDetailsPage = () => {
       setError(null);
       console.log("Fetching partner details for ID:", partnerId);
 
-      // Используем правильное имя параметра для RPC функции
       const { data, error: rpcError } = await safeRPC(
         'get_partner_by_id', 
         { p_id: partnerId },
@@ -73,7 +72,8 @@ const AdminPartnerDetailsPage = () => {
         role: partnerData.role,
         phone: partnerData.phone || '',
         referrerId: partnerData.referrer_id,
-        referralCode: partnerData.referral_code
+        referralCode: partnerData.referral_code,
+        referralAccessEnabled: partnerData.referral_access_enabled
       });
       
     } catch (err: any) {
@@ -124,6 +124,10 @@ const AdminPartnerDetailsPage = () => {
       description: "Информация о партнере успешно обновлена"
     });
   };
+
+  const handlePartnerUpdate = (updatedPartner: Partner) => {
+    setPartner(updatedPartner);
+  };
   
   if (!id) {
     console.error("No id provided in URL params");
@@ -164,6 +168,7 @@ const AdminPartnerDetailsPage = () => {
       partnerId={id}
       refreshing={refreshing}
       onRefresh={handleRefresh}
+      onPartnerUpdate={handlePartnerUpdate}
       getClientPayments={getClientPayments}
     />
   );

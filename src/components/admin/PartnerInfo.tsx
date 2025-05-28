@@ -3,17 +3,17 @@ import React, { useState } from 'react';
 import { Partner } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { safeRPC } from '@/api/utils/queryHelpers';
+import { updatePartnerReferralAccess } from '@/api/partnersApi/referrals';
 
 interface PartnerInfoProps {
   partner: Partner;
+  onPartnerUpdate?: (updatedPartner: Partner) => void;
 }
 
-export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
+export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpdate }) => {
   const { toast } = useToast();
   const [referralAccess, setReferralAccess] = useState(
     partner.referralAccessEnabled || partner.referral_access_enabled || false
@@ -25,16 +25,15 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
     
     setUpdating(true);
     try {
-      const { error } = await safeRPC('update_partner_referral_access', {
-        p_partner_id: partner.id,
-        p_referral_access_enabled: enabled
-      });
-      
-      if (error) {
-        throw error;
-      }
+      const updatedPartner = await updatePartnerReferralAccess(partner.id, enabled);
       
       setReferralAccess(enabled);
+      
+      // Уведомляем родительский компонент об обновлении
+      if (onPartnerUpdate) {
+        onPartnerUpdate(updatedPartner);
+      }
+      
       toast({
         title: "Настройки обновлены",
         description: `Доступ к реферальной программе ${enabled ? 'включен' : 'отключен'}`,
@@ -113,6 +112,12 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
             <p className="text-sm text-gray-600">ID сертификата</p>
             <p className="font-medium">{partner.certificateId || partner.certificate_id || 'Не выдан'}</p>
           </div>
+          {(partner.referralCode || partner.referral_code) && (
+            <div>
+              <p className="text-sm text-gray-600">Реферальный код</p>
+              <p className="font-medium font-mono text-blue-600">{partner.referralCode || partner.referral_code}</p>
+            </div>
+          )}
         </div>
 
         {/* Управление доступом к реферальной программе */}
@@ -123,6 +128,11 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
               <p className="text-sm text-gray-600">
                 Разрешить партнеру использовать реферальную программу
               </p>
+              {referralAccess && (
+                <p className="text-xs text-green-600">
+                  ✓ Партнер может приглашать новых партнеров и получать реферальные комиссии
+                </p>
+              )}
             </div>
             <Switch
               id="referral-access"
