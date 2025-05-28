@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { usePartners } from '@/contexts/PartnersContext';
 
 const formSchema = z.object({
@@ -104,6 +104,15 @@ const LoginForm = () => {
             </FormItem>
           )}
         />
+
+        <div className="text-right">
+          <Link 
+            to="/forgot-password" 
+            className="text-sm text-certificate-blue hover:underline"
+          >
+            Забыли пароль?
+          </Link>
+        </div>
 
         <Button 
           type="submit" 

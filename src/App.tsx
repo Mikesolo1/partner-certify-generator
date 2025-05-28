@@ -8,6 +8,8 @@ import { PartnersProvider } from "@/contexts/PartnersContext";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import PartnersPage from "./pages/PartnersPage";
@@ -37,6 +39,8 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/dashboard/clients" element={<ClientsPage />} />
               <Route path="/dashboard/commissions" element={<CommissionsReportPage />} />
