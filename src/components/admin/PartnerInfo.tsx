@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Partner } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +27,11 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpda
     
     setUpdating(true);
     try {
+      console.log("Updating referral access for partner:", partner.id, "to:", enabled);
+      
       const updatedPartner = await updatePartnerReferralAccess(partner.id, enabled);
+      
+      console.log("Updated partner data:", updatedPartner);
       
       setReferralAccess(enabled);
       
@@ -43,7 +48,12 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpda
       
       // Уведомляем родительский компонент об обновлении
       if (onPartnerUpdate) {
-        onPartnerUpdate(updatedPartner);
+        const updatedPartnerForCallback = {
+          ...updatedPartner,
+          referral_access_enabled: enabled
+        };
+        onPartnerUpdate(updatedPartnerForCallback);
+        console.log("Notified parent component with updated partner");
       }
       
       toast({
@@ -57,6 +67,8 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner, onPartnerUpda
         description: "Не удалось обновить настройки доступа",
         variant: "destructive",
       });
+      // Возвращаем состояние обратно при ошибке
+      setReferralAccess(!enabled);
     } finally {
       setUpdating(false);
     }
