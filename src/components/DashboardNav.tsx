@@ -1,107 +1,78 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Users, Award, FileText, Download, LogOut, UserPlus } from 'lucide-react';
+import { 
+  Home, 
+  Users, 
+  FileText, 
+  Award, 
+  HelpCircle, 
+  UserPlus,
+  BarChart3,
+  ChevronRight
+} from 'lucide-react';
 import { usePartners } from '@/contexts/PartnersContext';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-
-interface NavItemProps {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  isActive: boolean;
-}
-
-const NavItem = ({ href, icon: Icon, label, isActive }: NavItemProps) => (
-  <Link
-    to={href}
-    className={cn(
-      "flex items-center gap-x-2 py-2 px-4 rounded-md transition-colors",
-      isActive
-        ? "bg-certificate-blue text-white"
-        : "text-gray-600 hover:bg-gray-100"
-    )}
-  >
-    <Icon className="h-5 w-5" />
-    <span>{label}</span>
-  </Link>
-);
 
 const DashboardNav = () => {
   const location = useLocation();
-  const { logoutPartner, currentPartner } = usePartners();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogout = () => {
-    logoutPartner();
-    toast({
-      title: "Выход выполнен",
-      description: "Вы вышли из личного кабинета",
-    });
-    navigate('/login');
-  };
+  const { currentPartner } = usePartners();
 
   const isActive = (path: string) => location.pathname === path;
 
+  const navItems = [
+    { path: '/dashboard', icon: Home, label: 'Главная' },
+    { path: '/dashboard/clients', icon: Users, label: 'Клиенты' },
+    { path: '/dashboard/commissions', icon: BarChart3, label: 'Отчет комиссий' },
+    { path: '/dashboard/certificate', icon: Award, label: 'Сертификат' },
+    { path: '/dashboard/test', icon: HelpCircle, label: 'Тест' },
+    { path: '/dashboard/referrals', icon: UserPlus, label: 'Рефералы' },
+  ];
+
   return (
-    <div className="bg-white border-r h-full p-6">
+    <nav className="bg-white border-r border-gray-200 w-64 min-h-screen p-6">
       <div className="mb-8">
-        <h2 className="font-bold text-lg mb-1">
-          {currentPartner?.companyName || 'Личный кабинет'}
-        </h2>
-        <p className="text-sm text-gray-500">
-          Партнер S3
-        </p>
-      </div>
-
-      <nav className="space-y-2">
-        <NavItem href="/dashboard" icon={Award} label="Главная" isActive={isActive('/dashboard')} />
-        {currentPartner?.testPassed ? (
-          <>
-            <NavItem
-              href="/dashboard/certificate"
-              icon={FileText}
-              label="Сертификат"
-              isActive={isActive('/dashboard/certificate')}
-            />
-            <NavItem
-              href="/dashboard/clients"
-              icon={Users}
-              label="Мои клиенты"
-              isActive={isActive('/dashboard/clients')}
-            />
-            <NavItem
-              href="/dashboard/referrals"
-              icon={UserPlus}
-              label="Рефералы"
-              isActive={isActive('/dashboard/referrals')}
-            />
-          </>
-        ) : (
-          <NavItem
-            href="/dashboard/test"
-            icon={FileText}
-            label="Пройти тест"
-            isActive={isActive('/dashboard/test')}
-          />
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-brand to-cyan-400 rounded-xl flex items-center justify-center">
+            <span className="text-gray-900 font-black text-lg">S3</span>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">S3 Partners</h2>
+            <p className="text-sm text-gray-600">Партнерский портал</p>
+          </div>
+        </div>
+        
+        {currentPartner && (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-900">{currentPartner.companyName}</p>
+            <p className="text-xs text-gray-600">{currentPartner.contactPerson}</p>
+          </div>
         )}
-      </nav>
-
-      <div className="mt-auto pt-12">
-        <Button
-          variant="ghost"
-          className="flex w-full items-center gap-x-2 text-red-600 hover:bg-red-50 hover:text-red-700"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5" />
-          <span>Выйти</span>
-        </Button>
       </div>
-    </div>
+
+      <ul className="space-y-2">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <li key={item.path}>
+              <Link
+                to={item.path}
+                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                  isActive(item.path)
+                    ? 'bg-brand text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                {isActive(item.path) && <ChevronRight className="h-4 w-4" />}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 };
 

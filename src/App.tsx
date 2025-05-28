@@ -15,6 +15,7 @@ import PartnerTestPage from "./pages/PartnerTestPage";
 import PartnersPage from "./pages/PartnersPage";
 import ClientsPage from "./pages/ClientsPage";
 import ReferralsPage from "./pages/ReferralsPage";
+import CommissionsReportPage from "./pages/CommissionsReportPage";
 import AddPartnerPage from "./pages/AddPartnerPage";
 import EditPartnerPage from "./pages/EditPartnerPage";
 import AdminPage from "./pages/AdminPage";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/dashboard/certificate" element={<PartnerCertificatePage />} />
             <Route path="/dashboard/test" element={<PartnerTestPage />} />
             <Route path="/dashboard/clients" element={<ClientsPage />} />
+            <Route path="/dashboard/commissions" element={<CommissionsReportPage />} />
             <Route path="/dashboard/referrals" element={<ReferralsPage />} />
             <Route path="/certificate/:id" element={<CertificatePage />} />
             <Route path="/partners" element={<PartnersPage />} />
