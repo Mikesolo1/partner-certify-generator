@@ -54,7 +54,7 @@ const DashboardNav = () => {
           {currentPartner?.companyName || 'Личный кабинет'}
         </h2>
         <p className="text-sm text-gray-500">
-          Уровень: {currentPartner?.partnerLevel || '-'}
+          Партнер S3
         </p>
       </div>
 

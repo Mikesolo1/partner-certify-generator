@@ -1,26 +1,20 @@
 
 import React from 'react';
-import { Partner } from '@/types';
 
 interface DashboardHeaderProps {
   contactPersonName: string;
-  currentPartnerLevel: string;
+  currentPartnerLevel?: string; // Делаем опциональным, так как больше не используем уровни
 }
 
-const DashboardHeader = ({ contactPersonName, currentPartnerLevel }: DashboardHeaderProps) => {
+const DashboardHeader = ({ contactPersonName }: DashboardHeaderProps) => {
   return (
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold mb-2">
+    <div className="mb-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">
         Добро пожаловать, {contactPersonName}!
       </h1>
-      <div className="flex items-center gap-2">
-        <span className="text-gray-600">
-          Ваш партнерский уровень: 
-        </span>
-        <span className="font-semibold">
-          {currentPartnerLevel}
-        </span>
-      </div>
+      <p className="text-gray-600">
+        Управляйте своими клиентами и отслеживайте комиссионные выплаты
+      </p>
     </div>
   );
 };

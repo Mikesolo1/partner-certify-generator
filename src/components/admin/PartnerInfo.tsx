@@ -65,6 +65,22 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
     return roleConfig[role as keyof typeof roleConfig] || { variant: "default" as const, className: "bg-gray-600", children: role };
   };
 
+  const getYearsOfPartnership = (joinDate: string) => {
+    const now = new Date();
+    const join = new Date(joinDate);
+    const years = now.getFullYear() - join.getFullYear();
+    return Math.max(0, years);
+  };
+
+  const getCommissionRate = (yearsOfPartnership: number) => {
+    if (yearsOfPartnership === 0) return "50%";
+    if (yearsOfPartnership === 1) return "30%";
+    return "10%";
+  };
+
+  const yearsOfPartnership = getYearsOfPartnership(partner.joinDate || partner.join_date || '');
+  const currentCommissionRate = getCommissionRate(yearsOfPartnership);
+
   return (
     <Card>
       <CardHeader>
@@ -89,14 +105,14 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
             <p className="font-medium">{partner.phone || 'Не указан'}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Уровень партнера</p>
-            <p className="font-medium">{partner.partnerLevel || partner.partner_level}</p>
-          </div>
-          <div>
             <p className="text-sm text-gray-600">Дата присоединения</p>
             <p className="font-medium">
               {new Date(partner.joinDate || partner.join_date || '').toLocaleDateString('ru-RU')}
             </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Год партнерства</p>
+            <p className="font-medium">{yearsOfPartnership + 1}-й год</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Статус теста</p>
@@ -107,8 +123,8 @@ export const PartnerInfo: React.FC<PartnerInfoProps> = ({ partner }) => {
             <Badge {...getRoleBadge(partner.role || 'partner')} />
           </div>
           <div>
-            <p className="text-sm text-gray-600">Комиссия</p>
-            <p className="font-medium">{partner.commission || 0}%</p>
+            <p className="text-sm text-gray-600">Текущая комиссия</p>
+            <p className="font-medium text-green-600">{currentCommissionRate}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">ID сертификата</p>

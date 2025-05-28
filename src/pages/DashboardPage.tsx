@@ -138,14 +138,12 @@ const DashboardPage = () => {
   const totalCommission = paidCommission + pendingCommission;
   const clientCount = clients.length || 0;
   const contactPersonName = currentPartner.contactPerson || currentPartner.contact_person || 'партнер';
-  const currentPartnerLevel = currentPartner.partnerLevel || currentPartner.partner_level || 'Бронзовый';
   const testPassed = currentPartner.testPassed || currentPartner.test_passed || false;
   
   return (
     <DashboardLayout>
       <DashboardHeader 
         contactPersonName={contactPersonName}
-        currentPartnerLevel={currentPartnerLevel}
       />
       
       <DashboardStatistics

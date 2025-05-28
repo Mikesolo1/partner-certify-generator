@@ -112,14 +112,12 @@ export type Database = {
       partners: {
         Row: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -131,14 +129,12 @@ export type Database = {
         }
         Insert: {
           certificate_id?: string | null
-          commission?: number | null
           company_name: string
           contact_person: string
           created_at?: string | null
           email: string
           id?: string
           join_date?: string | null
-          partner_level: string
           password: string
           phone?: string
           referral_access_enabled?: boolean | null
@@ -150,14 +146,12 @@ export type Database = {
         }
         Update: {
           certificate_id?: string | null
-          commission?: number | null
           company_name?: string
           contact_person?: string
           created_at?: string | null
           email?: string
           id?: string
           join_date?: string | null
-          partner_level?: string
           password?: string
           phone?: string
           referral_access_enabled?: boolean | null
@@ -448,14 +442,12 @@ export type Database = {
         Args: { p_partner_id: string }
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -535,14 +527,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -621,14 +611,12 @@ export type Database = {
         Args: { p_email: string; p_password: string }
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -643,14 +631,12 @@ export type Database = {
         Args: { p_id: string }
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -726,14 +712,12 @@ export type Database = {
         Args: { p_partner_id: string }
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null
@@ -774,16 +758,21 @@ export type Database = {
               p_phone?: string
               p_referral_code?: string
             }
+          | {
+              p_company_name: string
+              p_contact_person: string
+              p_email: string
+              p_password: string
+              p_phone?: string
+            }
         Returns: {
           certificate_id: string | null
-          commission: number | null
           company_name: string
           contact_person: string
           created_at: string | null
           email: string
           id: string
           join_date: string | null
-          partner_level: string
           password: string
           phone: string
           referral_access_enabled: boolean | null

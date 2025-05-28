@@ -1,3 +1,4 @@
+
 import { Client, Payment } from '@/types';
 import * as api from '@/api/partnersApi';
 import { useToast } from '@/hooks/use-toast';
@@ -105,14 +106,10 @@ export const useClientManagement = (currentPartner: any = null) => {
           }
         : payment;
       
-      // Добавляем комиссию в зависимости от уровня партнера
-      const commission = currentPartner?.commission || 0;
-      const commissionAmount = paymentData.amount * (commission / 100);
-      
       const fullPaymentData = {
         ...paymentData,
         client_id: clientId,
-        commission_amount: commissionAmount,
+        commission_amount: 0, // Будет рассчитано на бэкенде по новой логике
         status: paymentData.status || "оплачено"
       };
       
@@ -127,7 +124,7 @@ export const useClientManagement = (currentPartner: any = null) => {
       
       toast({
         title: "Платеж добавлен",
-        description: `Платеж на сумму ${paymentData.amount} успешно добавлен. Ваша комиссия: ${commissionAmount.toFixed(2)}.`,
+        description: `Платеж на сумму ${paymentData.amount} успешно добавлен.`,
       });
       
       return newPayment;
