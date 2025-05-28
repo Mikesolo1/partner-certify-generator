@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -67,10 +68,13 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				certificate: {
-					blue: 'rgb(98, 207, 214)', // Переопределяем старый
-					darkBlue: '#1E40AF',
+					blue: 'rgb(98, 207, 214)',
+					darkBlue: '#1E3A8A',
+					lightBlue: '#3B82F6',
 					gold: '#F59E0B',
 					lightGold: '#FBBF24',
+					navy: '#1E40AF',
+					deepBlue: '#1E3A8A',
 				},
         text: {
           primary: '#000000',
