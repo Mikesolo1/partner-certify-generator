@@ -5,4 +5,3 @@ export * from './Payment';
 export * from './TestQuestion';
 export * from './PartnerLevel';
 export * from './Notification';
-export * from './PartnerLevelData';
