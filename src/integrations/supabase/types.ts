@@ -849,6 +849,10 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      update_partner_referral_access: {
+        Args: { p_partner_id: string; p_referral_access_enabled: boolean }
+        Returns: boolean
+      }
       update_partner_referral_code: {
         Args: { p_partner_id: string }
         Returns: string

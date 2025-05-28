@@ -30,7 +30,9 @@ export const usePartnersData = () => {
         commission: p.commission,
         role: p.role,
         phone: p.phone || '', // Include phone with fallback
-        referralAccessEnabled: p.referral_access_enabled || false
+        referralAccessEnabled: p.referral_access_enabled || false,
+        referrerId: p.referrer_id,
+        referralCode: p.referral_code
       }));
       
       setPartners(formattedPartners);
@@ -57,7 +59,9 @@ export const usePartnersData = () => {
       const completePartner: Partner = {
         ...newPartner,
         phone: newPartner.phone || '',
-        referralAccessEnabled: newPartner.referral_access_enabled || false
+        referralAccessEnabled: newPartner.referral_access_enabled || false,
+        referrerId: newPartner.referrer_id,
+        referralCode: newPartner.referral_code
       };
       setPartners((prev) => [...prev, completePartner]);
       return completePartner;
@@ -74,7 +78,9 @@ export const usePartnersData = () => {
       const completePartner: Partner = {
         ...updated,
         phone: updated.phone || '',
-        referralAccessEnabled: updated.referral_access_enabled || false
+        referralAccessEnabled: updated.referral_access_enabled || false,
+        referrerId: updated.referrer_id,
+        referralCode: updated.referral_code
       };
       setPartners(prev => prev.map(partner => partner.id === id ? completePartner : partner));
       return completePartner;
