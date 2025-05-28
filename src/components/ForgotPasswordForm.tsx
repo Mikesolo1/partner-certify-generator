@@ -39,8 +39,9 @@ const ForgotPasswordForm = () => {
       setIsLoading(true);
       console.log("Requesting password reset for email:", data.email);
       
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      // Используем нашу Edge Function для отправки письма восстановления
+      const { data: result, error } = await supabase.functions.invoke('send-password-reset', {
+        body: { email: data.email }
       });
       
       if (error) {
