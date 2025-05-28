@@ -29,14 +29,14 @@ const FinalCTASection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
-            <Link to="/register">
-              <Button size="lg" className="w-full sm:w-auto bg-white text-brand hover:bg-gray-100 text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 shadow-lg group font-semibold">
+            <Link to="/register" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full bg-white text-brand hover:bg-gray-100 text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 shadow-lg group font-semibold">
                 Присоединиться к программе
                 <ArrowRight className="ml-2 h-4 w-4 lg:h-5 lg:w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link to="/login">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 backdrop-blur-sm">
+            <Link to="/login" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 backdrop-blur-sm">
                 Уже партнер? Войти
               </Button>
             </Link>

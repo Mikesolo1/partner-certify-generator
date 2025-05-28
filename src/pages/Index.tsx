@@ -8,6 +8,7 @@ import CompanySection from '@/components/landing/CompanySection';
 import BenefitsSection from '@/components/landing/BenefitsSection';
 import PartnerBenefitsSection from '@/components/landing/PartnerBenefitsSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
@@ -23,6 +24,8 @@ const Index = () => {
         <PartnerBenefitsSection />
         <FinalCTASection />
       </main>
+
+      <Footer />
     </div>
   );
 };
