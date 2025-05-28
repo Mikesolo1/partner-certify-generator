@@ -29,7 +29,8 @@ export const usePartnersData = () => {
         testPassed: p.test_passed,
         commission: p.commission,
         role: p.role,
-        phone: p.phone || '' // Include phone with fallback
+        phone: p.phone || '', // Include phone with fallback
+        referralAccessEnabled: p.referral_access_enabled || false
       }));
       
       setPartners(formattedPartners);
@@ -55,7 +56,8 @@ export const usePartnersData = () => {
       // Ensure newPartner has all required fields including phone
       const completePartner: Partner = {
         ...newPartner,
-        phone: newPartner.phone || ''
+        phone: newPartner.phone || '',
+        referralAccessEnabled: newPartner.referral_access_enabled || false
       };
       setPartners((prev) => [...prev, completePartner]);
       return completePartner;
@@ -71,7 +73,8 @@ export const usePartnersData = () => {
       // Ensure updated partner has all required fields including phone
       const completePartner: Partner = {
         ...updated,
-        phone: updated.phone || ''
+        phone: updated.phone || '',
+        referralAccessEnabled: updated.referral_access_enabled || false
       };
       setPartners(prev => prev.map(partner => partner.id === id ? completePartner : partner));
       return completePartner;

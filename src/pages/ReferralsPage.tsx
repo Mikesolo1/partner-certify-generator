@@ -26,6 +26,20 @@ const ReferralsPage = () => {
     );
   }
 
+  // Проверяем доступ к реферальной программе
+  if (!currentPartner.referralAccessEnabled && !currentPartner.referral_access_enabled) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-4">Доступ к реферальной программе ограничен</h1>
+          <p className="text-gray-600 mb-8">
+            Доступ к реферальной программе управляется администратором. Обратитесь к администратору для получения доступа.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-8">

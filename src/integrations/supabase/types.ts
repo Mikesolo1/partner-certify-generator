@@ -122,6 +122,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -140,6 +141,7 @@ export type Database = {
           partner_level: string
           password: string
           phone?: string
+          referral_access_enabled?: boolean | null
           referral_code?: string | null
           referrer_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -158,6 +160,7 @@ export type Database = {
           partner_level?: string
           password?: string
           phone?: string
+          referral_access_enabled?: boolean | null
           referral_code?: string | null
           referrer_id?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -222,6 +225,7 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          partnership_year: number | null
           payment_destination: string | null
           status: string
           tariff_end_date: string | null
@@ -237,6 +241,7 @@ export type Database = {
           created_by?: string | null
           date?: string | null
           id?: string
+          partnership_year?: number | null
           payment_destination?: string | null
           status: string
           tariff_end_date?: string | null
@@ -252,6 +257,7 @@ export type Database = {
           created_by?: string | null
           date?: string | null
           id?: string
+          partnership_year?: number | null
           payment_destination?: string | null
           status?: string
           tariff_end_date?: string | null
@@ -379,6 +385,7 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          partnership_year: number | null
           payment_destination: string | null
           status: string
           tariff_end_date: string | null
@@ -406,12 +413,21 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          partnership_year: number | null
           payment_destination: string | null
           status: string
           tariff_end_date: string | null
           tariff_start_date: string | null
           updated_at: string | null
         }
+      }
+      calculate_commission_by_year: {
+        Args: { p_amount: number; p_partnership_year: number }
+        Returns: number
+      }
+      calculate_partnership_year: {
+        Args: { p_partner_id: string; p_payment_date: string }
+        Returns: number
       }
       calculate_referral_commission: {
         Args: { p_payment_id: string }
@@ -442,6 +458,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -528,6 +545,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -546,6 +564,7 @@ export type Database = {
           created_by: string | null
           date: string | null
           id: string
+          partnership_year: number | null
           payment_destination: string | null
           status: string
           tariff_end_date: string | null
@@ -612,6 +631,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -633,6 +653,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -715,6 +736,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -764,6 +786,7 @@ export type Database = {
           partner_level: string
           password: string
           phone: string
+          referral_access_enabled: boolean | null
           referral_code: string | null
           referrer_id: string | null
           role: Database["public"]["Enums"]["user_role"] | null

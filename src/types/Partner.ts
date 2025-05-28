@@ -22,4 +22,6 @@ export interface Partner {
   referrer_id?: string; // Added for compatibility
   referralCode?: string;
   referral_code?: string; // Added for compatibility
+  referralAccessEnabled?: boolean;
+  referral_access_enabled?: boolean; // Added for compatibility
 }

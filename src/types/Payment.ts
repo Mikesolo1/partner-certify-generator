@@ -14,4 +14,5 @@ export interface Payment {
   tariff_end_date?: string;
   created_by?: string; // Added missing field for admin who created the payment
   commission_paid?: boolean; // Flag indicating if commission has been paid to partner
+  partnership_year?: number; // Год партнерства для новой системы комиссий
 }

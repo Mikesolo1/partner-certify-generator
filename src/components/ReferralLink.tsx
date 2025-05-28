@@ -18,8 +18,8 @@ const ReferralLink = () => {
   useEffect(() => {
     if (currentPartner?.referralCode || currentPartner?.referral_code) {
       setReferralCode(currentPartner.referralCode || currentPartner.referral_code || '');
-    } else if (currentPartner?.id && currentPartner?.testPassed) {
-      // Генерируем реферальный код если его нет
+    } else if (currentPartner?.id && currentPartner?.testPassed && (currentPartner?.referralAccessEnabled || currentPartner?.referral_access_enabled)) {
+      // Генерируем реферальный код если его нет и есть доступ
       generateCode();
     }
   }, [currentPartner]);
@@ -72,7 +72,8 @@ const ReferralLink = () => {
     }
   };
 
-  if (!currentPartner?.testPassed) {
+  // Проверяем доступ к реферальной программе
+  if (!currentPartner?.testPassed || (!currentPartner?.referralAccessEnabled && !currentPartner?.referral_access_enabled)) {
     return null;
   }
 

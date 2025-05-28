@@ -1,165 +1,298 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Award, ArrowRight, Users, FileText, Shield, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import PartnerLevelsSection from '@/components/PartnerLevelsSection';
 
-const PartnerProgramSection = () => (
-  <section className="py-16 bg-white">
-    <div className="container mx-auto px-4 max-w-4xl">
-      <h2 className="text-3xl font-bold mb-8 text-center text-black">Партнёрская программа S3</h2>
-      <div className="space-y-6 text-lg text-gray-800">
-        <p>
-          Присоединяйтесь к партнёрской программе официального интегратора WABA (WhatsApp Business API) – компании S3 Tech!
-        </p>
-        <ul className="mb-3 list-disc ml-8">
-          <li>Получайте до 20% комиссии от платежей ваших клиентов — вывод в любой момент.</li>
-          <li>Доступ к персональному кабинету для управления клиентами и отслеживания выплат.</li>
-          <li>Официальный именной сертификат партнёра WABA — доступен после онлайн-теста.</li>
-          <li>Помощь персонального менеджера и техническая поддержка для вас и ваших клиентов.</li>
-          <li>Разные уровни партнёрства: от Бронзового до Платинового, бонусы за активность!</li>
-        </ul>
-        <p>
-          <span className="font-semibold text-certificate-blue">Как стать партнёром:</span><br />
-          1. Зарегистрируйтесь на сайте.<br />
-          2. Пройдите короткий сертификационный тест.<br />
-          3. Получите доступ к сертификату и начните подключать клиентов к сервису WhatsApp Business API!
-        </p>
-        <p>
-          <span className="font-semibold text-certificate-blue">Условия:</span> Партнёром может стать любая компания или индивидуальный предприниматель, сотрудничающий с бизнес-клиентами.
-        </p>
-        <p>
-          <a href="https://s3-tech.ru/partner-program" target="_blank" rel="noopener noreferrer" className="underline text-certificate-darkBlue font-medium hover:opacity-80">Подробнее о программе на официальном сайте S3 →</a>
-        </p>
-      </div>
-    </div>
-  </section>
-);
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Users, Award, TrendingUp, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Index = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
-      
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Hero Section */}
-      <section className="bg-brand/10 text-black py-16 relative overflow-hidden">
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-black">Официальный интегратор WhatsApp Business API</h1>
-            <p className="text-lg md:text-xl mb-8 text-gray-800">
-              Автоматизируйте общение с клиентами через WhatsApp и повышайте эффективность вашего бизнеса
+      <div className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Партнерская программа
+              <span className="text-blue-600 block">WhatsApp Business API</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Присоединяйтесь к нашей партнерской программе и зарабатывайте до 50% с каждого клиента. 
+              Предоставляем лучшие условия для работы с WhatsApp Business API.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button 
-                onClick={() => navigate('/register')}
-                className="bg-brand text-white hover:bg-brand/90 font-medium text-lg px-8 py-6"
-              >
-                Стать партнером
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+                <Link to="/register">
+                  Стать партнером <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/login')}
-                className="bg-transparent text-black border-brand hover:bg-brand/10"
-              >
-                Войти
+              <Button asChild variant="outline" size="lg">
+                <Link to="/login">
+                  Войти в кабинет
+                </Link>
               </Button>
             </div>
           </div>
         </div>
-      </section>
-      
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-black">Преимущества работы с нами</h2>
+      </div>
+
+      {/* Commission Structure */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              💰 Новая система комиссий WABA
+            </h2>
+            <p className="text-xl text-gray-600">
+              Приведите клиента с WhatsApp Business API и зарабатывайте долгосрочно
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="text-center">
+              <CardHeader>
+                <CardTitle className="text-2xl text-blue-600">1-й год</CardTitle>
+                <CardDescription className="text-lg font-semibold">50% комиссия</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Максимальный доход в первый год сотрудничества</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader>
+                <CardTitle className="text-2xl text-green-600">2-й год</CardTitle>
+                <CardDescription className="text-lg font-semibold">30% комиссия</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Стабильный доход во второй год</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader>
+                <CardTitle className="text-2xl text-purple-600">3+ год</CardTitle>
+                <CardDescription className="text-lg font-semibold">10% комиссия</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Пассивный доход с третьего года</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Income Example */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
+            <h3 className="text-2xl font-bold text-center mb-6">💡 Пример дохода с одного клиента</h3>
+            <div className="max-w-2xl mx-auto">
+              <p className="text-center text-gray-700 mb-6">
+                Если у клиента база 10 000 контактов, он платит около <strong>28 000 ₽ в месяц</strong>
+              </p>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-4 bg-white rounded-lg">
+                  <span>1-й год (50%):</span>
+                  <span className="font-bold text-blue-600">168 000 ₽</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-white rounded-lg">
+                  <span>2-й год (30%):</span>
+                  <span className="font-bold text-green-600">100 800 ₽</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-white rounded-lg">
+                  <span>3-й год (10%):</span>
+                  <span className="font-bold text-purple-600">33 600 ₽</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-900 text-white rounded-lg">
+                  <span className="text-lg">🟢 Итого за 3 года:</span>
+                  <span className="font-bold text-xl">302 400 ₽</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Why S3 Section */}
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              📦 Почему клиенты выбирают S3
+            </h2>
+          </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition hover:scale-105 border-l-4 border-brand text-center">
-              <div className="bg-brand/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-brand" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-black">Официальная интеграция</h3>
-              <p className="text-gray-700">
-                Мы являемся официальным интегратором WhatsApp Business API, что гарантирует полное соответствие правилам и требованиям платформы.
-              </p>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                  Без комиссии за сообщения
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Оплата только за количество уникальных контактов, с которыми была коммуникация за последние 30 дней. 
+                  Никаких дополнительных комиссий за отправленные сообщения.
+                </p>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition hover:scale-105 border-l-4 border-brand text-center">
-              <div className="bg-brand/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Award className="h-8 w-8 text-brand" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-black">Выгодная партнерская программа</h3>
-              <p className="text-gray-700">
-                Получайте комиссию от платежей привлеченных клиентов и повышайте свой партнерский статус для увеличения дохода.
-              </p>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-6 w-6 text-blue-600" />
+                  Минимум риска блокировок
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Мы оптимизируем шаблоны, следим за качеством рассылок и правильно ведём прогрев аккаунта. 
+                  Это значительно снижает риски блокировок.
+                </p>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition hover:scale-105 border-l-4 border-brand text-center">
-              <div className="bg-brand/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-brand" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-black">Техническая поддержка</h3>
-              <p className="text-gray-700">
-                Наша команда экспертов помогает с настройкой и интеграцией WhatsApp Business API для ваших клиентов.
-              </p>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-6 w-6 text-purple-600" />
+                  Полная поддержка аккаунтов
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Можем закрыть любой вопрос с аккаунтом — в том числе быстро заменить или перезапустить 
+                  WABA в случае блокировки.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </section>
-      
-      {/* Уровни партнерства */}
-      <PartnerLevelsSection />
-      
-      <PartnerProgramSection />
-      
-      {/* About Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6 text-center text-black">О компании S3 Tech</h2>
-            <p className="text-lg text-gray-800 mb-6">
-              S3 Tech – лидер в сфере интеграции WhatsApp Business API. Мы помогаем компаниям автоматизировать коммуникацию с клиентами через самый популярный мессенджер в мире.
-            </p>
-            <p className="text-lg text-gray-800 mb-6">
-              Как официальный интегратор WABA (WhatsApp Business API), мы предоставляем полный спектр услуг по настройке и оптимизации бизнес-аккаунта WhatsApp для эффективного взаимодействия с клиентами.
-            </p>
-            <p className="text-lg text-gray-800">
-              Наша миссия – сделать коммуникацию бизнеса с клиентами максимально эффективной и удобной через инновационные технологии обмена сообщениями.
+      </div>
+
+      {/* Features Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Преимущества партнерства
+            </h2>
+            <p className="text-xl text-gray-600">
+              Все инструменты для успешного развития бизнеса
             </p>
           </div>
-        </div>
-      </section>
-      
-      {/* Call to Action */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6 text-black">Присоединяйтесь к партнерской программе</h2>
-            <p className="text-lg text-gray-800 mb-8">
-              Начните зарабатывать на интеграции WhatsApp Business API уже сегодня
-            </p>
-            <Button 
-              onClick={() => navigate('/register')}
-              className="bg-brand text-white font-medium text-lg px-8 py-6 hover:bg-brand/90"
-            >
-              Зарегистрироваться как партнер
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                  Высокие комиссии
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  До 50% комиссии с каждого клиента в первый год. Долгосрочное партнерство с растущим доходом.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-6 w-6 text-blue-600" />
+                  Реферальная программа
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Приглашайте новых партнеров и получайте дополнительный доход от их деятельности.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-6 w-6 text-purple-600" />
+                  Профессиональная сертификация
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Получите официальный сертификат партнера после прохождения обучения и тестирования.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-6 w-6 text-green-600" />
+                  Техническая поддержка
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Полная техническая поддержка клиентов и помощь в решении любых вопросов по интеграции.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                  Удобный личный кабинет
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Отслеживайте клиентов, платежи и комиссии в удобном интерфейсе партнерского портала.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-6 w-6 text-purple-600" />
+                  Маркетинговые материалы
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Готовые презентации, кейсы и материалы для работы с клиентами и продвижения услуг.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </section>
-      
+      </div>
+
+      {/* CTA Section */}
+      <div className="py-16 bg-blue-600">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Готовы начать зарабатывать?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Присоединяйтесь к нашей партнерской программе уже сегодня и начните получать высокие комиссии
+          </p>
+          <Button asChild size="lg" variant="secondary">
+            <Link to="/register">
+              Стать партнером <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+
       {/* Footer */}
-      <footer className="bg-white text-black py-8 mt-auto">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="font-bold text-2xl text-black">S3</div>
-            <div className="ml-2 text-xl font-medium text-gray-800">Tech</div>
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-400">
+              © 2024 S3 WhatsApp Business API. Все права защищены.
+            </p>
           </div>
-          <p className="text-gray-800">&copy; {new Date().getFullYear()} S3 Tech. Официальный интегратор WhatsApp Business API.</p>
         </div>
       </footer>
     </div>
