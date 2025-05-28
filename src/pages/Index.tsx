@@ -14,7 +14,7 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header />
       
-      <div>
+      <main>
         <HeroSection />
         <WabaInfoSection />
         <CommissionSection />
@@ -22,7 +22,7 @@ const Index = () => {
         <BenefitsSection />
         <PartnerBenefitsSection />
         <FinalCTASection />
-      </div>
+      </main>
     </div>
   );
 };
