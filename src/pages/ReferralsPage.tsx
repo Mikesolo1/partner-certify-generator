@@ -26,14 +26,19 @@ const ReferralsPage = () => {
     );
   }
 
-  // Проверяем доступ к реферальной программе
-  if (!currentPartner.referralAccessEnabled && !currentPartner.referral_access_enabled) {
+  // Проверяем доступ к реферальной программе - используем оба поля для совместимости
+  const hasReferralAccess = currentPartner.referralAccessEnabled || currentPartner.referral_access_enabled;
+  
+  if (!hasReferralAccess) {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Доступ к реферальной программе ограничен</h1>
           <p className="text-gray-600 mb-8">
             Доступ к реферальной программе управляется администратором. Обратитесь к администратору для получения доступа.
+          </p>
+          <p className="text-sm text-gray-500">
+            Текущий статус доступа: {hasReferralAccess ? 'Разрешен' : 'Ограничен'}
           </p>
         </div>
       </DashboardLayout>

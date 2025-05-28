@@ -17,7 +17,10 @@ const ReferralsList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentPartner?.id && currentPartner?.testPassed && (currentPartner?.referralAccessEnabled || currentPartner?.referral_access_enabled)) {
+    // Проверяем доступ к реферальной программе - используем оба поля
+    const hasReferralAccess = currentPartner?.referralAccessEnabled || currentPartner?.referral_access_enabled;
+    
+    if (currentPartner?.id && currentPartner?.testPassed && hasReferralAccess) {
       fetchReferralsData();
     }
   }, [currentPartner]);
@@ -51,8 +54,10 @@ const ReferralsList = () => {
     .filter(comm => comm.paid_at)
     .reduce((sum, comm) => sum + comm.commission_amount, 0);
 
-  // Проверяем доступ к реферальной программе
-  if (!currentPartner?.testPassed || (!currentPartner?.referralAccessEnabled && !currentPartner?.referral_access_enabled)) {
+  // Проверяем доступ к реферальной программе - используем оба поля
+  const hasReferralAccess = currentPartner?.referralAccessEnabled || currentPartner?.referral_access_enabled;
+  
+  if (!currentPartner?.testPassed || !hasReferralAccess) {
     return null;
   }
 

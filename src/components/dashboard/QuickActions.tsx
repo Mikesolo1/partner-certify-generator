@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, Users, Award, Star, UserPlus } from 'lucide-react';
+import { usePartners } from '@/contexts/PartnersContext';
 
 interface QuickActionsProps {
   testPassed: boolean;
@@ -10,6 +11,11 @@ interface QuickActionsProps {
 }
 
 const QuickActions = ({ testPassed, showLevelUpHint }: QuickActionsProps) => {
+  const { currentPartner } = usePartners();
+  
+  // Проверяем доступ к реферальной программе
+  const hasReferralAccess = currentPartner?.referralAccessEnabled || currentPartner?.referral_access_enabled;
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -51,18 +57,21 @@ const QuickActions = ({ testPassed, showLevelUpHint }: QuickActionsProps) => {
               </Button>
             </Link>
 
-            <Link to="/dashboard/referrals">
-              <Button
-                variant="outline"
-                className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
-              >
-                <UserPlus className="h-8 w-8 mb-2 text-brand" />
-                <div>
-                  <p className="font-medium">Рефералы</p>
-                  <p className="text-xs text-gray-500">Реферальная программа</p>
-                </div>
-              </Button>
-            </Link>
+            {/* Показываем кнопку рефералов только если есть доступ */}
+            {hasReferralAccess && (
+              <Link to="/dashboard/referrals">
+                <Button
+                  variant="outline"
+                  className="h-auto w-full py-4 px-6 flex flex-col items-center justify-center text-left border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand/5"
+                >
+                  <UserPlus className="h-8 w-8 mb-2 text-brand" />
+                  <div>
+                    <p className="font-medium">Рефералы</p>
+                    <p className="text-xs text-gray-500">Реферальная программа</p>
+                  </div>
+                </Button>
+              </Link>
+            )}
           </>
         ) : (
           <Link to="/dashboard/test">
