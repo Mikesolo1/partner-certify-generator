@@ -17,11 +17,17 @@ const Index = () => {
       
       <main className="overflow-hidden">
         <HeroSection />
-        <WabaInfoSection />
-        <CommissionSection />
-        <CompanySection />
-        <BenefitsSection />
-        <PartnerBenefitsSection />
+        <div id="about">
+          <CompanySection />
+        </div>
+        <div id="services">
+          <WabaInfoSection />
+          <CommissionSection />
+        </div>
+        <div id="benefits">
+          <BenefitsSection />
+          <PartnerBenefitsSection />
+        </div>
         <FinalCTASection />
       </main>
 

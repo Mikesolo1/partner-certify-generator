@@ -39,10 +39,10 @@ const DashboardHeader = () => {
             <div className="text-sm text-gray-600">
               <span className="font-medium">{currentPartner?.companyName}</span>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <a href="tel:+79991234567" className="flex items-center space-x-2 text-sm text-gray-500 hover:text-blue-600 transition-colors">
               <Phone className="h-4 w-4" />
               <span>+7 (999) 123-45-67</span>
-            </div>
+            </a>
             <Button
               variant="ghost"
               size="sm"
@@ -70,10 +70,10 @@ const DashboardHeader = () => {
               <div className="px-2 text-sm">
                 <p className="font-medium text-gray-900">{currentPartner?.companyName}</p>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-500 px-2">
+              <a href="tel:+79991234567" className="flex items-center space-x-2 text-sm text-gray-500 px-2 hover:text-blue-600 transition-colors">
                 <Phone className="h-4 w-4" />
                 <span>+7 (999) 123-45-67</span>
-              </div>
+              </a>
               <div className="pt-4 border-t border-gray-200">
                 <Button
                   variant="ghost"

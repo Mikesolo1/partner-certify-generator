@@ -19,6 +19,14 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
   const menuBorderClass = isDark ? 'border-gray-800' : 'border-gray-200';
   const phoneTextClass = isDark ? 'text-gray-400' : 'text-gray-500';
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
+    }
+  };
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 ${bgClass} border-b shadow-xl`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,13 +41,13 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <a href="#about" className={`${linkTextClass} transition-colors font-medium`}>О компании</a>
-            <a href="#services" className={`${linkTextClass} transition-colors font-medium`}>Услуги</a>
-            <a href="#benefits" className={`${linkTextClass} transition-colors font-medium`}>Преимущества</a>
-            <div className={`flex items-center space-x-2 text-sm ${phoneTextClass}`}>
+            <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium`}>О компании</button>
+            <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium`}>Услуги</button>
+            <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium`}>Преимущества</button>
+            <a href="tel:+79991234567" className={`flex items-center space-x-2 text-sm ${phoneTextClass} hover:text-brand transition-colors`}>
               <Phone className="h-4 w-4" />
               <span>+7 (999) 123-45-67</span>
-            </div>
+            </a>
           </nav>
 
           {/* Desktop CTA */}
@@ -69,13 +77,13 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
         {isMenuOpen && (
           <div className={`lg:hidden py-4 border-t ${menuBorderClass}`}>
             <nav className="flex flex-col space-y-4">
-              <a href="#about" className={`${linkTextClass} transition-colors font-medium px-2`}>О компании</a>
-              <a href="#services" className={`${linkTextClass} transition-colors font-medium px-2`}>Услуги</a>
-              <a href="#benefits" className={`${linkTextClass} transition-colors font-medium px-2`}>Преимущества</a>
-              <div className={`flex items-center space-x-2 text-sm ${phoneTextClass} px-2`}>
+              <button onClick={() => scrollToSection('about')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>О компании</button>
+              <button onClick={() => scrollToSection('services')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Услуги</button>
+              <button onClick={() => scrollToSection('benefits')} className={`${linkTextClass} transition-colors font-medium px-2 text-left`}>Преимущества</button>
+              <a href="tel:+79991234567" className={`flex items-center space-x-2 text-sm ${phoneTextClass} px-2 hover:text-brand transition-colors`}>
                 <Phone className="h-4 w-4" />
                 <span>+7 (999) 123-45-67</span>
-              </div>
+              </a>
               <div className="flex flex-col space-y-2 pt-4">
                 <Link to="/login">
                   <Button variant="ghost" className={`w-full ${linkTextClass} ${buttonHoverClass}`}>

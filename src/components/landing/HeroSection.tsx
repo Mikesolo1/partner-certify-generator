@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -6,7 +5,7 @@ import { CheckCircle, Users, TrendingUp, Shield, Target, Star, ArrowRight, Spark
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+    <section id="hero" className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-brand/20 to-cyan-300/20 rounded-full blur-3xl animate-pulse"></div>
