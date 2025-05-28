@@ -55,22 +55,23 @@ export const usePartnersData = () => {
   const addPartner = async (partner: Partner) => {
     try {
       const newPartner = await api.createPartner(partner);
-      // Convert the API response from snake_case to camelCase
+      // The API response should already be in the correct format
+      // But we ensure all required fields are present with fallbacks
       const completePartner: Partner = {
         id: newPartner.id,
-        companyName: newPartner.company_name || newPartner.companyName,
-        contactPerson: newPartner.contact_person || newPartner.contactPerson,
+        companyName: newPartner.companyName,
+        contactPerson: newPartner.contactPerson,
         email: newPartner.email,
-        partnerLevel: newPartner.partner_level || newPartner.partnerLevel,
-        joinDate: newPartner.join_date || newPartner.joinDate,
-        certificateId: newPartner.certificate_id || newPartner.certificateId,
-        testPassed: newPartner.test_passed || newPartner.testPassed,
+        partnerLevel: newPartner.partnerLevel,
+        joinDate: newPartner.joinDate,
+        certificateId: newPartner.certificateId,
+        testPassed: newPartner.testPassed,
         commission: newPartner.commission,
         role: newPartner.role,
         phone: newPartner.phone || '',
-        referralAccessEnabled: newPartner.referral_access_enabled || newPartner.referralAccessEnabled || false,
-        referrerId: newPartner.referrer_id || newPartner.referrerId,
-        referralCode: newPartner.referral_code || newPartner.referralCode
+        referralAccessEnabled: newPartner.referralAccessEnabled || false,
+        referrerId: newPartner.referrerId,
+        referralCode: newPartner.referralCode
       };
       setPartners((prev) => [...prev, completePartner]);
       return completePartner;
@@ -83,22 +84,23 @@ export const usePartnersData = () => {
   const updatePartner = async (id: string, updatedPartner: Partner) => {
     try {
       const updated = await api.updatePartner(id, updatedPartner);
-      // Convert the API response from snake_case to camelCase
+      // The API response should already be in the correct format
+      // But we ensure all required fields are present with fallbacks
       const completePartner: Partner = {
         id: updated.id,
-        companyName: updated.company_name || updated.companyName,
-        contactPerson: updated.contact_person || updated.contactPerson,
+        companyName: updated.companyName,
+        contactPerson: updated.contactPerson,
         email: updated.email,
-        partnerLevel: updated.partner_level || updated.partnerLevel,
-        joinDate: updated.join_date || updated.joinDate,
-        certificateId: updated.certificate_id || updated.certificateId,
-        testPassed: updated.test_passed || updated.testPassed,
+        partnerLevel: updated.partnerLevel,
+        joinDate: updated.joinDate,
+        certificateId: updated.certificateId,
+        testPassed: updated.testPassed,
         commission: updated.commission,
         role: updated.role,
         phone: updated.phone || '',
-        referralAccessEnabled: updated.referral_access_enabled || updated.referralAccessEnabled || false,
-        referrerId: updated.referrer_id || updated.referrerId,
-        referralCode: updated.referral_code || updated.referralCode
+        referralAccessEnabled: updated.referralAccessEnabled || false,
+        referrerId: updated.referrerId,
+        referralCode: updated.referralCode
       };
       setPartners(prev => prev.map(partner => partner.id === id ? completePartner : partner));
       return completePartner;
