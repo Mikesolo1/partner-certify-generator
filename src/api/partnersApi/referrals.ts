@@ -78,43 +78,54 @@ export const markReferralCommissionsPaid = async (partnerId: string): Promise<vo
 
 export const updatePartnerReferralAccess = async (partnerId: string, enabled: boolean): Promise<Partner> => {
   try {
-    // Сначала обновляем доступ к реферальной программе
-    const { error: updateError } = await supabase.rpc('update_partner_referral_access', {
+    console.log("Calling update_partner_referral_access RPC with:", { partnerId, enabled });
+    
+    // Используем RPC функцию, которая должна вернуть обновленные данные партнера
+    const { data, error } = await supabase.rpc('update_partner_referral_access', {
       p_partner_id: partnerId,
       p_referral_access_enabled: enabled
     });
     
-    if (updateError) throw updateError;
+    if (error) {
+      console.error("RPC Error:", error);
+      throw error;
+    }
     
-    // Затем получаем обновленные данные партнера напрямую из таблицы
-    const { data: partnerData, error: fetchError } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('id', partnerId)
-      .single();
+    console.log("RPC Response:", data);
     
-    if (fetchError) throw fetchError;
+    // Если RPC функция возвращает только boolean, получаем данные партнера отдельно
+    const { data: partnerData, error: fetchError } = await supabase.rpc('get_partner_by_id', {
+      p_id: partnerId
+    });
     
-    if (!partnerData) {
+    if (fetchError) {
+      console.error("Fetch Error:", fetchError);
+      throw fetchError;
+    }
+    
+    if (!partnerData || partnerData.length === 0) {
       throw new Error("Partner not found after update");
     }
     
+    const updatedPartner = partnerData[0];
+    console.log("Fetched updated partner:", updatedPartner);
+    
     // Преобразуем данные в нужный формат
     return {
-      id: partnerData.id,
-      companyName: partnerData.company_name,
-      contactPerson: partnerData.contact_person,
-      email: partnerData.email,
-      partnerLevel: partnerData.partner_level,
-      joinDate: partnerData.join_date,
-      certificateId: partnerData.certificate_id,
-      testPassed: partnerData.test_passed,
-      commission: partnerData.commission,
-      role: partnerData.role,
-      phone: partnerData.phone || '',
-      referrerId: partnerData.referrer_id,
-      referralCode: partnerData.referral_code,
-      referralAccessEnabled: partnerData.referral_access_enabled
+      id: updatedPartner.id,
+      companyName: updatedPartner.company_name,
+      contactPerson: updatedPartner.contact_person,
+      email: updatedPartner.email,
+      partnerLevel: updatedPartner.partner_level,
+      joinDate: updatedPartner.join_date,
+      certificateId: updatedPartner.certificate_id,
+      testPassed: updatedPartner.test_passed,
+      commission: updatedPartner.commission,
+      role: updatedPartner.role,
+      phone: updatedPartner.phone || '',
+      referrerId: updatedPartner.referrer_id,
+      referralCode: updatedPartner.referral_code,
+      referralAccessEnabled: updatedPartner.referral_access_enabled
     };
   } catch (error) {
     console.error("Error updating partner referral access:", error);
