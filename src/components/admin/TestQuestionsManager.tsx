@@ -39,7 +39,7 @@ import { createTestQuestion, updateTestQuestion, deleteTestQuestion } from '@/ap
 interface TestQuestionsManagerProps {
   questions: TestQuestion[];
   onUpdateQuestion: (question: TestQuestion) => void;
-  onCreateQuestion: (question: Omit<TestQuestion, 'id'>) => void;
+  onCreateQuestion: (question: TestQuestion) => void;
   onDeleteQuestion: (id: string) => void;
 }
 
@@ -73,18 +73,38 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
   const handleUpdateQuestion = async () => {
     if (!selectedQuestion) return;
     
+    // Валидация формы
+    if (!formData.question.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Поле вопроса не может быть пустым",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.options.some(option => !option.trim())) {
+      toast({
+        title: "Ошибка",
+        description: "Все варианты ответов должны быть заполнены",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
       const updatedQuestion = await updateTestQuestion(
         selectedQuestion.id,
-        formData.question,
-        formData.options,
+        formData.question.trim(),
+        formData.options.map(opt => opt.trim()),
         formData.correctAnswer
       );
       
       onUpdateQuestion(updatedQuestion);
       setSelectedQuestion(null);
       setIsEditingQuestion(false);
+      resetForm();
       
       toast({
         title: "Вопрос обновлен",
@@ -121,15 +141,34 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
   };
 
   const handleCreateQuestion = async () => {
+    // Валидация формы
+    if (!formData.question.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Поле вопроса не может быть пустым",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.options.some(option => !option.trim())) {
+      toast({
+        title: "Ошибка",
+        description: "Все варианты ответов должны быть заполнены",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const newQuestion = await createTestQuestion(
-        formData.question,
-        formData.options,
+        formData.question.trim(),
+        formData.options.map(opt => opt.trim()),
         formData.correctAnswer
       );
       
-      onCreateQuestion(formData);
+      onCreateQuestion(newQuestion);
       resetForm();
       setIsCreatingQuestion(false);
       
@@ -167,6 +206,19 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
       });
     }
   };
+
+  const handleCreateDialogClose = () => {
+    setIsCreatingQuestion(false);
+    resetForm();
+  };
+
+  const handleEditDialogClose = () => {
+    setIsEditingQuestion(false);
+    setSelectedQuestion(null);
+    resetForm();
+  };
+
+  const isFormValid = formData.question.trim() && formData.options.every(opt => opt.trim());
 
   return (
     <div>
@@ -224,10 +276,10 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setIsCreatingQuestion(false)} variant="outline">Отмена</Button>
+              <Button onClick={handleCreateDialogClose} variant="outline">Отмена</Button>
               <Button 
                 onClick={handleCreateQuestion} 
-                disabled={!formData.question || formData.options.some(o => !o) || isSubmitting}
+                disabled={!isFormValid || isSubmitting}
               >
                 {isSubmitting ? "Создание..." : "Создать"}
               </Button>
@@ -315,10 +367,10 @@ export const TestQuestionsManager: React.FC<TestQuestionsManagerProps> = ({
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button onClick={() => setIsEditingQuestion(false)} variant="outline">Отмена</Button>
+                      <Button onClick={handleEditDialogClose} variant="outline">Отмена</Button>
                       <Button 
                         onClick={handleUpdateQuestion}
-                        disabled={!formData.question || formData.options.some(o => !o) || isSubmitting}
+                        disabled={!isFormValid || isSubmitting}
                       >
                         {isSubmitting ? "Сохранение..." : "Сохранить"}
                       </Button>
