@@ -31,7 +31,6 @@ const WABATrainingPage = () => {
 
   const features = [
     "Верифицированный бизнес-профиль с зеленой галочкой",
-    "Отправка до 1000 бесплатных сообщений в месяц",
     "Шаблоны сообщений для рассылок",
     "Интеграция с CRM и другими системами",
     "Аналитика и отчеты о доставке сообщений",
@@ -45,7 +44,7 @@ const WABATrainingPage = () => {
       tier: "Маркетинговые сообщения",
       description: "Промо-акции, новости, анонсы",
       price: "0.0802$",
-      details: "За каждое сообщение свыше лимита 1000/месяц"
+      details: "За каждое отправленное сообщение"
     },
     {
       tier: "Утилитарные сообщения",
@@ -152,7 +151,7 @@ const WABATrainingPage = () => {
               Тарификация WhatsApp Business API
             </CardTitle>
             <CardDescription>
-              Стоимость для России. Первые 1000 сообщений в месяц - бесплатно
+              Стоимость для России
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -280,13 +279,6 @@ const WABATrainingPage = () => {
                 <h4 className="font-semibold text-green-800">Шаблоны сообщений</h4>
                 <p className="text-green-700 text-sm mt-1">
                   Для рассылок нужно использовать предварительно одобренные шаблоны Meta
-                </p>
-              </div>
-
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h4 className="font-semibold text-purple-800">Бесплатные сообщения</h4>
-                <p className="text-purple-700 text-sm mt-1">
-                  Каждый месяц первые 1000 сообщений любого типа отправляются бесплатно
                 </p>
               </div>
             </div>
