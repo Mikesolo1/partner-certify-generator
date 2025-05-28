@@ -36,7 +36,7 @@ const FinalCTASection = () => {
               </Button>
             </Link>
             <Link to="/login" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 backdrop-blur-sm">
+              <Button size="lg" variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-brand text-base lg:text-lg px-6 lg:px-8 py-3 lg:py-4 backdrop-blur-sm transition-colors">
                 Уже партнер? Войти
               </Button>
             </Link>
