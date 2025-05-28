@@ -495,6 +495,21 @@ export type Database = {
           updated_at: string | null
         }[]
       }
+      create_test_question: {
+        Args: {
+          p_question: string
+          p_options: string
+          p_correct_answer: number
+        }
+        Returns: {
+          correct_answer: number
+          created_at: string | null
+          id: string
+          options: Json
+          question: string
+          updated_at: string | null
+        }[]
+      }
       delete_client: {
         Args: { p_client_id: string }
         Returns: boolean
@@ -859,6 +874,22 @@ export type Database = {
       update_partner_referral_code: {
         Args: { p_partner_id: string }
         Returns: string
+      }
+      update_test_question: {
+        Args: {
+          p_id: string
+          p_question: string
+          p_options: string
+          p_correct_answer: number
+        }
+        Returns: {
+          correct_answer: number
+          created_at: string | null
+          id: string
+          options: Json
+          question: string
+          updated_at: string | null
+        }[]
       }
       validate_referral_code: {
         Args: { p_referral_code: string }

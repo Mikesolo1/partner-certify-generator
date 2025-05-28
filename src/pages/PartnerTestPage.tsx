@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,15 +8,79 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { fetchTestQuestions } from '@/api/partnersApi/testQuestions';
+import { TestQuestion } from '@/types';
 
 const PartnerTestPage = () => {
-  const { testQuestions, currentPartner, completeTest } = usePartners();
+  const { currentPartner, completeTest } = usePartners();
+  const [testQuestions, setTestQuestions] = useState<TestQuestion[]>([]);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Array<number | undefined>>(new Array(testQuestions.length));
+  const [selectedAnswers, setSelectedAnswers] = useState<Array<number | undefined>>([]);
   const [showResults, setShowResults] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Загружаем актуальные вопросы теста при монтировании компонента
+  useEffect(() => {
+    const loadTestQuestions = async () => {
+      try {
+        setIsLoadingQuestions(true);
+        const questions = await fetchTestQuestions();
+        setTestQuestions(questions);
+        setSelectedAnswers(new Array(questions.length));
+      } catch (error) {
+        console.error("Error loading test questions:", error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить вопросы теста",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+
+    loadTestQuestions();
+  }, [toast]);
+
+  if (isLoadingQuestions) {
+    return (
+      <DashboardLayout>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Тест для партнеров S3</h1>
+          <p className="text-gray-600">Загрузка вопросов...</p>
+        </div>
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">Загрузка...</div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
+  if (testQuestions.length === 0) {
+    return (
+      <DashboardLayout>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Тест для партнеров S3</h1>
+          <p className="text-gray-600">Вопросы теста не найдены</p>
+        </div>
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">
+              <p className="text-gray-500 mb-4">Вопросы теста пока не добавлены</p>
+              <Button onClick={() => navigate('/dashboard')}>
+                Вернуться в личный кабинет
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    );
+  }
   
   const currentQuestion = testQuestions[currentQuestionIndex];
   
