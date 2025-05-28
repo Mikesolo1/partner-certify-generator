@@ -17,6 +17,30 @@ export const usePartnerAuth = () => {
   });
   const { toast } = useToast();
 
+  // Обновляем функцию setCurrentPartner, чтобы она также обновляла localStorage
+  const updateCurrentPartner = (partner: Partner | null) => {
+    setCurrentPartner(partner);
+    if (partner) {
+      try {
+        localStorage.setItem('currentPartner', JSON.stringify(partner));
+        console.log("Updated partner data in localStorage:", partner.id);
+      } catch (e) {
+        console.error("Error storing partner data:", e);
+        toast({
+          title: "Предупреждение",
+          description: "Не удалось сохранить данные сессии",
+          variant: "default"
+        });
+      }
+    } else {
+      try {
+        localStorage.removeItem('currentPartner');
+      } catch (e) {
+        console.error("Error removing partner data:", e);
+      }
+    }
+  };
+
   useEffect(() => {
     if (currentPartner) {
       try {
@@ -52,7 +76,7 @@ export const usePartnerAuth = () => {
           ...partner,
           phone: partner.phone || ''
         };
-        setCurrentPartner(completePartner);
+        updateCurrentPartner(completePartner);
         return completePartner;
       }
       
@@ -65,12 +89,12 @@ export const usePartnerAuth = () => {
   };
 
   const logoutPartner = () => {
-    setCurrentPartner(null);
+    updateCurrentPartner(null);
   };
 
   return {
     currentPartner,
-    setCurrentPartner,
+    setCurrentPartner: updateCurrentPartner,
     loginPartner,
     logoutPartner
   };
