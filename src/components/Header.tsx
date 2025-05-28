@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Mail } from 'lucide-react';
+import { usePartners } from '@/contexts/PartnersContext';
 
 interface HeaderProps {
   variant?: 'dark' | 'light';
@@ -11,6 +12,7 @@ interface HeaderProps {
 const Header = ({ variant = 'dark' }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { currentPartner } = usePartners();
 
   const isDark = variant === 'dark';
   const bgClass = isDark ? 'bg-gray-900/95 backdrop-blur-lg border-gray-800' : 'bg-white border-gray-200';
@@ -64,16 +66,31 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="ghost" className={`${linkTextClass} ${buttonHoverClass}`}>
-                Войти
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button className="bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-400 hover:to-brand text-gray-900 font-bold shadow-lg hover:shadow-xl transition-all duration-300">
-                Стать партнером
-              </Button>
-            </Link>
+            {currentPartner ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="ghost" className={`${linkTextClass} ${buttonHoverClass}`}>
+                    Личный кабинет
+                  </Button>
+                </Link>
+                <span className={`text-sm ${linkTextClass}`}>
+                  {currentPartner.companyName}
+                </span>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" className={`${linkTextClass} ${buttonHoverClass}`}>
+                    Войти
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button className="bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-400 hover:to-brand text-gray-900 font-bold shadow-lg hover:shadow-xl transition-all duration-300">
+                    Стать партнером
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -97,16 +114,31 @@ const Header = ({ variant = 'dark' }: HeaderProps) => {
                 <span>+7 (969) 777-62-52</span>
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Link to="/login">
-                  <Button variant="ghost" className={`w-full ${linkTextClass} ${buttonHoverClass}`}>
-                    Войти
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button className="w-full bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-400 hover:to-brand text-gray-900 font-bold">
-                    Стать партнером
-                  </Button>
-                </Link>
+                {currentPartner ? (
+                  <>
+                    <Link to="/dashboard">
+                      <Button variant="ghost" className={`w-full ${linkTextClass} ${buttonHoverClass}`}>
+                        Личный кабинет
+                      </Button>
+                    </Link>
+                    <p className={`text-sm ${linkTextClass} px-2`}>
+                      {currentPartner.companyName}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login">
+                      <Button variant="ghost" className={`w-full ${linkTextClass} ${buttonHoverClass}`}>
+                        Войти
+                      </Button>
+                    </Link>
+                    <Link to="/register">
+                      <Button className="w-full bg-gradient-to-r from-brand to-cyan-400 hover:from-cyan-400 hover:to-brand text-gray-900 font-bold">
+                        Стать партнером
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

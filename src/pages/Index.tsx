@@ -1,6 +1,5 @@
 
-import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
 import { usePartners } from '@/contexts/PartnersContext';
 import Header from '@/components/Header';
 import HeroSection from '@/components/landing/HeroSection';
@@ -13,7 +12,7 @@ import FinalCTASection from '@/components/landing/FinalCTASection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
-  const { currentPartner, loading } = usePartners();
+  const { loading } = usePartners();
 
   // Если идет загрузка, показываем загрузку
   if (loading) {
@@ -24,12 +23,7 @@ const Index = () => {
     );
   }
 
-  // Если пользователь авторизован, перенаправляем на дашборд
-  if (currentPartner) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // Если пользователь не авторизован, показываем лендинг
+  // Показываем лендинг для всех пользователей
   return (
     <div className="min-h-screen bg-white">
       <Header />
