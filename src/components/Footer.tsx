@@ -99,7 +99,7 @@ const Footer = () => {
               © 2024 S3 Partners. Все права защищены.
             </div>
             <div className="flex space-x-6 text-sm">
-              <a href="#privacy" className="text-gray-400 hover:text-brand transition-colors">
+              <a href="https://s3-tech.ru/terms-of-use.pdf" className="text-gray-400 hover:text-brand transition-colors">
                 Политика конфиденциальности
               </a>
               <a href="#terms" className="text-gray-400 hover:text-brand transition-colors">
